@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>People Database - Dennislaw SVD</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS for People Database Page -->
+  <style>
+    :root {
+      --primary-color: #298fca;
+      --secondary-color: #1e6bb8;
+      --accent-color: #f59e0b;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-light: #f8fafc;
+      --bg-white: #ffffff;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-color) !important;
+    }
+
+    .navbar-brand i {
+      margin-right: 0.5rem;
+      color: var(--accent-color);
+    }
+
+    .navbar-nav .nav-link {
+      font-weight: 500;
+      color: var(--text-dark) !important;
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem !important;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+      background: linear-gradient(135deg, #298fca, #1e6bb8);
+      color: white !important;
+      transform: translateY(-2px);
+    }
+
+    .page-header {
+      background: linear-gradient(135deg, #298fca 0%, #1e6bb8 50%, #0f4c75 100%);
+      color: white;
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    .page-header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .page-header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .stats-section {
+      background: var(--bg-white);
+      padding: 4rem 0;
+      margin-top: -2rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .database-info {
+      padding: 4rem 0;
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .info-card h3 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-card p {
+      color: var(--text-light);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .feature-list li:last-child {
+      border-bottom: none;
+    }
+
+    .feature-list i {
+      color: var(--accent-color);
+      width: 20px;
+    }
+
+    .recent-searches {
+      background: var(--bg-white);
+      padding: 4rem 0;
+    }
+
+    .search-item {
+      background: white;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--primary-color);
+      transition: all 0.3s ease;
+    }
+
+    .search-item:hover {
+      transform: translateX(5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .search-query {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .search-meta {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-results {
+      color: var(--text-dark);
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #298fca, #1e6bb8);
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      color: white;
+    }
+
+    .footer {
+      background: var(--text-dark);
+      color: white;
+      padding: 3rem 0 1rem 0;
+      margin-top: 4rem;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h5 {
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .footer-section p, .footer-section a {
+      color: #9ca3af;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .footer-section a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #374151;
+      padding-top: 1rem;
+      text-align: center;
+      color: #9ca3af;
+    }
+
+    .chart-container {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-placeholder {
+      background: var(--bg-light);
+      border: 2px dashed var(--border-color);
+      border-radius: 0.5rem;
+      padding: 3rem;
+      text-align: center;
+      color: var(--text-light);
+    }
+
+    @media (max-width: 768px) {
+      .page-header h1 {
+        font-size: 2.5rem;
+      }
+      
+      .stats-section {
+        margin-top: -1rem;
+      }
+      
+      .search-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Advanced Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-user-search"></i>
+        Dennislaw SVD
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="advanced-search.html"><i class="fas fa-search"></i> Advanced Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="people-database.html"><i class="fas fa-users"></i> People Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html"><i class="fas fa-info-circle"></i> About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1>People Database</h1>
+      <p>Comprehensive database of individuals involved in legal cases across multiple jurisdictions and time periods.</p>
+    </div>
+  </section>
+
+  <!-- Statistics Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-number">500K+</div>
+            <div class="stat-label">People in Database</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-number">2.5M+</div>
+            <div class="stat-label">Case Records</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-number">50+</div>
+            <div class="stat-label">Courts Covered</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-number">25+</div>
+            <div class="stat-label">Years of Data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Database Information Section -->
+  <section class="database-info">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="info-card">
+            <h3><i class="fas fa-database"></i> Database Coverage</h3>
+            <p>Our comprehensive database covers legal cases from multiple jurisdictions including federal, state, and municipal courts across the country.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check"></i> Supreme Court cases (1999-2024)</li>
+              <li><i class="fas fa-check"></i> Court of Appeals decisions</li>
+              <li><i class="fas fa-check"></i> District Court proceedings</li>
+              <li><i class="fas fa-check"></i> State court records</li>
+              <li><i class="fas fa-check"></i> Municipal court cases</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="info-card">
+            <h3><i class="fas fa-shield-alt"></i> Data Quality & Security</h3>
+            <p>We maintain the highest standards of data accuracy and security to ensure reliable search results for legal professionals and researchers.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check"></i> 99.9% accuracy rate</li>
+              <li><i class="fas fa-check"></i> Regular data verification</li>
+              <li><i class="fas fa-check"></i> Secure data transmission</li>
+              <li><i class="fas fa-check"></i> Privacy compliance</li>
+              <li><i class="fas fa-check"></i> Real-time updates</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="info-card">
+            <h3><i class="fas fa-search"></i> Search Capabilities</h3>
+            <p>Advanced search functionality allows users to find people using multiple criteria and filters for precise results.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check"></i> Case title search</li>
+              <li><i class="fas fa-check"></i> Person name search</li>
+              <li><i class="fas fa-check"></i> Date range filtering</li>
+              <li><i class="fas fa-check"></i> Court type filtering</li>
+              <li><i class="fas fa-check"></i> Case type categorization</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="info-card">
+            <h3><i class="fas fa-chart-line"></i> Analytics & Insights</h3>
+            <p>Comprehensive analytics provide insights into case patterns, legal trends, and individual involvement across different types of cases.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check"></i> Case frequency analysis</li>
+              <li><i class="fas fa-check"></i> Legal trend identification</li>
+              <li><i class="fas fa-check"></i> Court performance metrics</li>
+              <li><i class="fas fa-check"></i> Case outcome statistics</li>
+              <li><i class="fas fa-check"></i> Professional network mapping</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Data Visualization Section -->
+  <section class="database-info">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="chart-container">
+            <h3><i class="fas fa-chart-pie"></i> Case Type Distribution</h3>
+            <div class="chart-placeholder">
+              <i class="fas fa-chart-pie" style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-color);"></i>
+              <p>Interactive chart showing distribution of case types in our database</p>
+              <p><strong>Civil:</strong> 45% | <strong>Criminal:</strong> 30% | <strong>Family:</strong> 15% | <strong>Other:</strong> 10%</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="chart-container">
+            <h3><i class="fas fa-chart-bar"></i> Annual Case Volume</h3>
+            <div class="chart-placeholder">
+              <i class="fas fa-chart-bar" style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-color);"></i>
+              <p>Chart showing case volume trends over the past 25 years</p>
+              <p><strong>2024:</strong> 125K cases | <strong>2023:</strong> 118K cases | <strong>2022:</strong> 112K cases</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Searches Section -->
+  <section class="recent-searches">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2>Recent Popular Searches</h2>
+        <p class="text-muted">See what others are searching for in our database</p>
+      </div>
+      
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="search-item">
+            <div class="search-query">Smith v. Johnson (2024)</div>
+            <div class="search-meta">
+              <span><i class="fas fa-calendar"></i> 2 hours ago</span>
+              <span class="search-results"><i class="fas fa-users"></i> 3 people found</span>
+            </div>
+            <a href="people-results.html?query=Smith%20v.%20Johnson%20(2024)" class="btn-primary">View Results</a>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="search-item">
+            <div class="search-query">State v. Brown (2023)</div>
+            <div class="search-meta">
+              <span><i class="fas fa-calendar"></i> 5 hours ago</span>
+              <span class="search-results"><i class="fas fa-users"></i> 2 people found</span>
+            </div>
+            <a href="people-results.html?query=State%20v.%20Brown%20(2023)" class="btn-primary">View Results</a>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="search-item">
+            <div class="search-query">Corporate Inc. v. LLC (2024)</div>
+            <div class="search-meta">
+              <span><i class="fas fa-calendar"></i> 1 day ago</span>
+              <span class="search-results"><i class="fas fa-users"></i> 5 people found</span>
+            </div>
+            <a href="people-results.html?query=Corporate%20Inc.%20v.%20LLC%20(2024)" class="btn-primary">View Results</a>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="search-item">
+            <div class="search-query">Family Law v. Estate (2023)</div>
+            <div class="search-meta">
+              <span><i class="fas fa-calendar"></i> 2 days ago</span>
+              <span class="search-results"><i class="fas fa-users"></i> 4 people found</span>
+            </div>
+            <a href="people-results.html?query=Family%20Law%20v.%20Estate%20(2023)" class="btn-primary">View Results</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-4">
+        <a href="index.html" class="btn-primary">
+          <i class="fas fa-search"></i> Start Your Search
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Advanced Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h5><i class="fas fa-user-search"></i> Dennislaw SVD</h5>
+          <p>Your trusted partner for comprehensive people search and case history discovery.</p>
+        </div>
+        
+        <div class="footer-section">
+          <h5>Quick Links</h5>
+          <a href="index.html">Home</a>
+          <a href="advanced-search.html">Advanced Search</a>
+          <a href="people-database.html">People Database</a>
+          <a href="#">API Documentation</a>
+        </div>
+        
+        <div class="footer-section">
+          <h5>Support</h5>
+          <a href="#">Help Center</a>
+          <a href="contact.html">Contact Support</a>
+          <a href="#">Training Resources</a>
+          <a href="#">FAQ</a>
+        </div>
+        
+        <div class="footer-section">
+          <h5>Connect</h5>
+          <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+          <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
+          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+          <a href="contact.html"><i class="fas fa-envelope"></i> Email</a>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS and Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+  
+  <!-- Custom JavaScript for Database Page -->
+  <script>
+    // Add some interactive animations
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animate stats on scroll
+      const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -100px 0px'
+      };
+
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+
+      // Observe stat cards
+      document.querySelectorAll('.stat-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
+      });
+
+      // Observe info cards
+      document.querySelectorAll('.info-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(-20px)';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
+      });
+    });
+  </script>
+</body>
+</html>

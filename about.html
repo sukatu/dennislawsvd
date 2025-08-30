@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Dennislaw SVD</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS for About Page -->
+  <style>
+    :root {
+      --primary-color: #298fca;
+      --secondary-color: #1e6bb8;
+      --accent-color: #f59e0b;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-light: #f8fafc;
+      --bg-white: #ffffff;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-color) !important;
+    }
+
+    .navbar-brand i {
+      margin-right: 0.5rem;
+      color: var(--accent-color);
+    }
+
+    .navbar-nav .nav-link {
+      font-weight: 500;
+      color: var(--text-dark) !important;
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem !important;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+      background: linear-gradient(135deg, #298fca, #1e6bb8);
+      color: white !important;
+      transform: translateY(-2px);
+    }
+
+    .page-header {
+      background: linear-gradient(135deg, #298fca 0%, #1e6bb8 50%, #0f4c75 100%);
+      color: white;
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    .page-header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .page-header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .about-section {
+      padding: 4rem 0;
+    }
+
+    .about-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 3rem;
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .about-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .about-card h2 {
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .about-card p {
+      color: var(--text-light);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .mission-vision {
+      background: var(--bg-white);
+      padding: 4rem 0;
+    }
+
+    .mission-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+
+    .mission-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .mission-icon {
+      width: 5rem;
+      height: 5rem;
+      background: linear-gradient(135deg, #298fca, #1e6bb8, #0f4c75);
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem auto;
+      color: white;
+      font-size: 2rem;
+    }
+
+    .mission-card h3 {
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .mission-card p {
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    .team-section {
+      padding: 4rem 0;
+    }
+
+    .team-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      margin-bottom: 2rem;
+    }
+
+    .team-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .team-avatar {
+      width: 6rem;
+      height: 6rem;
+      background: linear-gradient(135deg, #298fca, #1e6bb8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem auto;
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 600;
+    }
+
+    .team-card h4 {
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .team-card .role {
+      color: var(--primary-color);
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+
+    .team-card p {
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    .values-section {
+      background: var(--bg-white);
+      padding: 4rem 0;
+    }
+
+    .value-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .value-item:hover {
+      transform: translateX(5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .value-icon {
+      width: 3rem;
+      height: 3rem;
+      background: linear-gradient(135deg, #298fca, #1e6bb8);
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .value-content h4 {
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .value-content p {
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    .footer {
+      background: var(--text-dark);
+      color: white;
+      padding: 3rem 0 1rem 0;
+      margin-top: 4rem;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h5 {
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .footer-section p, .footer-section a {
+      color: #9ca3af;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .footer-section a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #374151;
+      padding-top: 1rem;
+      text-align: center;
+      color: #9ca3af;
+    }
+
+    @media (max-width: 768px) {
+      .page-header h1 {
+        font-size: 2.5rem;
+      }
+      
+      .about-card {
+        padding: 2rem;
+      }
+      
+      .value-item {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Advanced Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-user-search"></i>
+        Dennislaw SVD
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="advanced-search.html"><i class="fas fa-search"></i> Advanced Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="people-database.html"><i class="fas fa-users"></i> People Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="about.html"><i class="fas fa-info-circle"></i> About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1>About Dennislaw SVD</h1>
+      <p>Learn about our mission to provide comprehensive people search capabilities for legal professionals and researchers.</p>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about-section">
+    <div class="container">
+      <div class="about-card">
+        <h2><i class="fas fa-building"></i> Our Story</h2>
+        <p>Dennislaw SVD was founded with a clear vision: to revolutionize how legal professionals and researchers find information about people involved in legal cases. What started as a simple case search tool has evolved into a comprehensive people search platform that connects case titles with the individuals involved.</p>
+        <p>Our journey began in 2020 when we recognized the growing need for a more efficient way to track people across multiple legal proceedings. Traditional case search systems focused on case outcomes and legal precedents, but often overlooked the human element - the individuals whose lives are affected by these legal processes.</p>
+        <p>Today, Dennislaw SVD serves as the premier platform for people search in legal contexts, helping attorneys, researchers, journalists, and other professionals quickly identify and track individuals across various legal proceedings.</p>
+      </div>
+
+      <div class="about-card">
+        <h2><i class="fas fa-cogs"></i> How It Works</h2>
+        <p>Our innovative approach combines advanced search algorithms with comprehensive data aggregation to provide accurate, up-to-date information about people involved in legal cases. When you search for a case title, our system doesn't just return case details - it identifies all the people involved and provides comprehensive information about their legal history.</p>
+        <p>The process begins with our extensive database that continuously collects and updates information from multiple court systems across the country. We employ sophisticated data processing techniques to ensure accuracy and eliminate duplicates, while maintaining the privacy and security of sensitive information.</p>
+        <p>When you perform a search, our system cross-references case titles with our people database, identifying all individuals involved, their roles in the case, and providing links to detailed case information on dennislawgh.com for comprehensive legal research.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission & Vision Section -->
+  <section class="mission-vision">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="mission-card">
+            <div class="mission-icon">
+              <i class="fas fa-bullseye"></i>
+            </div>
+            <h3>Our Mission</h3>
+            <p>To provide legal professionals and researchers with the most comprehensive and accurate people search capabilities, enabling them to quickly identify and track individuals across multiple legal proceedings with confidence and efficiency.</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="mission-card">
+            <div class="mission-icon">
+              <i class="fas fa-eye"></i>
+            </div>
+            <h3>Our Vision</h3>
+            <p>To become the global standard for people search in legal contexts, connecting case information with human stories to create a more transparent and accessible legal system for everyone.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team-section">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2>Our Team</h2>
+        <p class="text-muted">Meet the dedicated professionals behind Dennislaw SVD</p>
+      </div>
+      
+      <div class="row">
+        <div class="col-lg-4 col-md-6">
+          <div class="team-card">
+            <div class="team-avatar">JD</div>
+            <h4>John Dennis</h4>
+            <div class="role">Founder & CEO</div>
+            <p>Legal technology expert with over 15 years of experience in developing innovative solutions for the legal industry.</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="team-card">
+            <div class="team-avatar">SL</div>
+            <h4>Sarah Lawson</h4>
+            <div class="role">Chief Technology Officer</div>
+            <p>Former software engineer at major tech companies, specializing in database architecture and search algorithms.</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="team-card">
+            <div class="team-avatar">MC</div>
+            <h4>Michael Chen</h4>
+            <div class="role">Head of Legal Operations</div>
+            <p>Experienced attorney with expertise in legal research and data management across multiple jurisdictions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="values-section">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2>Our Core Values</h2>
+        <p class="text-muted">The principles that guide everything we do</p>
+      </div>
+      
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="value-item">
+            <div class="value-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="value-content">
+              <h4>Privacy & Security</h4>
+              <p>We prioritize the protection of personal information and maintain the highest standards of data security and privacy compliance.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="value-item">
+            <div class="value-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="value-content">
+              <h4>Accuracy & Reliability</h4>
+              <p>We are committed to providing the most accurate and up-to-date information, continuously verifying and updating our database.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="value-item">
+            <div class="value-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="value-content">
+              <h4>User-Centric Design</h4>
+              <p>Every feature and improvement is designed with our users in mind, ensuring an intuitive and efficient experience.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="value-item">
+            <div class="value-icon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <div class="value-content">
+              <h4>Innovation</h4>
+              <p>We continuously explore new technologies and methodologies to improve our platform and better serve our users.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Advanced Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h5><i class="fas fa-user-search"></i> Dennislaw SVD</h5>
+          <p>Your trusted partner for comprehensive people search and case history discovery.</p>
+        </div>
+        
+        <div class="footer-section">
+          <h5>Quick Links</h5>
+          <a href="index.html">Home</a>
+          <a href="advanced-search.html">Advanced Search</a>
+          <a href="people-database.html">People Database</a>
+          <a href="#">API Documentation</a>
+        </div>
+        
+        <div class="footer-section">
+          <h5>Support</h5>
+          <a href="#">Help Center</a>
+          <a href="contact.html">Contact Support</a>
+          <a href="#">Training Resources</a>
+          <a href="#">FAQ</a>
+        </div>
+        
+        <div class="footer-section">
+          <h5>Connect</h5>
+          <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+          <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
+          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+          <a href="contact.html"><i class="fas fa-envelope"></i> Email</a>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS and Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+  
+  <!-- Custom JavaScript for About Page -->
+  <script>
+    // Add some interactive animations
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animate cards on scroll
+      const observerOptions = {
+        threshold: 0.3,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+
+      // Observe all cards
+      document.querySelectorAll('.about-card, .mission-card, .team-card, .value-item').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'all 0.8s ease';
+        observer.observe(card);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Search - Dennislaw SVD</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS for Advanced Search Page -->
+  <style>
+    :root {
+      --primary-color: #298fca;
+      --secondary-color: #1e6bb8;
+      --accent-color: #f59e0b;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-light: #f8fafc;
+      --bg-white: #ffffff;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-color) !important;
+    }
+
+    .navbar-brand i {
+      margin-right: 0.5rem;
+      color: var(--accent-color);
+    }
+
+    .navbar-nav .nav-link {
+      font-weight: 500;
+      color: var(--text-dark) !important;
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem !important;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+      background: linear-gradient(135deg, #298fca, #1e6bb8);
+      color: white !important;
+      transform: translateY(-2px);
+    }
+
+    .page-header {
+      background: linear-gradient(135deg, #298fca 0%, #1e6bb8 50%, #0f4c75 100%);
+      color: white;
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    .page-header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .page-header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .search-container {
+      background: var(--bg-white);
+      border-radius: 1rem;
+      padding: 3rem;
+      box-shadow: var(--shadow-lg);
+      max-width: 1000px;
+      margin: -3rem auto 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    .search-section {
+      margin-bottom: 3rem;
+    }
+
+    .search-section h3 {
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: var(--bg-light);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #298fca;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(41, 143, 202, 0.1);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      background: var(--bg-light);
+      cursor: pointer;
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: #298fca;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(41, 143, 202, 0.1);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -0.75rem;
+    }
+
+    .col-md-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
+      padding: 0 0.75rem;
+    }
+
+    .col-md-4 {
+      flex: 0 0 33.333333%;
+      max-width: 33.333333%;
+      padding: 0 0.75rem;
+    }
+
+    .col-md-12 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      padding: 0 0.75rem;
+    }
+
+    .search-button {
+      width: 100%;
+      padding: 1.25rem;
+      background: linear-gradient(135deg, #298fca, #1e6bb8, #0f4c75);
+      border: none;
+      border-radius: 0.75rem;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      margin-top: 1rem;
+    }
+
+    .search-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .search-tips {
+      background: var(--bg-light);
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+
+    .search-tips h4 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .tip-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 0.5rem;
+      border-left: 3px solid var(--accent-color);
+    }
+
+    .tip-icon {
+      color: var(--accent-color);
+      font-size: 1.2rem;
+      margin-top: 0.2rem;
+    }
+
+    .footer {
+      background: var(--text-dark);
+      color: white;
+      padding: 3rem 0 1rem 0;
+      margin-top: 4rem;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h5 {
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .footer-section p, .footer-section a {
+      color: #9ca3af;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .footer-section a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #374151;
+      padding-top: 1rem;
+      text-align: center;
+      color: #9ca3af;
+    }
+
+    @media (max-width: 768px) {
+      .page-header h1 {
+        font-size: 2.5rem;
+      }
+      
+      .search-container {
+        margin: -2rem 1rem 0 1rem;
+        padding: 2rem;
+      }
+      
+      .col-md-6, .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Advanced Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-user-search"></i>
+        Dennislaw SVD
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="advanced-search.html"><i class="fas fa-search"></i> Advanced Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="people-database.html"><i class="fas fa-users"></i> People Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html"><i class="fas fa-info-circle"></i> About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1>Advanced People Search</h1>
+      <p>Use advanced filters and search criteria to find specific individuals involved in legal cases with precision and accuracy.</p>
+    </div>
+  </section>
+
+  <!-- Advanced Search Container -->
+  <div class="container">
+    <div class="search-container">
+      <form id="advancedSearchForm">
+        <!-- Basic Search Section -->
+        <div class="search-section">
+          <h3><i class="fas fa-search"></i> Basic Search</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Case Title</label>
+                <input type="text" class="form-control" placeholder="Enter case title or partial title">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Person Name</label>
+                <input type="text" class="form-control" placeholder="Enter person's full name">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Case Details Section -->
+        <div class="search-section">
+          <h3><i class="fas fa-file-alt"></i> Case Details</h3>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-label">Court Type</label>
+                <select class="form-select">
+                  <option value="">All Courts</option>
+                  <option value="supreme">Supreme Court</option>
+                  <option value="appeals">Court of Appeals</option>
+                  <option value="district">District Court</option>
+                  <option value="state">State Courts</option>
+                  <option value="federal">Federal Courts</option>
+                  <option value="municipal">Municipal Courts</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-label">Case Type</label>
+                <select class="form-select">
+                  <option value="">All Case Types</option>
+                  <option value="civil">Civil</option>
+                  <option value="criminal">Criminal</option>
+                  <option value="family">Family Law</option>
+                  <option value="corporate">Corporate</option>
+                  <option value="employment">Employment</option>
+                  <option value="property">Property</option>
+                  <option value="intellectual">Intellectual Property</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-label">Case Status</label>
+                <select class="form-select">
+                  <option value="">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="closed">Closed</option>
+                  <option value="appealed">Appealed</option>
+                  <option value="settled">Settled</option>
+                  <option value="dismissed">Dismissed</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date Range Section -->
+        <div class="search-section">
+          <h3><i class="fas fa-calendar"></i> Date Range</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">From Date</label>
+                <input type="date" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">To Date</label>
+                <input type="date" class="form-control">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legal Professionals Section -->
+        <div class="search-section">
+          <h3><i class="fas fa-gavel"></i> Legal Professionals</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Presiding Judge</label>
+                <input type="text" class="form-control" placeholder="Enter judge's name">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Lawyer/Attorney</label>
+                <input type="text" class="form-control" placeholder="Enter lawyer's name">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Case Details Section -->
+        <div class="search-section">
+          <h3><i class="fas fa-info-circle"></i> Additional Details</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Case Number</label>
+                <input type="text" class="form-control" placeholder="Enter case number">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Citation</label>
+                <input type="text" class="form-control" placeholder="Enter legal citation">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="form-label">Keywords</label>
+                <input type="text" class="form-control" placeholder="Enter relevant keywords (e.g., fraud, custody, contract)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Button -->
+        <button type="submit" class="search-button">
+          <i class="fas fa-search"></i> Perform Advanced Search
+        </button>
+      </form>
+
+      <!-- Search Tips -->
+      <div class="search-tips">
+        <h4><i class="fas fa-lightbulb"></i> Search Tips</h4>
+        <div class="tip-item">
+          <i class="fas fa-check-circle tip-icon"></i>
+          <div>
+            <strong>Use Partial Names:</strong> You can search with partial names or initials to find more results.
+          </div>
+        </div>
+        <div class="tip-item">
+          <i class="fas fa-check-circle tip-icon"></i>
+          <div>
+            <strong>Case Title Variations:</strong> Try different variations of case titles (e.g., "Smith v Johnson" or "Smith vs Johnson").
+          </div>
+        </div>
+        <div class="tip-item">
+          <i class="fas fa-check-circle tip-icon"></i>
+          <div>
+            <strong>Date Ranges:</strong> Use date ranges to narrow down results to specific time periods.
+          </div>
+        </div>
+        <div class="tip-item">
+          <i class="fas fa-check-circle tip-icon"></i>
+          <div>
+            <strong>Multiple Filters:</strong> Combine multiple search criteria for more precise results.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h5><i class="fas fa-user-search"></i> Dennislaw SVD</h5>
+          <p>Your trusted partner for comprehensive people search and case history discovery.</p>
+        </div>
+        
+        <div class="footer-section">
+          <h5>Quick Links</h5>
+          <a href="index.html">Home</a>
+          <a href="advanced-search.html">Advanced Search</a>
+          <a href="people-database.html">People Database</a>
+          <a href="#">API Documentation</a>
+        </div>
+        
+        <div class="footer-section">
+          <h5>Support</h5>
+          <a href="#">Help Center</a>
+          <a href="contact.html">Contact Support</a>
+          <a href="#">Training Resources</a>
+          <a href="#">FAQ</a>
+        </div>
+        
+        <div class="footer-section">
+          <h5>Connect</h5>
+          <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+          <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
+          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+          <a href="contact.html"><i class="fas fa-envelope"></i> Email</a>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS and Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+  
+  <!-- Custom JavaScript for Advanced Search -->
+  <script>
+    // Form submission
+    document.getElementById('advancedSearchForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Collect all form data
+      const formData = new FormData(this);
+      const searchParams = new URLSearchParams();
+      
+      // Add form data to search params
+      for (let [key, value] of formData.entries()) {
+        if (value) {
+          searchParams.append(key, value);
+        }
+      }
+      
+      // Redirect to results page with search parameters
+      window.location.href = 'people-results.html?' + searchParams.toString();
+    });
+
+    // Set default dates (last 5 years)
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date();
+      const fiveYearsAgo = new Date();
+      fiveYearsAgo.setFullYear(today.getFullYear() - 5);
+      
+      const fromDateInput = document.querySelector('input[type="date"]:first-of-type');
+      const toDateInput = document.querySelector('input[type="date"]:last-of-type');
+      
+      if (fromDateInput && toDateInput) {
+        fromDateInput.value = fiveYearsAgo.toISOString().split('T')[0];
+        toDateInput.value = today.toISOString().split('T')[0];
+      }
+    });
+  </script>
+</body>
+</html>

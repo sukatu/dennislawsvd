@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Results</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .case-result { margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container mt-4">
+    <h1>Search Results</h1>
+    <div id="case-results">
+      <!-- Results will be dynamically injected here -->
+    </div>
+
+    <a href="index.html" class="btn btn-secondary mt-4">Back to Search</a>
+  </div>
+
+  <script>
+    // Simulate search result data
+    const searchResults = [
+      { title: 'Case 1', date: '2022-01-01', judge: 'Judge A', lawyers: 'Lawyer 1, Lawyer 2', summary: 'Summary of Case 1', caseId: 1 },
+      { title: 'Case 2', date: '2021-02-01', judge: 'Judge B', lawyers: 'Lawyer 3, Lawyer 4', summary: 'Summary of Case 2', caseId: 2 },
+      // More cases can be added here
+    ];
+
+    const searchQuery = new URLSearchParams(window.location.search).get('search_query');
+
+    const filteredResults = searchResults.filter(result => result.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    if (filteredResults.length === 0) {
+      document.getElementById('case-results').innerHTML = '<p>No results found.</p>';
+    } else {
+      filteredResults.forEach(result => {
+        const caseElement = document.createElement('div');
+        caseElement.classList.add('card', 'case-result');
+        caseElement.innerHTML = `
+          <div class="card-body">
+            <h5 class="card-title">${result.title}</h5>
+            <p><strong>Date:</strong> ${result.date}</p>
+            <p><strong>Presiding Judge:</strong> ${result.judge}</p>
+            <p><strong>Lawyers:</strong> ${result.lawyers}</p>
+            <p><strong>Summary:</strong> ${result.summary}</p>
+            <a href="case-detail.html?caseId=${result.caseId}" class="btn btn-primary">View Case Details</a>
+          </div>
+        `;
+        document.getElementById('case-results').appendChild(caseElement);
+      });
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

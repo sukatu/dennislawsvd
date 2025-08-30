@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Detail</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-4">
+    <h1>Case Detail</h1>
+    <div id="case-detail">
+      <!-- Case details will be dynamically injected here -->
+    </div>
+
+    <a href="results.html" class="btn btn-secondary mt-4">Back to Results</a>
+  </div>
+
+  <script>
+    // Simulate case data
+    const caseData = [
+      { caseId: 1, title: 'Case 1', date: '2022-01-01', judge: 'Judge A', lawyers: 'Lawyer 1, Lawyer 2', judgement: 'Detailed judgement for Case 1', region: 'Region 1', courtType: 'High Court' },
+      { caseId: 2, title: 'Case 2', date: '2021-02-01', judge: 'Judge B', lawyers: 'Lawyer 3, Lawyer 4', judgement: 'Detailed judgement for Case 2', region: 'Region 2', courtType: 'Supreme Court' },
+      // More case data can be added here
+    ];
+
+    const caseId = new URLSearchParams(window.location.search).get('caseId');
+    const caseDetails = caseData.find(c => c.caseId == caseId);
+
+    if (!caseDetails) {
+      document.getElementById('case-detail').innerHTML = '<p>Case not found.</p>';
+    } else {
+      document.getElementById('case-detail').innerHTML = `
+        <h2>${caseDetails.title}</h2>
+        <p><strong>Date:</strong> ${caseDetails.date}</p>
+        <p><strong>Presiding Judge:</strong> ${caseDetails.judge}</p>
+        <p><strong>Lawyers:</strong> ${caseDetails.lawyers}</p>
+        <p><strong>Region:</strong> ${caseDetails.region}</p>
+        <p><strong>Court Type:</strong> ${caseDetails.courtType}</p>
+        <p><strong>Judgement:</strong> ${caseDetails.judgement}</p>
+        <a href="https://dennislawgh.com" class="btn btn-primary">View Full Case</a>
+      `;
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
