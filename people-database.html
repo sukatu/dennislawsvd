@@ -3,623 +3,487 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>People Database - Dennislaw SVD</title>
+  <title>People Database - Ghana Legal Risk Index</title>
   
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Custom CSS for People Database Page -->
   <style>
-    :root {
-      --primary-color: #298fca;
-      --secondary-color: #1e6bb8;
-      --accent-color: #f59e0b;
-      --text-dark: #1f2937;
-      --text-light: #6b7280;
-      --bg-light: #f8fafc;
-      --bg-white: #ffffff;
-      --border-color: #e5e7eb;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    :root{
+      --brand:#0ea5e9; /* sky-500 */
+      --brand-dark:#0284c7; /* sky-600 */
+      --text:#0f172a; /* slate-900 */
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-light);
-      color: var(--text-dark);
-    }
-
-    .navbar {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-      padding: 1rem 0;
-    }
-
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary-color) !important;
-    }
-
-    .navbar-brand i {
-      margin-right: 0.5rem;
-      color: var(--accent-color);
-    }
-
-    .navbar-nav .nav-link {
-      font-weight: 500;
-      color: var(--text-dark) !important;
-      margin: 0 0.5rem;
-      padding: 0.5rem 1rem !important;
-      border-radius: 0.5rem;
-      transition: all 0.3s ease;
-    }
-
-    .navbar-nav .nav-link:hover {
-      background: linear-gradient(135deg, #298fca, #1e6bb8);
-      color: white !important;
-      transform: translateY(-2px);
-    }
-
-    .page-header {
-      background: linear-gradient(135deg, #298fca 0%, #1e6bb8 50%, #0f4c75 100%);
-      color: white;
-      padding: 4rem 0;
-      text-align: center;
-    }
-
-    .page-header h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-
-    .page-header p {
-      font-size: 1.2rem;
-      opacity: 0.9;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .stats-section {
-      background: var(--bg-white);
-      padding: 4rem 0;
-      margin-top: -2rem;
-      position: relative;
-      z-index: 10;
-    }
-
-    .stat-card {
-      text-align: center;
-      padding: 2rem 1rem;
-      background: white;
-      border-radius: 1rem;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 2rem;
-      transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary-color);
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-label {
-      color: var(--text-light);
-      font-weight: 500;
-    }
-
-    .database-info {
-      padding: 4rem 0;
-    }
-
-    .info-card {
-      background: white;
-      border-radius: 1rem;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s ease;
-    }
-
-    .info-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .info-card h3 {
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .info-card p {
-      color: var(--text-light);
-      line-height: 1.6;
-      margin-bottom: 1rem;
-    }
-
-    .feature-list {
-      list-style: none;
-      padding: 0;
-    }
-
-    .feature-list li {
-      padding: 0.5rem 0;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .feature-list li:last-child {
-      border-bottom: none;
-    }
-
-    .feature-list i {
-      color: var(--accent-color);
-      width: 20px;
-    }
-
-    .recent-searches {
-      background: var(--bg-white);
-      padding: 4rem 0;
-    }
-
-    .search-item {
-      background: white;
-      border-radius: 0.75rem;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: var(--shadow-sm);
-      border-left: 4px solid var(--primary-color);
-      transition: all 0.3s ease;
-    }
-
-    .search-item:hover {
-      transform: translateX(5px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .search-query {
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-bottom: 0.5rem;
-    }
-
-    .search-meta {
-      color: var(--text-light);
-      font-size: 0.9rem;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .search-results {
-      color: var(--text-dark);
-      font-weight: 500;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #298fca, #1e6bb8);
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      display: inline-block;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-      color: white;
-    }
-
-    .footer {
-      background: var(--text-dark);
-      color: white;
-      padding: 3rem 0 1rem 0;
-      margin-top: 4rem;
-    }
-
-    .footer-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .footer-section h5 {
-      color: var(--accent-color);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    .footer-section p, .footer-section a {
-      color: #9ca3af;
-      text-decoration: none;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .footer-section a:hover {
-      color: white;
-    }
-
-    .footer-bottom {
-      border-top: 1px solid #374151;
-      padding-top: 1rem;
-      text-align: center;
-      color: #9ca3af;
-    }
-
-    .chart-container {
-      background: white;
-      border-radius: 1rem;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .chart-placeholder {
-      background: var(--bg-light);
-      border: 2px dashed var(--border-color);
-      border-radius: 0.5rem;
-      padding: 3rem;
-      text-align: center;
-      color: var(--text-light);
-    }
-
-    @media (max-width: 768px) {
-      .page-header h1 {
-        font-size: 2.5rem;
-      }
-      
-      .stats-section {
-        margin-top: -1rem;
-      }
-      
-      .search-meta {
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-    }
+    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+    /* nice scrollbar */
+    *{scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;}
+    *::-webkit-scrollbar{height:8px;width:8px}
+    *::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
   </style>
 </head>
-<body>
-  <!-- Advanced Navbar -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container">
-      <a class="navbar-brand" href="index.html">
-        <i class="fas fa-user-search"></i>
-        Dennislaw SVD
-      </a>
-      
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="advanced-search.html"><i class="fas fa-search"></i> Advanced Search</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="people-database.html"><i class="fas fa-users"></i> People Database</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="about.html"><i class="fas fa-info-circle"></i> About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
-          </li>
-        </ul>
+<body class="bg-slate-50 text-slate-900">
+  <!-- Top Nav -->
+  <header class="w-full bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+        <span class="font-semibold">Ghana Legal Risk Index</span>
       </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm/6 text-slate-200">
+        <a class="hover:text-white" href="index.html">Home</a>
+        <a class="hover:text-white" href="people-results.html">People Search</a>
+        <a class="hover:text-white" href="advanced-search.html">Advanced Search</a>
+        <a class="hover:text-white text-sky-400" href="people-database.html">People Database</a>
+        <a class="hover:text-white" href="about.html">About</a>
+        <a class="hover:text-white" href="contact.html">Contact</a>
+        <a class="hover:text-white" href="specification.html">Specification</a>
+      </nav>
+      <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/10" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
     </div>
-  </nav>
+  </header>
 
   <!-- Page Header -->
-  <section class="page-header">
-    <div class="container">
-      <h1>People Database</h1>
-      <p>Comprehensive database of individuals involved in legal cases across multiple jurisdictions and time periods.</p>
-    </div>
+  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">People Database</h1>
+    <p class="mt-2 text-slate-600">Browse our comprehensive database of individuals involved in legal cases across Ghana.</p>
   </section>
 
-  <!-- Statistics Section -->
-  <section class="stats-section">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3 col-sm-6">
-          <div class="stat-card">
-            <div class="stat-number">500K+</div>
-            <div class="stat-label">People in Database</div>
+  <!-- Search and Filters -->
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-6">
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex-1">
+          <div class="relative">
+            <input type="text" placeholder="Search people..." class="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 pl-10 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 20.586 16.243 15.83A8 8 0 1 0 15.83 16.243L20.586 21 21 20.586zM4 10a6 6 0 1 1 6 6 6.006 6.006 0 0 1-6-6z"/>
+            </svg>
           </div>
         </div>
-        <div class="col-md-3 col-sm-6">
-          <div class="stat-card">
-            <div class="stat-number">2.5M+</div>
-            <div class="stat-label">Case Records</div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-          <div class="stat-card">
-            <div class="stat-number">50+</div>
-            <div class="stat-label">Courts Covered</div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-          <div class="stat-card">
-            <div class="stat-number">25+</div>
-            <div class="stat-label">Years of Data</div>
-          </div>
+        <div class="flex items-center gap-2">
+          <select class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+            <option>All Types</option>
+            <option>Person</option>
+            <option>Organization</option>
+          </select>
+          <select class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+            <option>Sort by Name</option>
+            <option>Sort by Risk Score</option>
+            <option>Sort by Date</option>
+          </select>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Database Information Section -->
-  <section class="database-info">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="info-card">
-            <h3><i class="fas fa-database"></i> Database Coverage</h3>
-            <p>Our comprehensive database covers legal cases from multiple jurisdictions including federal, state, and municipal courts across the country.</p>
-            <ul class="feature-list">
-              <li><i class="fas fa-check"></i> Supreme Court cases (1999-2024)</li>
-              <li><i class="fas fa-check"></i> Court of Appeals decisions</li>
-              <li><i class="fas fa-check"></i> District Court proceedings</li>
-              <li><i class="fas fa-check"></i> State court records</li>
-              <li><i class="fas fa-check"></i> Municipal court cases</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="info-card">
-            <h3><i class="fas fa-shield-alt"></i> Data Quality & Security</h3>
-            <p>We maintain the highest standards of data accuracy and security to ensure reliable search results for legal professionals and researchers.</p>
-            <ul class="feature-list">
-              <li><i class="fas fa-check"></i> 99.9% accuracy rate</li>
-              <li><i class="fas fa-check"></i> Regular data verification</li>
-              <li><i class="fas fa-check"></i> Secure data transmission</li>
-              <li><i class="fas fa-check"></i> Privacy compliance</li>
-              <li><i class="fas fa-check"></i> Real-time updates</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="info-card">
-            <h3><i class="fas fa-search"></i> Search Capabilities</h3>
-            <p>Advanced search functionality allows users to find people using multiple criteria and filters for precise results.</p>
-            <ul class="feature-list">
-              <li><i class="fas fa-check"></i> Case title search</li>
-              <li><i class="fas fa-check"></i> Person name search</li>
-              <li><i class="fas fa-check"></i> Date range filtering</li>
-              <li><i class="fas fa-check"></i> Court type filtering</li>
-              <li><i class="fas fa-check"></i> Case type categorization</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="info-card">
-            <h3><i class="fas fa-chart-line"></i> Analytics & Insights</h3>
-            <p>Comprehensive analytics provide insights into case patterns, legal trends, and individual involvement across different types of cases.</p>
-            <ul class="feature-list">
-              <li><i class="fas fa-check"></i> Case frequency analysis</li>
-              <li><i class="fas fa-check"></i> Legal trend identification</li>
-              <li><i class="fas fa-check"></i> Court performance metrics</li>
-              <li><i class="fas fa-check"></i> Case outcome statistics</li>
-              <li><i class="fas fa-check"></i> Professional network mapping</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Data Visualization Section -->
-  <section class="database-info">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="chart-container">
-            <h3><i class="fas fa-chart-pie"></i> Case Type Distribution</h3>
-            <div class="chart-placeholder">
-              <i class="fas fa-chart-pie" style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-color);"></i>
-              <p>Interactive chart showing distribution of case types in our database</p>
-              <p><strong>Civil:</strong> 45% | <strong>Criminal:</strong> 30% | <strong>Family:</strong> 15% | <strong>Other:</strong> 10%</p>
+  <!-- Database Grid -->
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-10">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <!-- Person Card 1 -->
+      <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Charles Ansah</h4>
+              <p class="text-xs text-slate-500">Person</p>
             </div>
           </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="chart-container">
-            <h3><i class="fas fa-chart-bar"></i> Annual Case Volume</h3>
-            <div class="chart-placeholder">
-              <i class="fas fa-chart-bar" style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-color);"></i>
-              <p>Chart showing case volume trends over the past 25 years</p>
-              <p><strong>2024:</strong> 125K cases | <strong>2023:</strong> 118K cases | <strong>2022:</strong> 112K cases</p>
-            </div>
+          <div class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-600 ring-1 ring-rose-200">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-rose-500"></span> 85
+            <span class="ml-1 font-medium text-rose-500">High Risk</span>
           </div>
         </div>
-      </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Domains</div><div>Criminal</div></div>
+          <div><div class="font-semibold text-slate-800">Regions</div><div>Greater Accra</div></div>
+        </div>
+        <div class="mt-3 flex items-center justify-between text-xs text-slate-500">
+          <div class="flex gap-4">
+            <span><span class="font-semibold text-slate-700">0</span> Pending</span>
+            <span><span class="font-semibold text-slate-700">1</span> Resolved</span>
+          </div>
+          <div>Last: 2025-05-14</div>
+        </div>
+        <div class="mt-4">
+          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
+        </div>
+      </article>
+
+      <!-- Organization Card 1 -->
+      <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-6v-6H10v6H4a1 1 0 0 1-1-1z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">First Atlantic Bank Ltd</h4>
+              <p class="text-xs text-slate-500">Organization</p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-600 ring-1 ring-amber-200">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span> 49
+            <span class="ml-1 font-medium text-amber-500">Medium Risk</span>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Also known as:</div><div>First Atlantic Bank Limited, FAB</div></div>
+          <div><div class="font-semibold text-slate-800">Regions</div><div>Greater Accra, Ashanti</div></div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Domains</div><div>Banking/Financial, Labour/Employment</div></div>
+          <div class="text-right"><div class="text-slate-500">Last: 2020-12-02</div></div>
+        </div>
+        <div class="mt-3 flex items-center gap-4 text-xs text-slate-500">
+          <span><span class="font-semibold text-slate-700">1</span> Pending</span>
+          <span><span class="font-semibold text-slate-700">2</span> Resolved</span>
+        </div>
+        <div class="mt-4">
+          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
+        </div>
+      </article>
+
+      <!-- Person Card 2 -->
+      <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Masud Ibrahim</h4>
+              <p class="text-xs text-slate-500">Person</p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-200">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span> 32
+            <span class="ml-1 font-medium text-emerald-600">Low Risk</span>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Also known as:</div><div>M. Ibrahim</div></div>
+          <div><div class="font-semibold text-slate-800">Regions</div><div>Greater Accra</div></div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Domains</div><div>Land/Property, Human Rights</div></div>
+          <div class="text-right"><div class="text-slate-500">Last: 2025-04-15</div></div>
+        </div>
+        <div class="mt-3 flex items-center gap-4 text-xs text-slate-500">
+          <span><span class="font-semibold text-slate-700">1</span> Pending</span>
+          <span><span class="font-semibold text-slate-700">0</span> Resolved</span>
+        </div>
+        <div class="mt-4">
+          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
+        </div>
+      </article>
+
+      <!-- Person Card 3 -->
+      <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Rufina Acquah Kane</h4>
+              <p class="text-xs text-slate-500">Person</p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-200">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span> 15
+            <span class="ml-1 font-medium text-emerald-600">Low Risk</span>
+          </div>
+        </div>
+        <div class="mt-3 text-xs text-slate-600">
+          <div class="font-semibold text-slate-800">Also known as:</div>
+          <div class="">Rufina A. Kane</div>
+        </div>
+        <div class="mt-4">
+          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
+        </div>
+      </article>
+
+      <!-- Organization Card 2 -->
+      <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-6v-6H10v6H4a1 1 0 0 1-1-1z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Ghana Commercial Bank</h4>
+              <p class="text-xs text-slate-500">Organization</p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-600 ring-1 ring-amber-200">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span> 42
+            <span class="ml-1 font-medium text-amber-500">Medium Risk</span>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Also known as:</div><div>GCB Bank, GCB</div></div>
+          <div><div class="font-semibold text-slate-800">Regions</div><div>Nationwide</div></div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Domains</div><div>Banking/Financial</div></div>
+          <div class="text-right"><div class="text-slate-500">Last: 2024-08-20</div></div>
+        </div>
+        <div class="mt-3 flex items-center gap-4 text-xs text-slate-500">
+          <span><span class="font-semibold text-slate-700">2</span> Pending</span>
+          <span><span class="font-semibold text-slate-700">5</span> Resolved</span>
+        </div>
+        <div class="mt-4">
+          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
+        </div>
+      </article>
+
+      <!-- Person Card 4 -->
+      <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Kwame Asante</h4>
+              <p class="text-xs text-slate-500">Person</p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-600 ring-1 ring-rose-200">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-rose-500"></span> 78
+            <span class="ml-1 font-medium text-rose-500">High Risk</span>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Domains</div><div>Criminal, Commercial</div></div>
+          <div><div class="font-semibold text-slate-800">Regions</div><div>Ashanti, Greater Accra</div></div>
+        </div>
+        <div class="mt-3 flex items-center justify-between text-xs text-slate-500">
+          <div class="flex gap-4">
+            <span><span class="font-semibold text-slate-700">3</span> Pending</span>
+            <span><span class="font-semibold text-slate-700">2</span> Resolved</span>
+          </div>
+          <div>Last: 2025-01-10</div>
+        </div>
+        <div class="mt-4">
+          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
+        </div>
+      </article>
+
+      <!-- Person Card 5 -->
+      <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Ama Serwaa</h4>
+              <p class="text-xs text-slate-500">Person</p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-200">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span> 25
+            <span class="ml-1 font-medium text-emerald-600">Low Risk</span>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Domains</div><div>Family, Property</div></div>
+          <div><div class="font-semibold text-slate-800">Regions</div><div>Central, Greater Accra</div></div>
+        </div>
+        <div class="mt-3 flex items-center justify-between text-xs text-slate-500">
+          <div class="flex gap-4">
+            <span><span class="font-semibold text-slate-700">0</span> Pending</span>
+            <span><span class="font-semibold text-slate-700">1</span> Resolved</span>
+          </div>
+          <div>Last: 2024-11-30</div>
+        </div>
+        <div class="mt-4">
+          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
+        </div>
+      </article>
+
+      <!-- Organization Card 3 -->
+      <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-6v-6H10v6H4a1 1 0 0 1-1-1z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Ecobank Ghana</h4>
+              <p class="text-xs text-slate-500">Organization</p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-600 ring-1 ring-amber-200">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span> 38
+            <span class="ml-1 font-medium text-amber-500">Medium Risk</span>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Also known as:</div><div>Ecobank Ghana Limited</div></div>
+          <div><div class="font-semibold text-slate-800">Regions</div><div>Nationwide</div></div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+          <div><div class="font-semibold text-slate-800">Domains</div><div>Banking/Financial</div></div>
+          <div class="text-right"><div class="text-slate-500">Last: 2024-09-15</div></div>
+        </div>
+        <div class="mt-3 flex items-center gap-4 text-xs text-slate-500">
+          <span><span class="font-semibold text-slate-700">1</span> Pending</span>
+          <span><span class="font-semibold text-slate-700">3</span> Resolved</span>
+        </div>
+        <div class="mt-4">
+          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
+        </div>
+      </article>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8 flex items-center justify-center">
+      <nav class="flex items-center gap-2">
+        <button class="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">Previous</button>
+        <button class="rounded-lg bg-sky-600 px-3 py-2 text-sm text-white">1</button>
+        <button class="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">2</button>
+        <button class="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">3</button>
+        <button class="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">Next</button>
+      </nav>
     </div>
   </section>
 
-  <!-- Recent Searches Section -->
-  <section class="recent-searches">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2>Recent Popular Searches</h2>
-        <p class="text-muted">See what others are searching for in our database</p>
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+            <span class="font-semibold">Ghana Legal Risk Index</span>
+          </div>
+          <p class="text-slate-300 text-sm">Your trusted partner for comprehensive people search and case history discovery.</p>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="index.html" class="hover:text-white">Home</a></li>
+            <li><a href="advanced-search.html" class="hover:text-white">Advanced Search</a></li>
+            <li><a href="people-database.html" class="hover:text-white">People Database</a></li>
+            <li><a href="specification.html" class="hover:text-white">Specification</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Support</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Help Center</a></li>
+            <li><a href="contact.html" class="hover:text-white">Contact Support</a></li>
+            <li><a href="#" class="hover:text-white">Training Resources</a></li>
+            <li><a href="#" class="hover:text-white">FAQ</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Connect</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Twitter</a></li>
+            <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+            <li><a href="#" class="hover:text-white">Facebook</a></li>
+            <li><a href="contact.html" class="hover:text-white">Email</a></li>
+          </ul>
+        </div>
       </div>
       
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="search-item">
-            <div class="search-query">Smith v. Johnson (2024)</div>
-            <div class="search-meta">
-              <span><i class="fas fa-calendar"></i> 2 hours ago</span>
-              <span class="search-results"><i class="fas fa-users"></i> 3 people found</span>
-            </div>
-            <a href="people-results.html?query=Smith%20v.%20Johnson%20(2024)" class="btn-primary">View Results</a>
-          </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="search-item">
-            <div class="search-query">State v. Brown (2023)</div>
-            <div class="search-meta">
-              <span><i class="fas fa-calendar"></i> 5 hours ago</span>
-              <span class="search-results"><i class="fas fa-users"></i> 2 people found</span>
-            </div>
-            <a href="people-results.html?query=State%20v.%20Brown%20(2023)" class="btn-primary">View Results</a>
-          </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="search-item">
-            <div class="search-query">Corporate Inc. v. LLC (2024)</div>
-            <div class="search-meta">
-              <span><i class="fas fa-calendar"></i> 1 day ago</span>
-              <span class="search-results"><i class="fas fa-users"></i> 5 people found</span>
-            </div>
-            <a href="people-results.html?query=Corporate%20Inc.%20v.%20LLC%20(2024)" class="btn-primary">View Results</a>
-          </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="search-item">
-            <div class="search-query">Family Law v. Estate (2023)</div>
-            <div class="search-meta">
-              <span><i class="fas fa-calendar"></i> 2 days ago</span>
-              <span class="search-results"><i class="fas fa-users"></i> 4 people found</span>
-            </div>
-            <a href="people-results.html?query=Family%20Law%20v.%20Estate%20(2023)" class="btn-primary">View Results</a>
-          </div>
-        </div>
-      </div>
-      
-      <div class="text-center mt-4">
-        <a href="index.html" class="btn-primary">
-          <i class="fas fa-search"></i> Start Your Search
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Advanced Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h5><i class="fas fa-user-search"></i> Dennislaw SVD</h5>
-          <p>Your trusted partner for comprehensive people search and case history discovery.</p>
-        </div>
-        
-        <div class="footer-section">
-          <h5>Quick Links</h5>
-          <a href="index.html">Home</a>
-          <a href="advanced-search.html">Advanced Search</a>
-          <a href="people-database.html">People Database</a>
-          <a href="#">API Documentation</a>
-        </div>
-        
-        <div class="footer-section">
-          <h5>Support</h5>
-          <a href="#">Help Center</a>
-          <a href="contact.html">Contact Support</a>
-          <a href="#">Training Resources</a>
-          <a href="#">FAQ</a>
-        </div>
-        
-        <div class="footer-section">
-          <h5>Connect</h5>
-          <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
-          <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
-          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
-          <a href="contact.html"><i class="fas fa-envelope"></i> Email</a>
-        </div>
-      </div>
-      
-      <div class="footer-bottom">
-        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
+      <div class="mt-8 pt-8 border-t border-slate-700 text-center text-sm text-slate-400">
+        <p>&copy; 2025 Ghana Legal Risk Index. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>
 
-  <!-- Bootstrap JS and Popper.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-  
-  <!-- Custom JavaScript for Database Page -->
   <script>
-    // Add some interactive animations
-    document.addEventListener('DOMContentLoaded', function() {
-      // Animate stats on scroll
-      const observerOptions = {
-        threshold: 0.5,
-        rootMargin: '0px 0px -100px 0px'
-      };
+    // Mobile menu toggle
+    const mobileMenuBtn = document.querySelector('button[aria-label="Open menu"]');
+    const nav = document.querySelector('nav');
+    
+    if (mobileMenuBtn && nav) {
+      mobileMenuBtn.addEventListener('click', function() {
+        nav.classList.toggle('hidden');
+      });
+    }
 
-      const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
+    // Search functionality
+    const searchInput = document.querySelector('input[placeholder="Search people..."]');
+    const personCards = document.querySelectorAll('article');
+    
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        personCards.forEach(card => {
+          const name = card.querySelector('h4').textContent.toLowerCase();
+          const type = card.querySelector('p').textContent.toLowerCase();
+          const domains = card.querySelectorAll('.text-slate-600 div');
+          let domainText = '';
+          domains.forEach(domain => {
+            domainText += domain.textContent.toLowerCase() + ' ';
+          });
+          
+          if (name.includes(searchTerm) || type.includes(searchTerm) || domainText.includes(searchTerm)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
           }
         });
-      }, observerOptions);
-
-      // Observe stat cards
-      document.querySelectorAll('.stat-card').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'all 0.6s ease';
-        observer.observe(card);
       });
+    }
 
-      // Observe info cards
-      document.querySelectorAll('.info-card').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateX(-20px)';
-        card.style.transition = 'all 0.6s ease';
-        observer.observe(card);
+    // Sort functionality
+    const sortSelects = document.querySelectorAll('select');
+    sortSelects.forEach(select => {
+      select.addEventListener('change', function() {
+        const sortBy = this.value;
+        const cards = Array.from(personCards);
+        
+        cards.sort((a, b) => {
+          const nameA = a.querySelector('h4').textContent;
+          const nameB = b.querySelector('h4').textContent;
+          const riskA = parseInt(a.querySelector('.text-xs.font-semibold').textContent);
+          const riskB = parseInt(b.querySelector('.text-xs.font-semibold').textContent);
+          
+          if (sortBy.includes('Name')) {
+            return nameA.localeCompare(nameB);
+          } else if (sortBy.includes('Risk Score')) {
+            return sortBy.includes('High to Low') ? riskB - riskA : riskA - riskB;
+          }
+          return 0;
+        });
+        
+        const container = document.querySelector('.grid');
+        cards.forEach(card => container.appendChild(card));
       });
     });
   </script>

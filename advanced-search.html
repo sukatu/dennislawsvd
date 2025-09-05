@@ -3,576 +3,389 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advanced Search - Dennislaw SVD</title>
+  <title>Advanced Search - Ghana Legal Risk Index</title>
   
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Custom CSS for Advanced Search Page -->
   <style>
-    :root {
-      --primary-color: #298fca;
-      --secondary-color: #1e6bb8;
-      --accent-color: #f59e0b;
-      --text-dark: #1f2937;
-      --text-light: #6b7280;
-      --bg-light: #f8fafc;
-      --bg-white: #ffffff;
-      --border-color: #e5e7eb;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    :root{
+      --brand:#0ea5e9; /* sky-500 */
+      --brand-dark:#0284c7; /* sky-600 */
+      --text:#0f172a; /* slate-900 */
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-light);
-      color: var(--text-dark);
-    }
-
-    .navbar {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-      padding: 1rem 0;
-    }
-
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary-color) !important;
-    }
-
-    .navbar-brand i {
-      margin-right: 0.5rem;
-      color: var(--accent-color);
-    }
-
-    .navbar-nav .nav-link {
-      font-weight: 500;
-      color: var(--text-dark) !important;
-      margin: 0 0.5rem;
-      padding: 0.5rem 1rem !important;
-      border-radius: 0.5rem;
-      transition: all 0.3s ease;
-    }
-
-    .navbar-nav .nav-link:hover {
-      background: linear-gradient(135deg, #298fca, #1e6bb8);
-      color: white !important;
-      transform: translateY(-2px);
-    }
-
-    .page-header {
-      background: linear-gradient(135deg, #298fca 0%, #1e6bb8 50%, #0f4c75 100%);
-      color: white;
-      padding: 4rem 0;
-      text-align: center;
-    }
-
-    .page-header h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-
-    .page-header p {
-      font-size: 1.2rem;
-      opacity: 0.9;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .search-container {
-      background: var(--bg-white);
-      border-radius: 1rem;
-      padding: 3rem;
-      box-shadow: var(--shadow-lg);
-      max-width: 1000px;
-      margin: -3rem auto 0 auto;
-      position: relative;
-      z-index: 10;
-    }
-
-    .search-section {
-      margin-bottom: 3rem;
-    }
-
-    .search-section h3 {
-      color: var(--primary-color);
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-label {
-      font-weight: 500;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 0.75rem;
-      border: 2px solid var(--border-color);
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      background: var(--bg-light);
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: #298fca;
-      background: white;
-      box-shadow: 0 0 0 3px rgba(41, 143, 202, 0.1);
-    }
-
-    .form-select {
-      width: 100%;
-      padding: 0.75rem;
-      border: 2px solid var(--border-color);
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      background: var(--bg-light);
-      cursor: pointer;
-    }
-
-    .form-select:focus {
-      outline: none;
-      border-color: #298fca;
-      background: white;
-      box-shadow: 0 0 0 3px rgba(41, 143, 202, 0.1);
-    }
-
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      margin: 0 -0.75rem;
-    }
-
-    .col-md-6 {
-      flex: 0 0 50%;
-      max-width: 50%;
-      padding: 0 0.75rem;
-    }
-
-    .col-md-4 {
-      flex: 0 0 33.333333%;
-      max-width: 33.333333%;
-      padding: 0 0.75rem;
-    }
-
-    .col-md-12 {
-      flex: 0 0 100%;
-      max-width: 100%;
-      padding: 0 0.75rem;
-    }
-
-    .search-button {
-      width: 100%;
-      padding: 1.25rem;
-      background: linear-gradient(135deg, #298fca, #1e6bb8, #0f4c75);
-      border: none;
-      border-radius: 0.75rem;
-      color: white;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-md);
-      margin-top: 1rem;
-    }
-
-    .search-button:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .search-tips {
-      background: var(--bg-light);
-      border-radius: 1rem;
-      padding: 2rem;
-      margin-top: 2rem;
-    }
-
-    .search-tips h4 {
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    .tip-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      padding: 1rem;
-      background: white;
-      border-radius: 0.5rem;
-      border-left: 3px solid var(--accent-color);
-    }
-
-    .tip-icon {
-      color: var(--accent-color);
-      font-size: 1.2rem;
-      margin-top: 0.2rem;
-    }
-
-    .footer {
-      background: var(--text-dark);
-      color: white;
-      padding: 3rem 0 1rem 0;
-      margin-top: 4rem;
-    }
-
-    .footer-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .footer-section h5 {
-      color: var(--accent-color);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    .footer-section p, .footer-section a {
-      color: #9ca3af;
-      text-decoration: none;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .footer-section a:hover {
-      color: white;
-    }
-
-    .footer-bottom {
-      border-top: 1px solid #374151;
-      padding-top: 1rem;
-      text-align: center;
-      color: #9ca3af;
-    }
-
-    @media (max-width: 768px) {
-      .page-header h1 {
-        font-size: 2.5rem;
-      }
-      
-      .search-container {
-        margin: -2rem 1rem 0 1rem;
-        padding: 2rem;
-      }
-      
-      .col-md-6, .col-md-4 {
-        flex: 0 0 100%;
-        max-width: 100%;
-      }
-    }
+    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+    /* nice scrollbar */
+    *{scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;}
+    *::-webkit-scrollbar{height:8px;width:8px}
+    *::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
   </style>
 </head>
-<body>
-  <!-- Advanced Navbar -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container">
-      <a class="navbar-brand" href="index.html">
-        <i class="fas fa-user-search"></i>
-        Dennislaw SVD
-      </a>
-      
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="advanced-search.html"><i class="fas fa-search"></i> Advanced Search</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="people-database.html"><i class="fas fa-users"></i> People Database</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="about.html"><i class="fas fa-info-circle"></i> About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
-          </li>
-        </ul>
+<body class="bg-slate-50 text-slate-900">
+  <!-- Top Nav -->
+  <header class="w-full bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+        <span class="font-semibold">Ghana Legal Risk Index</span>
       </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm/6 text-slate-200">
+        <a class="hover:text-white" href="index.html">Home</a>
+        <a class="hover:text-white" href="people-results.html">People Search</a>
+        <a class="hover:text-white text-sky-400" href="advanced-search.html">Advanced Search</a>
+        <a class="hover:text-white" href="people-database.html">People Database</a>
+        <a class="hover:text-white" href="about.html">About</a>
+        <a class="hover:text-white" href="contact.html">Contact</a>
+        <a class="hover:text-white" href="specification.html">Specification</a>
+      </nav>
+      <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/10" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
     </div>
-  </nav>
+  </header>
 
   <!-- Page Header -->
-  <section class="page-header">
-    <div class="container">
-      <h1>Advanced People Search</h1>
-      <p>Use advanced filters and search criteria to find specific individuals involved in legal cases with precision and accuracy.</p>
-    </div>
+  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">Advanced Search</h1>
+    <p class="mt-2 text-slate-600">Use advanced filters to find exactly what you're looking for in our comprehensive legal database.</p>
   </section>
 
-  <!-- Advanced Search Container -->
-  <div class="container">
-    <div class="search-container">
-      <form id="advancedSearchForm">
-        <!-- Basic Search Section -->
-        <div class="search-section">
-          <h3><i class="fas fa-search"></i> Basic Search</h3>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">Case Title</label>
-                <input type="text" class="form-control" placeholder="Enter case title or partial title">
-              </div>
+  <!-- Advanced Search Form -->
+  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pb-10">
+    <div class="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+      <form class="space-y-8" id="advancedSearchForm">
+        <!-- Basic Information -->
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
+            </svg>
+            Basic Information
+          </h3>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">First Name</label>
+              <input type="text" name="firstName" placeholder="Enter first name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">Person Name</label>
-                <input type="text" class="form-control" placeholder="Enter person's full name">
-              </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Last Name</label>
+              <input type="text" name="lastName" placeholder="Enter last name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
             </div>
-          </div>
-        </div>
-
-        <!-- Case Details Section -->
-        <div class="search-section">
-          <h3><i class="fas fa-file-alt"></i> Case Details</h3>
-          <div class="row">
-            <div class="col-md-4">
-              <div class="form-group">
-                <label class="form-label">Court Type</label>
-                <select class="form-select">
-                  <option value="">All Courts</option>
-                  <option value="supreme">Supreme Court</option>
-                  <option value="appeals">Court of Appeals</option>
-                  <option value="district">District Court</option>
-                  <option value="state">State Courts</option>
-                  <option value="federal">Federal Courts</option>
-                  <option value="municipal">Municipal Courts</option>
-                </select>
-              </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Phone Number</label>
+              <input type="text" name="phone" placeholder="Enter phone number" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
             </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label class="form-label">Case Type</label>
-                <select class="form-select">
-                  <option value="">All Case Types</option>
-                  <option value="civil">Civil</option>
-                  <option value="criminal">Criminal</option>
-                  <option value="family">Family Law</option>
-                  <option value="corporate">Corporate</option>
-                  <option value="employment">Employment</option>
-                  <option value="property">Property</option>
-                  <option value="intellectual">Intellectual Property</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label class="form-label">Case Status</label>
-                <select class="form-select">
-                  <option value="">All Statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="closed">Closed</option>
-                  <option value="appealed">Appealed</option>
-                  <option value="settled">Settled</option>
-                  <option value="dismissed">Dismissed</option>
-                </select>
-              </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Email Address</label>
+              <input type="email" name="email" placeholder="Enter email address" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
             </div>
           </div>
         </div>
 
-        <!-- Date Range Section -->
-        <div class="search-section">
-          <h3><i class="fas fa-calendar"></i> Date Range</h3>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">From Date</label>
-                <input type="date" class="form-control">
-              </div>
+        <!-- Legal Information -->
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+            </svg>
+            Legal Information
+          </h3>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Case Title</label>
+              <input type="text" name="caseTitle" placeholder="Enter case title" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">To Date</label>
-                <input type="date" class="form-control">
-              </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Suit Number</label>
+              <input type="text" name="suitNumber" placeholder="Enter suit number" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
             </div>
-          </div>
-        </div>
-
-        <!-- Legal Professionals Section -->
-        <div class="search-section">
-          <h3><i class="fas fa-gavel"></i> Legal Professionals</h3>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">Presiding Judge</label>
-                <input type="text" class="form-control" placeholder="Enter judge's name">
-              </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Judge Name</label>
+              <input type="text" name="judgeName" placeholder="Enter judge name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">Lawyer/Attorney</label>
-                <input type="text" class="form-control" placeholder="Enter lawyer's name">
-              </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Lawyer Name</label>
+              <input type="text" name="lawyerName" placeholder="Enter lawyer name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
             </div>
           </div>
         </div>
 
-        <!-- Case Details Section -->
-        <div class="search-section">
-          <h3><i class="fas fa-info-circle"></i> Additional Details</h3>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">Case Number</label>
-                <input type="text" class="form-control" placeholder="Enter case number">
-              </div>
+        <!-- Filters -->
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 4a1 1 0 0 1 1-1h5a1 1 0 0 1 .894.553L11.382 6H20a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+            </svg>
+            Filters
+          </h3>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Legal Domain</label>
+              <select name="legalDomain" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
+                <option value="">Select domain</option>
+                <option value="criminal">Criminal</option>
+                <option value="civil">Civil</option>
+                <option value="commercial">Commercial</option>
+                <option value="family">Family</option>
+                <option value="labor">Labor/Employment</option>
+                <option value="property">Land/Property</option>
+                <option value="human-rights">Human Rights</option>
+                <option value="banking">Banking/Financial</option>
+                <option value="probate">Probate/Administration</option>
+              </select>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">Citation</label>
-                <input type="text" class="form-control" placeholder="Enter legal citation">
-              </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Court Tier</label>
+              <select name="courtTier" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
+                <option value="">Select court tier</option>
+                <option value="supreme">Supreme Court</option>
+                <option value="appeal">Court of Appeal</option>
+                <option value="high">High Court</option>
+                <option value="circuit">Circuit Court</option>
+                <option value="district">District Court</option>
+              </select>
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Region</label>
+              <select name="region" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
+                <option value="">Select region</option>
+                <option value="greater-accra">Greater Accra</option>
+                <option value="ashanti">Ashanti</option>
+                <option value="western">Western</option>
+                <option value="eastern">Eastern</option>
+                <option value="volta">Volta</option>
+                <option value="central">Central</option>
+                <option value="northern">Northern</option>
+                <option value="upper-east">Upper East</option>
+                <option value="upper-west">Upper West</option>
+                <option value="brong-ahafo">Brong-Ahafo</option>
+                <option value="western-north">Western North</option>
+                <option value="ahafo">Ahafo</option>
+                <option value="bono">Bono</option>
+                <option value="bono-east">Bono East</option>
+                <option value="oti">Oti</option>
+                <option value="savannah">Savannah</option>
+                <option value="north-east">North East</option>
+              </select>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label class="form-label">Keywords</label>
-                <input type="text" class="form-control" placeholder="Enter relevant keywords (e.g., fraud, custody, contract)">
-              </div>
+        </div>
+
+        <!-- Date Range -->
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
+            </svg>
+            Date Range
+          </h3>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">From Date</label>
+              <input type="date" name="fromDate" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
             </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">To Date</label>
+              <input type="date" name="toDate" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Filters -->
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+            </svg>
+            Additional Filters
+          </h3>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Case Status</label>
+              <select name="caseStatus" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="closed">Closed</option>
+                <option value="appealed">Appealed</option>
+                <option value="settled">Settled</option>
+                <option value="dismissed">Dismissed</option>
+                <option value="ongoing">Ongoing</option>
+              </select>
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-semibold text-slate-600">Risk Level</label>
+              <select name="riskLevel" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
+                <option value="">All Risk Levels</option>
+                <option value="low">Low Risk (0-40)</option>
+                <option value="medium">Medium Risk (41-70)</option>
+                <option value="high">High Risk (71-100)</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="mb-1 block text-xs font-semibold text-slate-600">Keywords</label>
+            <input type="text" name="keywords" placeholder="Enter relevant keywords (e.g., fraud, custody, contract)" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
           </div>
         </div>
 
         <!-- Search Button -->
-        <button type="submit" class="search-button">
-          <i class="fas fa-search"></i> Perform Advanced Search
-        </button>
+        <div class="flex justify-center">
+          <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-8 py-3 font-semibold text-white hover:bg-sky-700 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 20.586 16.243 15.83A8 8 0 1 0 15.83 16.243L20.586 21 21 20.586zM4 10a6 6 0 1 1 6 6 6.006 6.006 0 0 1-6-6z"/>
+            </svg>
+            Perform Advanced Search
+          </button>
+        </div>
       </form>
+    </div>
 
-      <!-- Search Tips -->
-      <div class="search-tips">
-        <h4><i class="fas fa-lightbulb"></i> Search Tips</h4>
-        <div class="tip-item">
-          <i class="fas fa-check-circle tip-icon"></i>
+    <!-- Search Tips -->
+    <div class="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-6">
+      <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        Search Tips
+      </h3>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="flex items-start gap-3">
+          <div class="w-6 h-6 bg-sky-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+            </svg>
+          </div>
           <div>
-            <strong>Use Partial Names:</strong> You can search with partial names or initials to find more results.
+            <h4 class="font-medium text-slate-900">Use Partial Names</h4>
+            <p class="text-sm text-slate-600">You can search with partial names or initials to find more results.</p>
           </div>
         </div>
-        <div class="tip-item">
-          <i class="fas fa-check-circle tip-icon"></i>
+        
+        <div class="flex items-start gap-3">
+          <div class="w-6 h-6 bg-sky-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+            </svg>
+          </div>
           <div>
-            <strong>Case Title Variations:</strong> Try different variations of case titles (e.g., "Smith v Johnson" or "Smith vs Johnson").
+            <h4 class="font-medium text-slate-900">Case Title Variations</h4>
+            <p class="text-sm text-slate-600">Try different variations of case titles (e.g., "Smith v Johnson" or "Smith vs Johnson").</p>
           </div>
         </div>
-        <div class="tip-item">
-          <i class="fas fa-check-circle tip-icon"></i>
+        
+        <div class="flex items-start gap-3">
+          <div class="w-6 h-6 bg-sky-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+            </svg>
+          </div>
           <div>
-            <strong>Date Ranges:</strong> Use date ranges to narrow down results to specific time periods.
+            <h4 class="font-medium text-slate-900">Date Ranges</h4>
+            <p class="text-sm text-slate-600">Use date ranges to narrow down results to specific time periods.</p>
           </div>
         </div>
-        <div class="tip-item">
-          <i class="fas fa-check-circle tip-icon"></i>
+        
+        <div class="flex items-start gap-3">
+          <div class="w-6 h-6 bg-sky-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+            </svg>
+          </div>
           <div>
-            <strong>Multiple Filters:</strong> Combine multiple search criteria for more precise results.
+            <h4 class="font-medium text-slate-900">Multiple Filters</h4>
+            <p class="text-sm text-slate-600">Combine multiple search criteria for more precise results.</p>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Advanced Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h5><i class="fas fa-user-search"></i> Dennislaw SVD</h5>
-          <p>Your trusted partner for comprehensive people search and case history discovery.</p>
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+            <span class="font-semibold">Ghana Legal Risk Index</span>
+          </div>
+          <p class="text-slate-300 text-sm">Your trusted partner for comprehensive people search and case history discovery.</p>
         </div>
         
-        <div class="footer-section">
-          <h5>Quick Links</h5>
-          <a href="index.html">Home</a>
-          <a href="advanced-search.html">Advanced Search</a>
-          <a href="people-database.html">People Database</a>
-          <a href="#">API Documentation</a>
+        <div>
+          <h4 class="font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="index.html" class="hover:text-white">Home</a></li>
+            <li><a href="advanced-search.html" class="hover:text-white">Advanced Search</a></li>
+            <li><a href="people-database.html" class="hover:text-white">People Database</a></li>
+            <li><a href="specification.html" class="hover:text-white">Specification</a></li>
+          </ul>
         </div>
         
-        <div class="footer-section">
-          <h5>Support</h5>
-          <a href="#">Help Center</a>
-          <a href="contact.html">Contact Support</a>
-          <a href="#">Training Resources</a>
-          <a href="#">FAQ</a>
+        <div>
+          <h4 class="font-semibold mb-4">Support</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Help Center</a></li>
+            <li><a href="contact.html" class="hover:text-white">Contact Support</a></li>
+            <li><a href="#" class="hover:text-white">Training Resources</a></li>
+            <li><a href="#" class="hover:text-white">FAQ</a></li>
+          </ul>
         </div>
         
-        <div class="footer-section">
-          <h5>Connect</h5>
-          <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
-          <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
-          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
-          <a href="contact.html"><i class="fas fa-envelope"></i> Email</a>
+        <div>
+          <h4 class="font-semibold mb-4">Connect</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Twitter</a></li>
+            <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+            <li><a href="#" class="hover:text-white">Facebook</a></li>
+            <li><a href="contact.html" class="hover:text-white">Email</a></li>
+          </ul>
         </div>
       </div>
       
-      <div class="footer-bottom">
-        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
+      <div class="mt-8 pt-8 border-t border-slate-700 text-center text-sm text-slate-400">
+        <p>&copy; 2025 Ghana Legal Risk Index. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>
 
-  <!-- Bootstrap JS and Popper.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-  
-  <!-- Custom JavaScript for Advanced Search -->
   <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.querySelector('button[aria-label="Open menu"]');
+    const nav = document.querySelector('nav');
+    
+    if (mobileMenuBtn && nav) {
+      mobileMenuBtn.addEventListener('click', function() {
+        nav.classList.toggle('hidden');
+      });
+    }
+
     // Form submission
-    document.getElementById('advancedSearchForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Collect all form data
-      const formData = new FormData(this);
-      const searchParams = new URLSearchParams();
-      
-      // Add form data to search params
-      for (let [key, value] of formData.entries()) {
-        if (value) {
-          searchParams.append(key, value);
+    const searchForm = document.getElementById('advancedSearchForm');
+    if (searchForm) {
+      searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Collect all form data
+        const formData = new FormData(this);
+        const searchParams = new URLSearchParams();
+        
+        // Add form data to search params
+        for (let [key, value] of formData.entries()) {
+          if (value) {
+            searchParams.append(key, value);
+          }
         }
-      }
-      
-      // Redirect to results page with search parameters
-      window.location.href = 'people-results.html?' + searchParams.toString();
-    });
+        
+        // Redirect to results page with search parameters
+        window.location.href = 'people-results.html?' + searchParams.toString();
+      });
+    }
 
     // Set default dates (last 5 years)
     document.addEventListener('DOMContentLoaded', function() {
@@ -580,13 +393,29 @@
       const fiveYearsAgo = new Date();
       fiveYearsAgo.setFullYear(today.getFullYear() - 5);
       
-      const fromDateInput = document.querySelector('input[type="date"]:first-of-type');
-      const toDateInput = document.querySelector('input[type="date"]:last-of-type');
+      const fromDateInput = document.querySelector('input[name="fromDate"]');
+      const toDateInput = document.querySelector('input[name="toDate"]');
       
       if (fromDateInput && toDateInput) {
         fromDateInput.value = fiveYearsAgo.toISOString().split('T')[0];
         toDateInput.value = today.toISOString().split('T')[0];
       }
+    });
+
+    // Form validation
+    const form = document.getElementById('advancedSearchForm');
+    const inputs = form.querySelectorAll('input, select');
+    
+    inputs.forEach(input => {
+      input.addEventListener('blur', function() {
+        if (this.hasAttribute('required') && !this.value.trim()) {
+          this.classList.add('border-red-500');
+          this.classList.remove('border-slate-200');
+        } else {
+          this.classList.remove('border-red-500');
+          this.classList.add('border-slate-200');
+        }
+      });
     });
   </script>
 </body>

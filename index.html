@@ -3,738 +3,325 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dennislaw SVD - People Search by Case Title</title>
+  <title>Ghana Legal Risk Index - Look Up Anyone!</title>
   
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts (Inter) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Tailwind (for theme/colors) - light-weight CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Custom CSS for Advanced UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
-    :root {
-      --primary-color: #298fca;
-      --secondary-color: #1e6bb8;
-      --accent-color: #f59e0b;
-      --text-dark: #0f172a; /* adjusted to slate-900 like glri */
-      --text-light: #6b7280;
-      --bg-light: #f8fafc;
-      --bg-white: #ffffff;
-      --border-color: #e5e7eb;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    :root{
+      --brand:#0ea5e9; /* sky-500 */
+      --brand-dark:#0284c7; /* sky-600 */
+      --text:#0f172a; /* slate-900 */
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    /* Use Inter everywhere and adopt neutral page background (glri look) */
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: #f8fafc; /* similar to Tailwind slate-50 */
-      min-height: 100vh;
-      color: var(--text-dark);
-    }
-
-    /* NAVBAR adapted to glri_search_results theme (dark header) */
-    .navbar {
-      background: #0f172a !important; /* slate-900 */
-      color: #ffffff !important;
-      border-bottom: none;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
-      padding: 0.6rem 0;
-    }
-
-    .navbar .container {
-      max-width: 1100px;
-    }
-
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.125rem;
-      color: #ffffff !important;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .navbar-brand i {
-      color: #38bdf8 !important; /* sky-400 feel */
-      font-size: 1rem;
-    }
-
-    .navbar-nav .nav-link {
-      font-weight: 500;
-      color: #e2e8f0 !important; /* slate-200 */
-      margin: 0 0.25rem;
-      padding: 0.4rem 0.75rem !important;
-      border-radius: 0.5rem;
-      transition: color .15s ease, background .15s ease, transform .15s ease;
-    }
-
-    .navbar-nav .nav-link:hover,
-    .navbar-nav .nav-link.active {
-      background: rgba(255,255,255,0.03);
-      color: #ffffff !important;
-      transform: translateY(-1px);
-    }
-
-    /* Toggler visibility */
-    .navbar .navbar-toggler {
-      border-color: rgba(255,255,255,0.08);
-      background: transparent;
-    }
-    .navbar .navbar-toggler-icon {
-      display: none;
-    }
-    .navbar .navbar-toggler svg {
-      width: 1.2rem;
-      height: 1.2rem;
-      color: #e2e8f0;
-    }
-
-    /* Make .container spacing align with tailwind-like layout */
-    .container {
-      max-width: 1100px;
-    }
-
-    /* Hero adapted to neutral background but keep strong heading */
-    .hero-section {
-      padding: 3.5rem 0 2rem 0;
-      text-align: center;
-      color: var(--text-dark);
-      background: transparent;
-    }
-
-    .hero-section h1 {
-      font-size: 2.75rem;
-      font-weight: 800;
-      margin-bottom: 0.75rem;
-      color: var(--text-dark);
-    }
-
-    .hero-section p {
-      font-size: 1rem;
-      color: var(--text-light);
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    /* Keep the rest of the original component styles mostly unchanged */
-    .search-container {
-      background: var(--bg-white);
-      border-radius: 1rem;
-      padding: 2.25rem;
-      box-shadow: var(--shadow-lg);
-      max-width: 900px;
-      margin: -2.5rem auto 0 auto;
-      position: relative;
-      z-index: 10;
-    }
-
-    .search-header { text-align: center; margin-bottom: 1rem; }
-    .search-header h2 { color: var(--text-dark); font-weight: 600; margin-bottom: 0.25rem; }
-    .search-header p { color: var(--text-light); font-size: 0.95rem; }
-
-    .search-form { margin-bottom: 1rem; }
-    .search-input-group { position: relative; margin-bottom: 1rem; }
-    .search-input {
-      width: 100%;
-      padding: 0.9rem 0.9rem 0.9rem 2.6rem;
-      border: 1px solid var(--border-color);
-      border-radius: 0.6rem;
-      font-size: 1rem;
-      transition: all 0.2s ease;
-      background: #f8fafc;
-    }
-    .search-input:focus { outline: none; border-color: var(--primary-color); background: white; box-shadow: 0 0 0 4px rgba(41,143,202,0.06); }
-    .search-icon { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--text-light); font-size: 1rem; }
-
-    .search-button {
-      width: 100%;
-      padding: 0.9rem;
-      background: linear-gradient(90deg,var(--primary-color),var(--secondary-color));
-      border: none;
-      border-radius: 0.6rem;
-      color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: var(--shadow-md);
-    }
-    .search-button:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-
-    /* keep rest of existing component styles (stats, features, suggestions, footer etc.) */
-    /* ...rest of original CSS preserved below (unchanged) ... */
-
-    .search-options { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .search-option { flex: 1; min-width: 150px; }
-    .search-option select { width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background: white; font-size: 0.9rem; }
-
-    .advanced-search-toggle { text-align: center; margin-bottom: 1rem; }
-    .advanced-search-toggle button { background: none; border: none; color: var(--primary-color); font-weight: 500; cursor: pointer; padding: 0.35rem 0.6rem; border-radius: 0.5rem; transition: all 0.2s ease; }
-    .advanced-search-toggle button:hover { background: var(--bg-light); }
-
-    .advanced-fields { display: none; background: var(--bg-light); padding: 1rem; border-radius: 0.6rem; margin-bottom: 1rem; }
-    .advanced-fields.show { display: block; }
-
-    .stats-section { background: var(--bg-white); padding: 3rem 0; margin-top: 1.75rem; }
-    .stat-card { text-align: center; padding: 1.25rem 0.5rem; }
-    .stat-number { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.25rem; }
-    .stat-label { color: var(--text-light); font-weight: 500; }
-
-    .features-section { background: transparent; padding: 3rem 0; }
-    .feature-card { background: white; padding: 1.25rem; border-radius: 0.8rem; text-align: center; box-shadow: var(--shadow-sm); transition: all 0.2s ease; height: 100%; }
-    .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-    .feature-icon { width: 3.25rem; height: 3.25rem; background: linear-gradient(90deg,var(--primary-color),var(--secondary-color)); border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; color: white; font-size: 1rem; }
-
-    .footer { background: var(--text-dark); color: white; padding: 2rem 0 1rem 0; margin-top: 2.5rem; }
-    .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-    .footer-section h5 { color: var(--accent-color); margin-bottom: 0.5rem; font-weight: 600; }
-    .footer-section p, .footer-section a { color: #9ca3af; text-decoration: none; margin-bottom: 0.4rem; display: block; }
-    .footer-section a:hover { color: white; }
-    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.75rem; text-align: center; color: #9ca3af; font-size: 0.9rem; }
-
-    /* Suggestions & other utilities copied from original */
-    .loading-spinner { display: none; width: 16px; height: 16px; border: 2px solid #ffffff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-left: 0.5rem; }
-    @keyframes spin { 0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
-
-    .search-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 0.75rem 0.75rem; box-shadow: var(--shadow-lg); z-index: 1000; max-height: 300px; overflow-y: auto; display: none; }
-    .suggestion-item { padding: 1rem; cursor: pointer; border-bottom: 1px solid var(--border-color); transition: all 0.2s ease; display: flex; align-items: center; gap: 1rem; }
-    .suggestion-item:hover { background-color: var(--bg-light); transform: translateX(5px); }
-    .suggestion-item:last-child { border-bottom: none; }
-    .suggestion-icon { width: 2.5rem; height: 2.5rem; background: linear-gradient(90deg,var(--primary-color),var(--secondary-color)); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; flex-shrink: 0; }
-    .suggestion-content { flex: 1; }
-    .suggestion-title { font-weight: 600; color: var(--text-dark); margin-bottom: 0.25rem; font-size: 0.95rem; }
-    .suggestion-meta { color: var(--text-light); font-size: 0.85rem; display:flex; gap: 0.75rem; flex-wrap:wrap; }
-    .suggestion-type { background: var(--primary-color); color: white; padding: 0.15rem 0.45rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; }
-    .suggestion-highlight { background-color: rgba(41, 143, 202, 0.12); padding: 0.05rem 0.18rem; border-radius: 0.2rem; font-weight: 700; }
-    .no-suggestions { padding: 1rem; text-align: center; color: var(--text-light); font-style: italic; }
-    .suggestions-header { padding: 0.5rem 0.75rem; background: var(--bg-light); border-bottom: 1px solid var(--border-color); font-weight: 600; color: var(--text-dark); font-size: 0.9rem; }
-    .suggestions-footer { padding: 0.5rem 0.75rem; background: var(--bg-light); border-top: 1px solid var(--border-color); text-align:center; font-size: 0.85rem; color: var(--text-light); }
-
-    @media (max-width: 768px) {
-      .hero-section h1 { font-size: 1.75rem; }
-      .search-container { margin: -1.5rem 1rem 0 1rem; padding: 1rem; }
-      .search-options { flex-direction: column; }
-    }
+    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+    /* nice scrollbar */
+    *{scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;}
+    *::-webkit-scrollbar{height:8px;width:8px}
+    *::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-  <!-- Advanced Navbar -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container">
-      <a class="navbar-brand" href="#">
-        <i class="fas fa-user-search"></i>
-        Dennislaw SVD
-      </a>
-      
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <!-- use inline SVG for visibility on dark background -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M4 6h16M4 12h16M4 18h16" />
+  <!-- Top Nav -->
+  <header class="w-full bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+        <span class="font-semibold">Ghana Legal Risk Index</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm/6 text-slate-200">
+        <a class="hover:text-white" href="index.html">Home</a>
+        <a class="hover:text-white" href="advanced-search.html">Advanced Search</a>
+        <a class="hover:text-white" href="people-database.html">People Database</a>
+        <a class="hover:text-white" href="about.html">About</a>
+        <a class="hover:text-white" href="contact.html">Contact</a>
+      </nav>
+      <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/10" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link active" href="index.html"><i class="fas fa-home"></i> Home</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="fas fa-layer-group"></i> Categories
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="categoriesDropdown">
-              <li><a class="dropdown-item" href="people-results.html?category=banking">Banking</a></li>
-              <li><a class="dropdown-item" href="people-results.html?category=insurance">Insurance</a></li>
-              <li><a class="dropdown-item" href="people-results.html?category=criminal">Criminal Cases</a></li>
-              <li><a class="dropdown-item" href="people-results.html?category=land">Land</a></li>
-              <li><a class="dropdown-item" href="people-results.html?category=divorce">Divorce</a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="advanced-search.html"><i class="fas fa-search"></i> Advanced Search</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="people-database.html"><i class="fas fa-users"></i> People Database</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="about.html"><i class="fas fa-info-circle"></i> About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="specification.html"><i class="fas fa-file-alt"></i> Specification</a>
-          </li>
-        </ul>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">Look Up Anyone!</h1>
+    <p class="mt-2 text-slate-600">Search for individuals involved in legal cases with Ghana's most comprehensive legal risk database. Find case history, presiding judges, lawyers, and case outcomes.</p>
+    <div class="mt-3 flex items-center justify-center gap-6 text-sm text-slate-500">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.011 8.011 0 0 1 4.07 13H4a1 1 0 0 1 0-2h.07A8.011 8.011 0 0 1 11 4.07V4a1 1 0 0 1 2 0v.07A8.011 8.011 0 0 1 19.93 11H20a1 1 0 0 1 0 2h-.07A8.011 8.011 0 0 1 13 19.93Z"/></svg>
+        <span><span class="font-semibold">464</span> Courts Connected</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4a1 1 0 0 1 1-1h5a1 1 0 0 1 .894.553L11.382 6H20a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+        <span><span class="font-semibold">16</span> Regions Covered</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 1-4 4 4.005 4.005 0 0 1 4-4Zm8-3h-3.586l-1.707-1.707A1 1 0 0 0 13.586 3H10.414a1 1 0 0 0-.707.293L8 5H5a2 2 0 0 0-2 2v11a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7a2 2 0 0 0-2-2Z"/></svg>
+        <span>Updated Daily</span>
       </div>
     </div>
-  </nav>
 
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="container text-center">
-      <h1>Find People by Case Title</h1>
-      <p>Search for individuals involved in legal cases by entering case titles. Discover case history, presiding judges, lawyers, and case outcomes with Dennislaw SVD's comprehensive people search database.</p>
+    <!-- Tabs -->
+    <div class="mt-6 inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+      <button data-tab="name" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium bg-sky-50 text-sky-700 border border-sky-200">Name</button>
+      <button data-tab="phone" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Phone</button>
+      <button data-tab="address" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Address</button>
     </div>
-  </section>
 
-  <!-- Advanced Search Container -->
-  <div class="container">
-    <div class="search-container">
-      <div class="search-header">
-        <h2><i class="fas fa-user-search"></i> Legal Document & People Search</h2>
-        <p>Search by Title of Case, Suit No., Date, and Nature of Document (Judgment, Ruling, Cause List). Gazette support coming soon.</p>
-      </div>
-
-      <form class="search-form" id="searchForm">
-        <div class="search-input-group" style="margin-bottom: 1rem;">
-          <i class="fas fa-heading search-icon"></i>
-          <input type="text" class="search-input" id="titleInput" placeholder="Title of the Case (e.g., Smith v. Johnson)">
+    <!-- Search form (Name) -->
+    <div id="tab-name" class="mt-5">
+      <form class="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-2" id="searchForm">
+        <div>
+          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">First Name</label>
+          <input id="firstName" type="text" placeholder="Enter first name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
         </div>
-
-        <div class="search-options">
-          <div class="search-option">
-            <input type="text" id="suitNoInput" class="form-control" placeholder="Suit No. (e.g., GJ/123/2024)">
-          </div>
-          <div class="search-option">
-            <input type="date" id="dateInput" class="form-control" placeholder="Date">
-          </div>
-          <div class="search-option">
-            <select id="natureInput" class="form-select">
-              <option value="">Nature of Document</option>
-              <option value="judgment">Judgment</option>
-              <option value="ruling">Ruling</option>
-              <option value="cause_list">Cause List</option>
-            </select>
-          </div>
+        <div>
+          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">Last Name</label>
+          <input id="lastName" type="text" placeholder="Enter last name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
         </div>
-
-        <div class="advanced-search-toggle">
-          <button type="button" id="advancedToggle">
-            <i class="fas fa-cog"></i> Advanced Search Options
+        <div class="sm:col-span-2">
+          <button type="submit" id="searchBtn" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 font-semibold text-white hover:bg-sky-700 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 20.586 16.243 15.83A8 8 0 1 0 15.83 16.243L20.586 21 21 20.586zM4 10a6 6 0 1 1 6 6 6.006 6.006 0 0 1-6-6z"/>
+            </svg>
+            Search
           </button>
         </div>
-
-        <div class="advanced-fields" id="advancedFields">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label">Judge Name</label>
-                <input type="text" class="form-control" id="judgeInput" placeholder="Enter judge name">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label">Lawyer</label>
-                <input type="text" class="form-control" id="lawyerInput" placeholder="Enter lawyer name">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- (Note: original file duplicated advanced fields; preserved content but kept single visible block above) -->
-
-        <button type="submit" class="search-button">
-          <i class="fas fa-search"></i> Search
-          <div class="loading-spinner" id="loadingSpinner"></div>
-        </button>
       </form>
     </div>
-  </div>
+
+    <!-- Placeholder forms for other tabs -->
+    <div id="tab-phone" class="hidden mt-5">
+      <form class="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">Phone Number</label>
+          <input type="text" placeholder="Enter phone number" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
+        </div>
+        <div class="sm:col-span-1 flex items-end">
+          <button type="button" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 font-semibold text-white hover:bg-sky-700 transition">Search</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="tab-address" class="hidden mt-5">
+      <form class="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">Address</label>
+          <input type="text" placeholder="Enter address" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
+        </div>
+        <div class="sm:col-span-1 flex items-end">
+          <button type="button" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 font-semibold text-white hover:bg-sky-700 transition">Search</button>
+        </div>
+      </form>
+    </div>
+  </section>
 
   <!-- Statistics Section -->
-  <section class="stats-section">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3 col-sm-6">
-          <div class="stat-card">
-            <div class="stat-number">500K+</div>
-            <div class="stat-label">People in Database</div>
+  <section class="border-t border-slate-200 bg-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-slate-900">Why Choose Ghana Legal Risk Index?</h2>
+        <p class="mt-2 text-slate-600">Advanced features designed for legal professionals and researchers</p>
+      </div>
+      
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900">People Search</h3>
           </div>
+          <p class="text-slate-600">Find individuals by searching case titles with comprehensive results showing case history and involvement.</p>
         </div>
-        <div class="col-md-3 col-sm-6">
-          <div class="stat-card">
-            <div class="stat-number">2.5M+</div>
-            <div class="stat-label">Case Records</div>
+        
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900">Case Summaries</h3>
           </div>
+          <p class="text-slate-600">Detailed case summaries with judgments, presiding judges, lawyers, and case outcomes for each person.</p>
         </div>
-        <div class="col-md-3 col-sm-6">
-          <div class="stat-card">
-            <div class="stat-number">25+</div>
-            <div class="stat-label">Years of Data</div>
+        
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900">DennislawGH Integration</h3>
           </div>
+          <p class="text-slate-600">Direct access to full case details on dennislawgh.com with one-click navigation.</p>
         </div>
-        <div class="col-md-3 col-sm-6">
-          <div class="stat-card">
-            <div class="stat-number">99.9%</div>
-            <div class="stat-label">Accuracy Rate</div>
+        
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900">Case History</h3>
           </div>
+          <p class="text-slate-600">Track complete legal history showing how many times a person appeared in different cases.</p>
+        </div>
+        
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900">Legal Professionals</h3>
+          </div>
+          <p class="text-slate-600">Identify presiding judges and lawyers involved in cases for comprehensive legal research.</p>
+        </div>
+        
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 18a6 6 0 0 0 6-6V6a6 6 0 0 0-12 0v6a6 6 0 0 0 6 6Z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900">Mobile Optimized</h3>
+          </div>
+          <p class="text-slate-600">Access people search anywhere with our responsive design and mobile app.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Features Section -->
-  <section class="features-section">
-    <div class="container">
-      <div class="text-center mb-4">
-        <h2>Why Choose Dennislaw SVD?</h2>
-        <p class="text-muted">Advanced features designed for legal professionals and researchers</p>
-      </div>
-      
-      <div class="row">
-        <div class="col-lg-4 col-md-6 mb-4">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="fas fa-user-search"></i>
-            </div>
-            <h5>People Search</h5>
-            <p>Find individuals by searching case titles with comprehensive results showing case history and involvement.</p>
-          </div>
+  <!-- Additional Stats Section -->
+  <section class="bg-slate-50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-sky-600">500K+</div>
+          <div class="text-sm text-slate-600">People in Database</div>
         </div>
-        
-        <div class="col-lg-4 col-md-6 mb-4">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="fas fa-file-alt"></i>
-            </div>
-            <h5>Case Summaries</h5>
-            <p>Detailed case summaries with judgments, presiding judges, lawyers, and case outcomes for each person.</p>
-          </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-sky-600">2.5M+</div>
+          <div class="text-sm text-slate-600">Case Records</div>
         </div>
-        
-        <div class="col-lg-4 col-md-6 mb-4">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="fas fa-external-link-alt"></i>
-            </div>
-            <h5>DennislawGH Integration</h5>
-            <p>Direct access to full case details on dennislawgh.com with one-click navigation.</p>
-          </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-sky-600">25+</div>
+          <div class="text-sm text-slate-600">Years of Data</div>
         </div>
-        
-        <div class="col-lg-4 col-md-6 mb-4">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="fas fa-history"></i>
-            </div>
-            <h5>Case History</h5>
-            <p>Track complete legal history showing how many times a person appeared in different cases.</p>
-          </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 mb-4">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="fas fa-gavel"></i>
-            </div>
-            <h5>Legal Professionals</h5>
-            <p>Identify presiding judges and lawyers involved in cases for comprehensive legal research.</p>
-          </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 mb-4">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="fas fa-mobile-alt"></i>
-            </div>
-            <h5>Mobile Optimized</h5>
-            <p>Access people search anywhere with our responsive design and mobile app.</p>
-          </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-sky-600">99.9%</div>
+          <div class="text-sm text-slate-600">Accuracy Rate</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Advanced Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h5><i class="fas fa-user-search"></i> Dennislaw SVD</h5>
-          <p>Your trusted partner for comprehensive people search and case history discovery.</p>
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+            <span class="font-semibold">Ghana Legal Risk Index</span>
+          </div>
+          <p class="text-slate-300 text-sm">Your trusted partner for comprehensive people search and case history discovery.</p>
         </div>
         
-        <div class="footer-section">
-          <h5>Quick Links</h5>
-          <a href="index.html">Home</a>
-          <a href="advanced-search.html">Advanced Search</a>
-          <a href="people-database.html">People Database</a>
-          <a href="specification.html">Specification</a>
+        <div>
+          <h4 class="font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="index.html" class="hover:text-white">Home</a></li>
+            <li><a href="advanced-search.html" class="hover:text-white">Advanced Search</a></li>
+            <li><a href="people-database.html" class="hover:text-white">People Database</a></li>
+            <li><a href="specification.html" class="hover:text-white">Specification</a></li>
+          </ul>
         </div>
         
-        <div class="footer-section">
-          <h5>Support</h5>
-          <a href="#">Help Center</a>
-          <a href="contact.html">Contact Support</a>
-          <a href="#">Training Resources</a>
-          <a href="#">FAQ</a>
+        <div>
+          <h4 class="font-semibold mb-4">Support</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Help Center</a></li>
+            <li><a href="contact.html" class="hover:text-white">Contact Support</a></li>
+            <li><a href="#" class="hover:text-white">Training Resources</a></li>
+            <li><a href="#" class="hover:text-white">FAQ</a></li>
+          </ul>
         </div>
         
-        <div class="footer-section">
-          <h5>Connect</h5>
-          <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
-          <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
-          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
-          <a href="contact.html"><i class="fas fa-envelope"></i> Email</a>
+        <div>
+          <h4 class="font-semibold mb-4">Connect</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Twitter</a></li>
+            <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+            <li><a href="#" class="hover:text-white">Facebook</a></li>
+            <li><a href="contact.html" class="hover:text-white">Email</a></li>
+          </ul>
         </div>
       </div>
       
-      <div class="footer-bottom">
-        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
+      <div class="mt-8 pt-8 border-t border-slate-700 text-center text-sm text-slate-400">
+        <p>&copy; 2025 Ghana Legal Risk Index. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>
 
-  <!-- Bootstrap JS and Popper.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-  
-  <!-- Custom JavaScript for Advanced Functionality -->
   <script>
-    // Advanced search toggle (safely handle single button)
-    const advToggle = document.getElementById('advancedToggle');
-    const advFields = document.getElementById('advancedFields');
-    if (advToggle && advFields) {
-      advToggle.addEventListener('click', function() {
-        advFields.classList.toggle('show');
-        if (advFields.classList.contains('show')) {
-          this.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Advanced Options';
-        } else {
-          this.innerHTML = '<i class="fas fa-cog"></i> Advanced Search Options';
-        }
+    // Tabs
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const sections = {
+      name: document.getElementById('tab-name'),
+      phone: document.getElementById('tab-phone'),
+      address: document.getElementById('tab-address'),
+    };
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => b.classList.remove('active','bg-sky-50','text-sky-700','border','border-sky-200'));
+        btn.classList.add('active','bg-sky-50','text-sky-700','border','border-sky-200');
+        Object.values(sections).forEach(sec => sec.classList.add('hidden'));
+        sections[btn.dataset.tab].classList.remove('hidden');
       });
-    }
-
-    // Inputs
-    const titleInput = document.getElementById('titleInput');
-    const suitNoInput = document.getElementById('suitNoInput');
-    const dateInput = document.getElementById('dateInput');
-    const natureInput = document.getElementById('natureInput');
-    const searchSuggestions = document.getElementById('searchSuggestions');
-    let currentFocus = -1;
-    let suggestionsList = [];
-    
-    function debounce(func, wait) {
-      let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
-
-    const debouncedShowSuggestions = debounce(function(query) {
-      if (query.length > 1) {
-        showSuggestions(query);
-      } else {
-        hideSuggestions();
-      }
-    }, 300);
-
-    if (titleInput && searchSuggestions) titleInput.addEventListener('input', function() {
-      const query = this.value.trim();
-      currentFocus = -1;
-      if (query.length > 1) {
-        searchSuggestions.innerHTML = '<div class="suggestions-header"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
-        searchSuggestions.style.display = 'block';
-      } else {
-        hideSuggestions();
-      }
-      debouncedShowSuggestions(query);
     });
 
-    if (titleInput && searchSuggestions) titleInput.addEventListener('keydown', function(e) {
-      const suggestions = searchSuggestions.querySelectorAll('.suggestion-item');
-      if (suggestions.length === 0) return;
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        currentFocus++;
-        if (currentFocus >= suggestions.length) currentFocus = 0;
-        setActiveSuggestion(suggestions);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        currentFocus--;
-        if (currentFocus < 0) currentFocus = suggestions.length - 1;
-        setActiveSuggestion(suggestions);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (currentFocus > -1 && suggestions[currentFocus]) {
-          suggestions[currentFocus].click();
-        } else {
-          document.getElementById('searchForm').submit();
-        }
-      } else if (e.key === 'Escape') {
-        hideSuggestions();
-        titleInput.blur();
-      }
-    });
-
-    function setActiveSuggestion(suggestions) {
-      suggestions.forEach((item, index) => {
-        if (index === currentFocus) {
-          item.style.backgroundColor = 'var(--primary-color)';
-          item.style.color = 'white';
-          item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } else {
-          item.style.backgroundColor = '';
-          item.style.color = '';
-        }
-      });
-    }
-
-    function showSuggestions(query) {
-      // (Same mock suggestions as original)
-      const allSuggestions = [
-        { title: 'Smith v. Johnson', year: '2024', type: 'Civil', court: 'District Court', people: 'John Smith, Mary Johnson', description: 'Contract dispute case' },
-        { title: 'State v. Brown', year: '2023', type: 'Criminal', court: 'Superior Court', people: 'Michael Brown, State Prosecutor', description: 'Fraud and embezzlement case' },
-        { title: 'Corporate Inc. v. LLC', year: '2024', type: 'Corporate', court: 'Business Court', people: 'Corporate Inc., LLC Partners', description: 'Business partnership dispute' },
-        { title: 'Family Law v. Estate', year: '2023', type: 'Family', court: 'Family Court', people: 'Family Law Firm, Estate Trustees', description: 'Custody and estate settlement' },
-        { title: 'Criminal Appeal v. State', year: '2024', type: 'Criminal', court: 'Court of Appeals', people: 'Criminal Defendant, State', description: 'Appeal of criminal conviction' },
-        { title: 'Johnson v. Insurance Co.', year: '2024', type: 'Civil', court: 'Circuit Court', people: 'Sarah Johnson, Insurance Company', description: 'Insurance claim dispute' },
-        { title: 'Employment v. Corporation', year: '2023', type: 'Employment', court: 'Labor Court', people: 'Employee Union, Corporation', description: 'Labor law violation case' },
-        { title: 'Property v. Developers', year: '2024', type: 'Property', court: 'Land Court', people: 'Property Owners, Developers', description: 'Property development dispute' }
-      ];
-
-      const filteredSuggestions = allSuggestions.filter(suggestion => {
-        const searchText = query.toLowerCase();
-        return suggestion.title.toLowerCase().includes(searchText) ||
-               suggestion.people.toLowerCase().includes(searchText) ||
-               suggestion.type.toLowerCase().includes(searchText) ||
-               suggestion.description.toLowerCase().includes(searchText);
-      });
-
-      if (filteredSuggestions.length > 0) {
-        const suggestionsHTML = `
-          <div class="suggestions-header"><i class="fas fa-search"></i> Found ${filteredSuggestions.length} matching cases</div>
-          ${filteredSuggestions.map(suggestion => {
-            const highlightedTitle = highlightText(suggestion.title, query);
-            const highlightedPeople = highlightText(suggestion.people, query);
-            return `
-              <div class="suggestion-item" onclick="selectSuggestion('${suggestion.title} (${suggestion.year})')">
-                <div class="suggestion-icon"><i class="fas fa-${getIconForType(suggestion.type)}"></i></div>
-                <div class="suggestion-content">
-                  <div class="suggestion-title">${highlightedTitle}</div>
-                  <div class="suggestion-meta">
-                    <span class="suggestion-type">${suggestion.type}</span>
-                    <span><i class="fas fa-calendar"></i> ${suggestion.year}</span>
-                    <span><i class="fas fa-gavel"></i> ${suggestion.court}</span>
-                    <span><i class="fas fa-users"></i> ${highlightedPeople}</span>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('')}
-          <div class="suggestions-footer"><i class="fas fa-info-circle"></i> Click on a suggestion to select it</div>
-        `;
-        searchSuggestions.innerHTML = suggestionsHTML;
-        searchSuggestions.style.display = 'block';
-      } else {
-        searchSuggestions.innerHTML = `
-          <div class="suggestions-header"><i class="fas fa-search"></i> No exact matches found</div>
-          <div class="no-suggestions"><i class="fas fa-lightbulb"></i> Try searching with different keywords or case titles</div>
-          <div class="suggestions-footer"><i class="fas fa-info-circle"></i> You can still search with your current input</div>
-        `;
-        searchSuggestions.style.display = 'block';
-      }
-    }
-
-    function highlightText(text, query) {
-      if (!query) return text;
-      const regex = new RegExp(`(${query})`, 'gi');
-      return text.replace(regex, '<span class="suggestion-highlight">$1</span>');
-    }
-
-    function getIconForType(type) {
-      const iconMap = { 'Civil': 'balance-scale', 'Criminal': 'gavel', 'Family': 'heart', 'Corporate': 'building', 'Employment': 'briefcase', 'Property': 'home' };
-      return iconMap[type] || 'file-alt';
-    }
-
-    function hideSuggestions() {
-      if (searchSuggestions) searchSuggestions.style.display = 'none';
-    }
-
-    function selectSuggestion(text) {
-      if (titleInput) titleInput.value = text;
-      hideSuggestions();
-    }
-
-    document.addEventListener('click', function(e) {
-      if (titleInput && searchSuggestions && !titleInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
-        hideSuggestions();
-      }
-    });
-
-    // Form submission with loading state
+    // Form submission
     const searchForm = document.getElementById('searchForm');
     if (searchForm) {
       searchForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const searchButton = document.querySelector('.search-button');
-        if (loadingSpinner) loadingSpinner.style.display = 'inline-block';
-        if (searchButton) {
-          searchButton.disabled = true;
-          // keep minimal innerHTML change to preserve spinner id
-        }
-        const params = new URLSearchParams({
-          title: (titleInput && titleInput.value.trim()) || '',
-          suitNo: (suitNoInput && suitNoInput.value.trim()) || '',
-          date: (dateInput && dateInput.value) || '',
-          nature: (natureInput && natureInput.value) || ''
-        });
-        setTimeout(() => {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        
+        if (firstName || lastName) {
+          const params = new URLSearchParams({
+            firstName: firstName,
+            lastName: lastName
+          });
           window.location.href = 'people-results.html?' + params.toString();
-        }, 1200);
+        }
       });
     }
 
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+    // Mobile menu toggle
+    const mobileMenuBtn = document.querySelector('button[aria-label="Open menu"]');
+    const nav = document.querySelector('nav');
+    
+    if (mobileMenuBtn && nav) {
+      mobileMenuBtn.addEventListener('click', function() {
+        nav.classList.toggle('hidden');
       });
-    });
-
-    // Animate stats
-    document.addEventListener('DOMContentLoaded', function() {
-      const observerOptions = { threshold: 0.5, rootMargin: '0px 0px -80px 0px' };
-      const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-          }
-        });
-      }, observerOptions);
-
-      document.querySelectorAll('.stat-card').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(12px)';
-        card.style.transition = 'all 0.6s ease';
-        observer.observe(card);
-      });
-    });
+    }
   </script>
 </body>
 </html>

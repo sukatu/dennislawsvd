@@ -5,582 +5,186 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About - Dennislaw SVD</title>
   
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Custom CSS for About Page -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #298fca;
-      --secondary-color: #1e6bb8;
-      --accent-color: #f59e0b;
-      --text-dark: #1f2937;
-      --text-light: #6b7280;
-      --bg-light: #f8fafc;
-      --bg-white: #ffffff;
-      --border-color: #e5e7eb;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    :root{
+      --brand:#0ea5e9; /* sky-500 */
+      --brand-dark:#0284c7; /* sky-600 */
+      --text:#0f172a; /* slate-900 */
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-light);
-      color: var(--text-dark);
-    }
-
-    .navbar {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-      padding: 1rem 0;
-    }
-
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary-color) !important;
-    }
-
-    .navbar-brand i {
-      margin-right: 0.5rem;
-      color: var(--accent-color);
-    }
-
-    .navbar-nav .nav-link {
-      font-weight: 500;
-      color: var(--text-dark) !important;
-      margin: 0 0.5rem;
-      padding: 0.5rem 1rem !important;
-      border-radius: 0.5rem;
-      transition: all 0.3s ease;
-    }
-
-    .navbar-nav .nav-link:hover {
-      background: linear-gradient(135deg, #298fca, #1e6bb8);
-      color: white !important;
-      transform: translateY(-2px);
-    }
-
-    .page-header {
-      background: linear-gradient(135deg, #298fca 0%, #1e6bb8 50%, #0f4c75 100%);
-      color: white;
-      padding: 4rem 0;
-      text-align: center;
-    }
-
-    .page-header h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-
-    .page-header p {
-      font-size: 1.2rem;
-      opacity: 0.9;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .about-section {
-      padding: 4rem 0;
-    }
-
-    .about-card {
-      background: white;
-      border-radius: 1rem;
-      padding: 3rem;
-      margin-bottom: 3rem;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s ease;
-    }
-
-    .about-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .about-card h2 {
-      color: var(--primary-color);
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .about-card p {
-      color: var(--text-light);
-      line-height: 1.8;
-      margin-bottom: 1.5rem;
-      font-size: 1.1rem;
-    }
-
-    .mission-vision {
-      background: var(--bg-white);
-      padding: 4rem 0;
-    }
-
-    .mission-card {
-      background: white;
-      border-radius: 1rem;
-      padding: 2.5rem;
-      text-align: center;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s ease;
-      height: 100%;
-    }
-
-    .mission-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .mission-icon {
-      width: 5rem;
-      height: 5rem;
-      background: linear-gradient(135deg, #298fca, #1e6bb8, #0f4c75);
-      border-radius: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem auto;
-      color: white;
-      font-size: 2rem;
-    }
-
-    .mission-card h3 {
-      color: var(--text-dark);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    .mission-card p {
-      color: var(--text-light);
-      line-height: 1.6;
-    }
-
-    .team-section {
-      padding: 4rem 0;
-    }
-
-    .team-card {
-      background: white;
-      border-radius: 1rem;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s ease;
-      margin-bottom: 2rem;
-    }
-
-    .team-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .team-avatar {
-      width: 6rem;
-      height: 6rem;
-      background: linear-gradient(135deg, #298fca, #1e6bb8);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem auto;
-      color: white;
-      font-size: 2.5rem;
-      font-weight: 600;
-    }
-
-    .team-card h4 {
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-
-    .team-card .role {
-      color: var(--primary-color);
-      font-weight: 500;
-      margin-bottom: 1rem;
-    }
-
-    .team-card p {
-      color: var(--text-light);
-      line-height: 1.6;
-    }
-
-    .values-section {
-      background: var(--bg-white);
-      padding: 4rem 0;
-    }
-
-    .value-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      background: white;
-      border-radius: 1rem;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s ease;
-    }
-
-    .value-item:hover {
-      transform: translateX(5px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .value-icon {
-      width: 3rem;
-      height: 3rem;
-      background: linear-gradient(135deg, #298fca, #1e6bb8);
-      border-radius: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
-
-    .value-content h4 {
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-
-    .value-content p {
-      color: var(--text-light);
-      line-height: 1.6;
-    }
-
-    .footer {
-      background: var(--text-dark);
-      color: white;
-      padding: 3rem 0 1rem 0;
-      margin-top: 4rem;
-    }
-
-    .footer-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .footer-section h5 {
-      color: var(--accent-color);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    .footer-section p, .footer-section a {
-      color: #9ca3af;
-      text-decoration: none;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .footer-section a:hover {
-      color: white;
-    }
-
-    .footer-bottom {
-      border-top: 1px solid #374151;
-      padding-top: 1rem;
-      text-align: center;
-      color: #9ca3af;
-    }
-
-    @media (max-width: 768px) {
-      .page-header h1 {
-        font-size: 2.5rem;
-      }
-      
-      .about-card {
-        padding: 2rem;
-      }
-      
-      .value-item {
-        flex-direction: column;
-        text-align: center;
-      }
-    }
+    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+    /* nice scrollbar */
+    *{scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;}
+    *::-webkit-scrollbar{height:8px;width:8px}
+    *::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
   </style>
 </head>
-<body>
-  <!-- Advanced Navbar -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container">
-      <a class="navbar-brand" href="index.html">
-        <i class="fas fa-user-search"></i>
-        Dennislaw SVD
-      </a>
-      
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="advanced-search.html"><i class="fas fa-search"></i> Advanced Search</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="people-database.html"><i class="fas fa-users"></i> People Database</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="about.html"><i class="fas fa-info-circle"></i> About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
-          </li>
-        </ul>
+<body class="bg-slate-50 text-slate-900">
+  <!-- Top Nav -->
+  <header class="w-full bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+        <span class="font-semibold">Dennislaw SVD</span>
       </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm/6 text-slate-200">
+        <a class="hover:text-white" href="index.html">Home</a>
+        <a class="hover:text-white" href="people-results.html">People Search</a>
+        <a class="hover:text-white" href="advanced-search.html">Advanced Search</a>
+        <a class="hover:text-white" href="people-database.html">People Database</a>
+        <a class="hover:text-white" href="about.html">About</a>
+        <a class="hover:text-white" href="contact.html">Contact</a>
+        <a class="hover:text-white" href="specification.html">Specification</a>
+      </nav>
+      <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/10" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
     </div>
-  </nav>
+  </header>
 
   <!-- Page Header -->
-  <section class="page-header">
-    <div class="container">
-      <h1>About Dennislaw SVD</h1>
-      <p>Learn about our mission to provide comprehensive people search capabilities for legal professionals and researchers.</p>
+  <section class="bg-slate-900 text-white py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">About Dennislaw SVD</h1>
+      <p class="mt-4 text-xl text-slate-300 max-w-3xl mx-auto">
+        Your comprehensive legal research platform for finding people, cases, and legal information across Ghana's court system.
+      </p>
     </div>
   </section>
 
-  <!-- About Section -->
-  <section class="about-section">
-    <div class="container">
-      <div class="about-card">
-        <h2><i class="fas fa-building"></i> Our Story</h2>
-        <p>Dennislaw SVD was founded with a clear vision: to revolutionize how legal professionals and researchers find information about people involved in legal cases. What started as a simple case search tool has evolved into a comprehensive people search platform that connects case titles with the individuals involved.</p>
-        <p>Our journey began in 2020 when we recognized the growing need for a more efficient way to track people across multiple legal proceedings. Traditional case search systems focused on case outcomes and legal precedents, but often overlooked the human element - the individuals whose lives are affected by these legal processes.</p>
-        <p>Today, Dennislaw SVD serves as the premier platform for people search in legal contexts, helping attorneys, researchers, journalists, and other professionals quickly identify and track individuals across various legal proceedings.</p>
-      </div>
-
-      <div class="about-card">
-        <h2><i class="fas fa-cogs"></i> How It Works</h2>
-        <p>Our innovative approach combines advanced search algorithms with comprehensive data aggregation to provide accurate, up-to-date information about people involved in legal cases. When you search for a case title, our system doesn't just return case details - it identifies all the people involved and provides comprehensive information about their legal history.</p>
-        <p>The process begins with our extensive database that continuously collects and updates information from multiple court systems across the country. We employ sophisticated data processing techniques to ensure accuracy and eliminate duplicates, while maintaining the privacy and security of sensitive information.</p>
-        <p>When you perform a search, our system cross-references case titles with our people database, identifying all individuals involved, their roles in the case, and providing links to detailed case information on dennislawgh.com for comprehensive legal research.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Mission & Vision Section -->
-  <section class="mission-vision">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="mission-card">
-            <div class="mission-icon">
-              <i class="fas fa-bullseye"></i>
-            </div>
-            <h3>Our Mission</h3>
-            <p>To provide legal professionals and researchers with the most comprehensive and accurate people search capabilities, enabling them to quickly identify and track individuals across multiple legal proceedings with confidence and efficiency.</p>
-          </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="mission-card">
-            <div class="mission-icon">
-              <i class="fas fa-eye"></i>
-            </div>
-            <h3>Our Vision</h3>
-            <p>To become the global standard for people search in legal contexts, connecting case information with human stories to create a more transparent and accessible legal system for everyone.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Team Section -->
-  <section class="team-section">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2>Our Team</h2>
-        <p class="text-muted">Meet the dedicated professionals behind Dennislaw SVD</p>
-      </div>
-      
-      <div class="row">
-        <div class="col-lg-4 col-md-6">
-          <div class="team-card">
-            <div class="team-avatar">JD</div>
-            <h4>John Dennis</h4>
-            <div class="role">Founder & CEO</div>
-            <p>Legal technology expert with over 15 years of experience in developing innovative solutions for the legal industry.</p>
-          </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6">
-          <div class="team-card">
-            <div class="team-avatar">SL</div>
-            <h4>Sarah Lawson</h4>
-            <div class="role">Chief Technology Officer</div>
-            <p>Former software engineer at major tech companies, specializing in database architecture and search algorithms.</p>
-          </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6">
-          <div class="team-card">
-            <div class="team-avatar">MC</div>
-            <h4>Michael Chen</h4>
-            <div class="role">Head of Legal Operations</div>
-            <p>Experienced attorney with expertise in legal research and data management across multiple jurisdictions.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Values Section -->
-  <section class="values-section">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2>Our Core Values</h2>
-        <p class="text-muted">The principles that guide everything we do</p>
-      </div>
-      
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="value-item">
-            <div class="value-icon">
-              <i class="fas fa-shield-alt"></i>
-            </div>
-            <div class="value-content">
-              <h4>Privacy & Security</h4>
-              <p>We prioritize the protection of personal information and maintain the highest standards of data security and privacy compliance.</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="value-item">
-            <div class="value-icon">
-              <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="value-content">
-              <h4>Accuracy & Reliability</h4>
-              <p>We are committed to providing the most accurate and up-to-date information, continuously verifying and updating our database.</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="value-item">
-            <div class="value-icon">
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="value-content">
-              <h4>User-Centric Design</h4>
-              <p>Every feature and improvement is designed with our users in mind, ensuring an intuitive and efficient experience.</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col-lg-6">
-          <div class="value-item">
-            <div class="value-icon">
-              <i class="fas fa-lightbulb"></i>
-            </div>
-            <div class="value-content">
-              <h4>Innovation</h4>
-              <p>We continuously explore new technologies and methodologies to improve our platform and better serve our users.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Advanced Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h5><i class="fas fa-user-search"></i> Dennislaw SVD</h5>
-          <p>Your trusted partner for comprehensive people search and case history discovery.</p>
-        </div>
-        
-        <div class="footer-section">
-          <h5>Quick Links</h5>
-          <a href="index.html">Home</a>
-          <a href="advanced-search.html">Advanced Search</a>
-          <a href="people-database.html">People Database</a>
-          <a href="#">API Documentation</a>
-        </div>
-        
-        <div class="footer-section">
-          <h5>Support</h5>
-          <a href="#">Help Center</a>
-          <a href="contact.html">Contact Support</a>
-          <a href="#">Training Resources</a>
-          <a href="#">FAQ</a>
-        </div>
-        
-        <div class="footer-section">
-          <h5>Connect</h5>
-          <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
-          <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
-          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
-          <a href="contact.html"><i class="fas fa-envelope"></i> Email</a>
+  <!-- Main Content -->
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <!-- Main Content -->
+      <div class="lg:col-span-2">
+        <div class="prose prose-slate max-w-none">
+          <h2 class="text-2xl font-bold text-slate-900 mb-6">Our Mission</h2>
+          <p class="text-slate-600 mb-6">
+            Dennislaw SVD is dedicated to providing comprehensive legal research tools that make it easier for legal professionals, researchers, and the public to access and analyze legal information across Ghana's court system.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-slate-900 mb-6">What We Do</h2>
+          <p class="text-slate-600 mb-6">
+            Our platform offers advanced search capabilities to find people involved in legal cases, track case history, and access detailed information about legal proceedings. We connect data from over 464 courts across 16 regions in Ghana.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-slate-900 mb-6">Key Features</h2>
+          <ul class="list-disc list-inside text-slate-600 mb-6 space-y-2">
+            <li>Comprehensive people search by case title</li>
+            <li>Advanced filtering and search options</li>
+            <li>Case history tracking and analysis</li>
+            <li>Integration with DennislawGH platform</li>
+            <li>Mobile-optimized interface</li>
+            <li>Real-time data updates</li>
+          </ul>
+          
+          <h2 class="text-2xl font-bold text-slate-900 mb-6">Our Data</h2>
+          <p class="text-slate-600 mb-6">
+            We maintain a comprehensive database of over 2.5 million case records spanning more than 25 years of legal history. Our data is updated daily and maintains a 99.9% accuracy rate.
+          </p>
         </div>
       </div>
       
-      <div class="footer-bottom">
+      <!-- Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">Quick Stats</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-600">People in Database</span>
+              <span class="font-semibold text-slate-900">500K+</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-600">Case Records</span>
+              <span class="font-semibold text-slate-900">2.5M+</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-600">Courts Connected</span>
+              <span class="font-semibold text-slate-900">464</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-600">Regions Covered</span>
+              <span class="font-semibold text-slate-900">16</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-600">Years of Data</span>
+              <span class="font-semibold text-slate-900">25+</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-600">Accuracy Rate</span>
+              <span class="font-semibold text-slate-900">99.9%</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm mt-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">Contact Us</h3>
+          <p class="text-slate-600 text-sm mb-4">
+            Have questions about our platform or need support? We're here to help.
+          </p>
+          <a href="contact.html" class="inline-flex items-center gap-2 text-sky-600 hover:text-sky-700 font-medium">
+            Get in Touch
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white py-12">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+            <span class="font-semibold">Dennislaw SVD</span>
+          </div>
+          <p class="text-slate-300 text-sm">Your trusted partner for comprehensive people search and case history discovery.</p>
+        </div>
+        
+        <div>
+          <h5 class="font-semibold mb-4">Quick Links</h5>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="index.html" class="hover:text-white">Home</a></li>
+            <li><a href="advanced-search.html" class="hover:text-white">Advanced Search</a></li>
+            <li><a href="people-database.html" class="hover:text-white">People Database</a></li>
+            <li><a href="specification.html" class="hover:text-white">Specification</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h5 class="font-semibold mb-4">Support</h5>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Help Center</a></li>
+            <li><a href="contact.html" class="hover:text-white">Contact Support</a></li>
+            <li><a href="#" class="hover:text-white">Training Resources</a></li>
+            <li><a href="#" class="hover:text-white">FAQ</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h5 class="font-semibold mb-4">Connect</h5>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Twitter</a></li>
+            <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+            <li><a href="#" class="hover:text-white">Facebook</a></li>
+            <li><a href="contact.html" class="hover:text-white">Email</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-slate-700 mt-8 pt-8 text-center text-sm text-slate-400">
         <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>
-
-  <!-- Bootstrap JS and Popper.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-  
-  <!-- Custom JavaScript for About Page -->
-  <script>
-    // Add some interactive animations
-    document.addEventListener('DOMContentLoaded', function() {
-      // Animate cards on scroll
-      const observerOptions = {
-        threshold: 0.3,
-        rootMargin: '0px 0px -50px 0px'
-      };
-
-      const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-          }
-        });
-      }, observerOptions);
-
-      // Observe all cards
-      document.querySelectorAll('.about-card, .mission-card, .team-card, .value-item').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = 'all 0.8s ease';
-        observer.observe(card);
-      });
-    });
-  </script>
 </body>
 </html>

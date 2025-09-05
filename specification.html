@@ -3,1176 +3,515 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>System Specification - Dennislaw SVD</title>
+  <title>System Specification - Ghana Legal Risk Index</title>
   
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Custom CSS for Specification Page -->
   <style>
-    :root {
-      --primary-color: #298fca;
-      --secondary-color: #1e6bb8;
-      --accent-color: #f59e0b;
-      --text-dark: #1f2937;
-      --text-light: #6b7280;
-      --bg-light: #f8fafc;
-      --bg-white: #ffffff;
-      --border-color: #e5e7eb;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-      --code-bg: #1f2937;
-      --code-color: #f3f4f6;
+    :root{
+      --brand:#0ea5e9; /* sky-500 */
+      --brand-dark:#0284c7; /* sky-600 */
+      --text:#0f172a; /* slate-900 */
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-light);
-      color: var(--text-dark);
-      line-height: 1.7;
-    }
-
-    .navbar {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-      padding: 1rem 0;
-    }
-
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary-color) !important;
-    }
-
-    .navbar-brand i {
-      margin-right: 0.5rem;
-      color: var(--accent-color);
-    }
-
-    .navbar-nav .nav-link {
-      font-weight: 500;
-      color: var(--text-dark) !important;
-      margin: 0 0.5rem;
-      padding: 0.5rem 1rem !important;
-      border-radius: 0.5rem;
-      transition: all 0.3s ease;
-    }
-
-    .navbar-nav .nav-link:hover {
-      background: linear-gradient(135deg, #298fca, #1e6bb8);
-      color: white !important;
-      transform: translateY(-2px);
-    }
-
-    .page-header {
-      background: linear-gradient(135deg, #298fca 0%, #1e6bb8 50%, #0f4c75 100%);
-      color: white;
-      padding: 4rem 0;
-      text-align: center;
-    }
-
-    .page-header h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-
-    .page-header p {
-      font-size: 1.2rem;
-      opacity: 0.9;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .spec-container {
-      max-width: 1200px;
-      margin: -3rem auto 0 auto;
-      position: relative;
-      z-index: 10;
-      background: white;
-      border-radius: 1rem;
-      box-shadow: var(--shadow-lg);
-      overflow: hidden;
-    }
-
-    .spec-sidebar {
-      background: var(--bg-light);
-      padding: 2rem 0;
-      height: 100%;
-      border-right: 1px solid var(--border-color);
-    }
-
-    .spec-sidebar .nav-link {
-      color: var(--text-dark);
-      padding: 0.75rem 2rem;
-      border-radius: 0;
-      border-left: 3px solid transparent;
-      transition: all 0.3s ease;
-    }
-
-    .spec-sidebar .nav-link:hover,
-    .spec-sidebar .nav-link.active {
-      background: white;
-      border-left-color: var(--primary-color);
-      color: var(--primary-color);
-    }
-
-    .spec-content {
-      padding: 3rem;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .section {
-      margin-bottom: 3rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .section:last-child {
-      border-bottom: none;
-    }
-
-    .section h2 {
-      color: var(--primary-color);
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .section h3 {
-      color: var(--text-dark);
-      margin: 2rem 0 1rem 0;
-      font-weight: 600;
-      font-size: 1.3rem;
-    }
-
-    .section h4 {
-      color: var(--secondary-color);
-      margin: 1.5rem 0 0.75rem 0;
-      font-weight: 600;
-    }
-
-    .section p {
-      margin-bottom: 1rem;
-      color: var(--text-light);
-    }
-
-    .section ul, .section ol {
-      margin-bottom: 1rem;
-      padding-left: 2rem;
-    }
-
-    .section li {
-      margin-bottom: 0.5rem;
-      color: var(--text-light);
-    }
-
-    .highlight-box {
-      background: linear-gradient(135deg, rgba(41, 143, 202, 0.1), rgba(30, 107, 184, 0.1));
-      border: 1px solid rgba(41, 143, 202, 0.2);
-      border-radius: 0.75rem;
-      padding: 1.5rem;
-      margin: 1.5rem 0;
-    }
-
-    .highlight-box h4 {
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
-
-    .tech-stack {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin: 1.5rem 0;
-    }
-
-    .tech-item {
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 0.5rem;
-      padding: 1rem;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-
-    .tech-item:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--primary-color);
-    }
-
-    .tech-icon {
-      width: 3rem;
-      height: 3rem;
-      background: linear-gradient(135deg, #298fca, #1e6bb8);
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 0.75rem auto;
-      color: white;
-      font-size: 1.2rem;
-    }
-
-    .timeline {
-      position: relative;
-      padding-left: 2rem;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: var(--primary-color);
-    }
-
-    .timeline-item {
-      position: relative;
-      margin-bottom: 2rem;
-    }
-
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: -2.5rem;
-      top: 0.5rem;
-      width: 1rem;
-      height: 1rem;
-      background: var(--primary-color);
-      border-radius: 50%;
-      border: 3px solid white;
-    }
-
-    .timeline-content {
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .timeline-title {
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-bottom: 0.5rem;
-    }
-
-    .timeline-date {
-      color: var(--text-light);
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-    }
-
-    .code-block {
-      background: var(--code-bg);
-      color: var(--code-color);
-      padding: 1.5rem;
-      border-radius: 0.5rem;
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      overflow-x: auto;
-      margin: 1.5rem 0;
-    }
-
-    .code-block .keyword {
-      color: #60a5fa;
-    }
-
-    .code-block .string {
-      color: #34d399;
-    }
-
-    .code-block .comment {
-      color: #9ca3af;
-    }
-
-    .table-responsive {
-      background: white;
-      border-radius: 0.5rem;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      margin: 1.5rem 0;
-    }
-
-    .table {
-      margin: 0;
-    }
-
-    .table th {
-      background: var(--bg-light);
-      border: none;
-      color: var(--text-dark);
-      font-weight: 600;
-      padding: 1rem;
-    }
-
-    .table td {
-      border: none;
-      border-bottom: 1px solid var(--border-color);
-      padding: 1rem;
-      color: var(--text-light);
-    }
-
-    .table tr:hover {
-      background: var(--bg-light);
-    }
-
-    .metric-card {
-      background: white;
-      border-radius: 0.75rem;
-      padding: 1.5rem;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s ease;
-      height: 100%;
-    }
-
-    .metric-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .metric-icon {
-      width: 3rem;
-      height: 3rem;
-      background: linear-gradient(135deg, #298fca, #1e6bb8);
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1rem;
-      color: white;
-      font-size: 1.2rem;
-    }
-
-    .metric-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary-color);
-      margin-bottom: 0.5rem;
-    }
-
-    .metric-label {
-      color: var(--text-light);
-      font-size: 0.9rem;
-    }
-
-    .footer {
-      background: var(--text-dark);
-      color: white;
-      padding: 3rem 0 1rem 0;
-      margin-top: 4rem;
-    }
-
-    .footer-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .footer-section h5 {
-      color: var(--accent-color);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    .footer-section p, .footer-section a {
-      color: #9ca3af;
-      text-decoration: none;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .footer-section a:hover {
-      color: white;
-    }
-
-    .footer-bottom {
-      border-top: 1px solid #374151;
-      padding-top: 1rem;
-      text-align: center;
-      color: #9ca3af;
-    }
-
-    @media (max-width: 768px) {
-      .page-header h1 {
-        font-size: 2.5rem;
-      }
-      
-      .spec-container {
-        margin: -2rem 1rem 0 1rem;
-      }
-      
-      .spec-content {
-        padding: 2rem;
-      }
-      
-      .tech-stack {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .toc-link {
-      color: var(--text-dark);
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .toc-link:hover {
-      color: var(--primary-color);
-    }
-
-    .toc-link.active {
-      color: var(--primary-color);
-      font-weight: 600;
-    }
+    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+    /* nice scrollbar */
+    *{scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;}
+    *::-webkit-scrollbar{height:8px;width:8px}
+    *::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
   </style>
 </head>
-<body>
-  <!-- Advanced Navbar -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container">
-      <a class="navbar-brand" href="index.html">
-        <i class="fas fa-user-search"></i>
-        Dennislaw SVD
-      </a>
-      
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="advanced-search.html"><i class="fas fa-search"></i> Advanced Search</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="people-database.html"><i class="fas fa-users"></i> People Database</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="about.html"><i class="fas fa-info-circle"></i> About</a>
-          </li>
-          <li class="nav-link" href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="specification.html"><i class="fas fa-file-alt"></i> Specification</a>
-          </li>
-        </ul>
+<body class="bg-slate-50 text-slate-900">
+  <!-- Top Nav -->
+  <header class="w-full bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+        <span class="font-semibold">Ghana Legal Risk Index</span>
       </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm/6 text-slate-200">
+        <a class="hover:text-white" href="index.html">Home</a>
+        <a class="hover:text-white" href="people-results.html">People Search</a>
+        <a class="hover:text-white" href="advanced-search.html">Advanced Search</a>
+        <a class="hover:text-white" href="people-database.html">People Database</a>
+        <a class="hover:text-white" href="about.html">About</a>
+        <a class="hover:text-white" href="contact.html">Contact</a>
+        <a class="hover:text-white text-sky-400" href="specification.html">Specification</a>
+      </nav>
+      <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/10" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
     </div>
-  </nav>
+  </header>
 
   <!-- Page Header -->
-  <section class="page-header">
-    <div class="container">
-      <h1>System Specification & Requirements</h1>
-      <p>Complete technical specification, architecture design, and development requirements for the Dennislaw SVD People Search System</p>
+  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">System Specification</h1>
+    <p class="mt-2 text-slate-600">Comprehensive technical documentation for the Ghana Legal Risk Index platform architecture, features, and implementation details.</p>
+  </section>
+
+  <!-- Specification Content -->
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-10">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
+      <!-- Sidebar Navigation -->
+      <aside class="lg:col-span-1">
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sticky top-6">
+          <h3 class="text-sm font-semibold text-slate-900 mb-4">Table of Contents</h3>
+          <nav class="space-y-2">
+            <a href="#overview" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Overview</a>
+            <a href="#architecture" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Architecture</a>
+            <a href="#features" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Features</a>
+            <a href="#api" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">API Documentation</a>
+            <a href="#database" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Database Schema</a>
+            <a href="#security" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Security</a>
+            <a href="#deployment" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Deployment</a>
+            <a href="#maintenance" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Maintenance</a>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="lg:col-span-3">
+        <div class="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+          <!-- Overview Section -->
+          <section id="overview" class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.011 8.011 0 0 1 4.07 13H4a1 1 0 0 1 0-2h.07A8.011 8.011 0 0 1 11 4.07V4a1 1 0 0 1 2 0v.07A8.011 8.011 0 0 1 19.93 11H20a1 1 0 0 1 0 2h-.07A8.011 8.011 0 0 1 13 19.93Z"/>
+              </svg>
+              System Overview
+            </h2>
+            <p class="text-slate-600 mb-4">The Ghana Legal Risk Index is a comprehensive legal database platform designed to provide instant access to legal case information, people search capabilities, and risk assessment tools for legal professionals, researchers, and the general public.</p>
+            
+            <div class="bg-sky-50 border border-sky-200 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-slate-900 mb-3">Key Objectives</h3>
+              <ul class="space-y-2 text-slate-600">
+                <li class="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                  </svg>
+                  Provide instant access to legal case information across Ghana
+                </li>
+                <li class="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                  </svg>
+                  Enable comprehensive people search by case involvement
+                </li>
+                <li class="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                  </svg>
+                  Offer risk assessment and scoring capabilities
+                </li>
+                <li class="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                  </svg>
+                  Support advanced search and filtering options
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- Architecture Section -->
+          <section id="architecture" class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-6v-6H10v6H4a1 1 0 0 1-1-1z"/>
+              </svg>
+              System Architecture
+            </h2>
+            <p class="text-slate-600 mb-4">The platform is built using modern web technologies with a focus on scalability, performance, and user experience.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div class="rounded-lg border border-slate-200 p-4">
+                <h3 class="text-lg font-semibold text-slate-900 mb-3">Frontend Technologies</h3>
+                <ul class="space-y-2 text-sm text-slate-600">
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    HTML5 & CSS3
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    Tailwind CSS
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    JavaScript (ES6+)
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    Font Awesome Icons
+                  </li>
+                </ul>
+              </div>
+              
+              <div class="rounded-lg border border-slate-200 p-4">
+                <h3 class="text-lg font-semibold text-slate-900 mb-3">Backend Technologies</h3>
+                <ul class="space-y-2 text-sm text-slate-600">
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    Node.js / Python
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    PostgreSQL / MongoDB
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    RESTful API
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    Redis Cache
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- Features Section -->
+          <section id="features" class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+              </svg>
+              Core Features
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="rounded-lg border border-slate-200 p-6">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold text-slate-900">People Search</h3>
+                </div>
+                <p class="text-slate-600 text-sm">Advanced search functionality to find individuals by name, case involvement, and legal history.</p>
+              </div>
+
+              <div class="rounded-lg border border-slate-200 p-6">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold text-slate-900">Case Management</h3>
+                </div>
+                <p class="text-slate-600 text-sm">Comprehensive case tracking with detailed information about judgments, rulings, and outcomes.</p>
+              </div>
+
+              <div class="rounded-lg border border-slate-200 p-6">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold text-slate-900">Risk Assessment</h3>
+                </div>
+                <p class="text-slate-600 text-sm">Automated risk scoring system based on legal history and case involvement patterns.</p>
+              </div>
+
+              <div class="rounded-lg border border-slate-200 p-6">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M21 20.586 16.243 15.83A8 8 0 1 0 15.83 16.243L20.586 21 21 20.586zM4 10a6 6 0 1 1 6 6 6.006 6.006 0 0 1-6-6z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold text-slate-900">Advanced Search</h3>
+                </div>
+                <p class="text-slate-600 text-sm">Multi-criteria search with filters for court type, date range, legal domain, and more.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- API Documentation Section -->
+          <section id="api" class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+              API Documentation
+            </h2>
+            <p class="text-slate-600 mb-4">The platform provides RESTful API endpoints for programmatic access to legal data.</p>
+            
+            <div class="bg-slate-900 rounded-lg p-6 mb-4">
+              <h3 class="text-white font-semibold mb-3">Search People Endpoint</h3>
+              <code class="text-green-400 text-sm">GET /api/v1/people/search?name=John&case_type=criminal</code>
+            </div>
+            
+            <div class="bg-slate-900 rounded-lg p-6 mb-4">
+              <h3 class="text-white font-semibold mb-3">Get Case Details</h3>
+              <code class="text-green-400 text-sm">GET /api/v1/cases/{case_id}</code>
+            </div>
+            
+            <div class="bg-slate-900 rounded-lg p-6">
+              <h3 class="text-white font-semibold mb-3">Risk Assessment</h3>
+              <code class="text-green-400 text-sm">POST /api/v1/risk/assess</code>
+            </div>
+          </section>
+
+          <!-- Database Schema Section -->
+          <section id="database" class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 4a1 1 0 0 1 1-1h5a1 1 0 0 1 .894.553L11.382 6H20a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+              </svg>
+              Database Schema
+            </h2>
+            <p class="text-slate-600 mb-4">The database is designed to efficiently store and retrieve legal case information with proper indexing and relationships.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="rounded-lg border border-slate-200 p-4">
+                <h3 class="text-lg font-semibold text-slate-900 mb-3">Core Tables</h3>
+                <ul class="space-y-2 text-sm text-slate-600">
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    people
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    cases
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    case_participants
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    courts
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    judges
+                  </li>
+                </ul>
+              </div>
+              
+              <div class="rounded-lg border border-slate-200 p-4">
+                <h3 class="text-lg font-semibold text-slate-900 mb-3">Key Relationships</h3>
+                <ul class="space-y-2 text-sm text-slate-600">
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    Many-to-many: People ↔ Cases
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    One-to-many: Courts → Cases
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    One-to-many: Judges → Cases
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
+                    One-to-many: Cases → Judgments
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- Security Section -->
+          <section id="security" class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 1l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 1z"/>
+              </svg>
+              Security & Privacy
+            </h2>
+            <p class="text-slate-600 mb-4">The platform implements comprehensive security measures to protect sensitive legal data and ensure user privacy.</p>
+            
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-slate-900 mb-3">Security Features</h3>
+              <ul class="space-y-2 text-slate-600">
+                <li class="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                  </svg>
+                  End-to-end encryption for all data transmission
+                </li>
+                <li class="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                  </svg>
+                  Role-based access control (RBAC)
+                </li>
+                <li class="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                  </svg>
+                  Regular security audits and penetration testing
+                </li>
+                <li class="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                  </svg>
+                  GDPR compliance for data protection
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- Deployment Section -->
+          <section id="deployment" class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 8a4 4 0 1 1-4 4 4.005 4.005 0 0 1 4-4Zm8-3h-3.586l-1.707-1.707A1 1 0 0 0 13.586 3H10.414a1 1 0 0 0-.707.293L8 5H5a2 2 0 0 0-2 2v11a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7a2 2 0 0 0-2-2Z"/>
+              </svg>
+              Deployment & Infrastructure
+            </h2>
+            <p class="text-slate-600 mb-4">The platform is deployed using modern cloud infrastructure with high availability and scalability.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="rounded-lg border border-slate-200 p-4 text-center">
+                <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-6v-6H10v6H4a1 1 0 0 1-1-1z"/>
+                  </svg>
+                </div>
+                <h3 class="font-semibold text-slate-900">Cloud Hosting</h3>
+                <p class="text-sm text-slate-600">AWS/Azure</p>
+              </div>
+              
+              <div class="rounded-lg border border-slate-200 p-4 text-center">
+                <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 8a4 4 0 1 1-4 4 4.005 4.005 0 0 1 4-4Zm8-3h-3.586l-1.707-1.707A1 1 0 0 0 13.586 3H10.414a1 1 0 0 0-.707.293L8 5H5a2 2 0 0 0-2 2v11a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7a2 2 0 0 0-2-2Z"/>
+                  </svg>
+                </div>
+                <h3 class="font-semibold text-slate-900">Load Balancing</h3>
+                <p class="text-sm text-slate-600">Auto-scaling</p>
+              </div>
+              
+              <div class="rounded-lg border border-slate-200 p-4 text-center">
+                <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.011 8.011 0 0 1 4.07 13H4a1 1 0 0 1 0-2h.07A8.011 8.011 0 0 1 11 4.07V4a1 1 0 0 1 2 0v.07A8.011 8.011 0 0 1 19.93 11H20a1 1 0 0 1 0 2h-.07A8.011 8.011 0 0 1 13 19.93Z"/>
+                  </svg>
+                </div>
+                <h3 class="font-semibold text-slate-900">Monitoring</h3>
+                <p class="text-sm text-slate-600">24/7 Support</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Maintenance Section -->
+          <section id="maintenance" class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+              </svg>
+              Maintenance & Support
+            </h2>
+            <p class="text-slate-600 mb-4">Regular maintenance and updates ensure optimal performance and security of the platform.</p>
+            
+            <div class="bg-slate-50 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-slate-900 mb-3">Maintenance Schedule</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 class="font-medium text-slate-900 mb-2">Daily</h4>
+                  <ul class="text-sm text-slate-600 space-y-1">
+                    <li>• Database backups</li>
+                    <li>• Security monitoring</li>
+                    <li>• Performance checks</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-medium text-slate-900 mb-2">Weekly</h4>
+                  <ul class="text-sm text-slate-600 space-y-1">
+                    <li>• System updates</li>
+                    <li>• Data validation</li>
+                    <li>• User feedback review</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
   </section>
 
-  <!-- Specification Container -->
-  <div class="container">
-    <div class="spec-container">
-      <div class="row g-0">
-        <!-- Sidebar Navigation -->
-        <div class="col-lg-3">
-          <div class="spec-sidebar">
-            <nav class="nav flex-column">
-              <a class="nav-link active" href="#overview">Project Overview</a>
-              <a class="nav-link" href="#architecture">System Architecture</a>
-              <a class="nav-link" href="#database">Database Design</a>
-              <a class="nav-link" href="#search">Search Functionality</a>
-              <a class="nav-link" href="#roles">User Roles</a>
-              <a class="nav-link" href="#ui">UI/UX Design</a>
-              <a class="nav-link" href="#features">Features</a>
-              <a class="nav-link" href="#security">Security</a>
-              <a class="nav-link" href="#performance">Performance</a>
-              <a class="nav-link" href="#testing">Testing</a>
-              <a class="nav-link" href="#timeline">Timeline</a>
-              <a class="nav-link" href="#cost">Cost Estimation</a>
-              <a class="nav-link" href="#deployment">Deployment</a>
-              <a class="nav-link" href="#metrics">Success Metrics</a>
-            </nav>
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
+            <span class="font-semibold">Ghana Legal Risk Index</span>
           </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="col-lg-9">
-          <div class="spec-content">
-            <!-- Project Overview -->
-            <div id="overview" class="section">
-              <h2><i class="fas fa-project-diagram"></i> Project Overview</h2>
-              <div class="highlight-box">
-                <h4>Project Summary</h4>
-                <p><strong>Project Name:</strong> Dennislaw SVD People Search System</p>
-                <p><strong>Project Type:</strong> Web-based Legal People Search Platform</p>
-                <p><strong>Timeline:</strong> 8 weeks (2 months)</p>
-                <p><strong>Team Size:</strong> 3-4 developers + 1 project manager</p>
-                <p><strong>Technology Stack:</strong> Modern web technologies with scalable backend</p>
-              </div>
-            </div>
-
-            <!-- System Architecture -->
-            <div id="architecture" class="section">
-              <h2><i class="fas fa-sitemap"></i> System Architecture</h2>
-              
-              <h3>Frontend Technologies</h3>
-              <div class="tech-stack">
-                <div class="tech-item">
-                  <div class="tech-icon">
-                    <i class="fab fa-react"></i>
-                  </div>
-                  <strong>React.js</strong>
-                  <small>Dynamic UI components</small>
-                </div>
-                <div class="tech-item">
-                  <div class="tech-icon">
-                    <i class="fab fa-js"></i>
-                  </div>
-                  <strong>TypeScript</strong>
-                  <small>Type safety & development</small>
-                </div>
-                <div class="tech-item">
-                  <div class="tech-icon">
-                    <i class="fab fa-css3-alt"></i>
-                  </div>
-                  <strong>Tailwind CSS</strong>
-                  <small>Utility-first styling</small>
-                </div>
-                <div class="tech-item">
-                  <div class="tech-icon">
-                    <i class="fas fa-database"></i>
-                  </div>
-                  <strong>Redux</strong>
-                  <small>State management</small>
-                </div>
-              </div>
-
-              <h3>Backend Technologies</h3>
-              <div class="tech-stack">
-                <div class="tech-item">
-                  <div class="tech-icon">
-                    <i class="fab fa-node-js"></i>
-                  </div>
-                  <strong>Node.js</strong>
-                  <small>Runtime environment</small>
-                </div>
-                <div class="tech-item">
-                  <div class="tech-icon">
-                    <i class="fas fa-server"></i>
-                  </div>
-                  <strong>Express.js</strong>
-                  <small>Web framework</small>
-                </div>
-                <div class="tech-item">
-                  <div class="tech-icon">
-                    <i class="fas fa-database"></i>
-                  </div>
-                  <strong>PostgreSQL</strong>
-                  <small>Primary database</small>
-                </div>
-                <div class="tech-item">
-                  <div class="tech-icon">
-                    <i class="fas fa-search"></i>
-                  </div>
-                  <strong>Elasticsearch</strong>
-                  <small>Search & indexing</small>
-                </div>
-              </div>
-            </div>
-
-            <!-- Database Design -->
-            <div id="database" class="section">
-              <h2><i class="fas fa-database"></i> Database Design</h2>
-              
-              <h3>Core Tables</h3>
-              <div class="code-block">
-<span class="keyword">CREATE TABLE</span> people (
-    id <span class="keyword">UUID PRIMARY KEY</span>,
-    first_name <span class="keyword">VARCHAR</span>(100),
-    last_name <span class="keyword">VARCHAR</span>(100),
-    middle_name <span class="keyword">VARCHAR</span>(100),
-    date_of_birth <span class="keyword">DATE</span>,
-    ssn_hash <span class="keyword">VARCHAR</span>(255),
-    created_at <span class="keyword">TIMESTAMP</span>,
-    updated_at <span class="keyword">TIMESTAMP</span>
-);
-              </div>
-
-              <h3>Key Relationships</h3>
-              <ul>
-                <li><strong>People → Cases:</strong> Many-to-many through case_participants</li>
-                <li><strong>Cases → Courts:</strong> Many-to-one relationship</li>
-                <li><strong>Cases → Documents:</strong> One-to-many relationship</li>
-                <li><strong>Case Participants:</strong> Junction table with role information</li>
-              </ul>
-            </div>
-
-            <!-- Search Functionality -->
-            <div id="search" class="section">
-              <h2><i class="fas fa-search"></i> Search Functionality</h2>
-              
-              <h3>Search Types</h3>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="metric-card">
-                    <div class="metric-icon">
-                      <i class="fas fa-search"></i>
-                    </div>
-                    <div class="metric-value">Basic Search</div>
-                    <div class="metric-label">Case title, person name, case number</div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="metric-card">
-                    <div class="metric-icon">
-                      <i class="fas fa-filter"></i>
-                    </div>
-                    <div class="metric-value">Advanced Search</div>
-                    <div class="metric-label">Multiple criteria with boolean logic</div>
-                  </div>
-                </div>
-              </div>
-
-              <h3>Performance Requirements</h3>
-              <ul>
-                <li><strong>Basic Search:</strong> &lt; 500ms response time</li>
-                <li><strong>Typeahead:</strong> &lt; 200ms response time</li>
-                <li><strong>Advanced Search:</strong> &lt; 1 second response time</li>
-                <li><strong>Concurrent Users:</strong> 1000+ simultaneous users</li>
-              </ul>
-            </div>
-
-            <!-- User Roles -->
-            <div id="roles" class="section">
-              <h2><i class="fas fa-users"></i> User Roles & Permissions</h2>
-              
-              <div class="table-responsive">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>User Type</th>
-                      <th>Features</th>
-                      <th>Limits</th>
-                      <th>Cost</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>Public Users</strong></td>
-                      <td>Basic search, limited results</td>
-                      <td>10 searches/hour</td>
-                      <td>Free</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Registered Users</strong></td>
-                      <td>Enhanced search, search history</td>
-                      <td>100 searches/day</td>
-                      <td>Free</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Premium Users</strong></td>
-                      <td>Unlimited search, full access</td>
-                      <td>Unlimited</td>
-                      <td>$29/month</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Enterprise</strong></td>
-                      <td>Custom integrations, API access</td>
-                      <td>Unlimited</td>
-                      <td>Custom pricing</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- UI/UX Design -->
-            <div id="ui" class="section">
-              <h2><i class="fas fa-palette"></i> UI/UX Design Requirements</h2>
-              
-              <h3>Design System</h3>
-              <ul>
-                <li><strong>Color Palette:</strong> Primary #298fca, Secondary #1e6bb8, Accent #f59e0b</li>
-                <li><strong>Typography:</strong> Inter font family with consistent hierarchy</li>
-                <li><strong>Spacing:</strong> 8px grid system for consistent layouts</li>
-                <li><strong>Components:</strong> Reusable, accessible components</li>
-              </ul>
-
-              <h3>Accessibility Standards</h3>
-              <ul>
-                <li><strong>WCAG 2.1 AA</strong> compliance</li>
-                <li><strong>Screen Reader</strong> support</li>
-                <li><strong>Keyboard Navigation</strong> for all features</li>
-                <li><strong>High Contrast</strong> mode</li>
-              </ul>
-            </div>
-
-            <!-- Features -->
-            <div id="features" class="section">
-              <h2><i class="fas fa-star"></i> Features & Functionality</h2>
-              
-              <h3>Development Phases</h3>
-              <div class="timeline">
-                <div class="timeline-item">
-                  <div class="timeline-content">
-                    <div class="timeline-title">Phase 1: Core System (Weeks 1-4)</div>
-                    <div class="timeline-date">Foundation & Basic Features</div>
-                    <ul>
-                      <li>User Authentication & Registration</li>
-                      <li>Basic Search Functionality</li>
-                      <li>Database Schema & API</li>
-                      <li>Basic UI Components</li>
-                    </ul>
-                  </div>
-                </div>
-                
-                <div class="timeline-item">
-                  <div class="timeline-content">
-                    <div class="timeline-title">Phase 2: Advanced Features (Weeks 5-6)</div>
-                    <div class="timeline-date">Enhanced Functionality</div>
-                    <ul>
-                      <li>Advanced Search Filters</li>
-                      <li>Typeahead/Autocomplete</li>
-                      <li>User Dashboard</li>
-                      <li>Search History</li>
-                    </ul>
-                  </div>
-                </div>
-                
-                <div class="timeline-item">
-                  <div class="timeline-content">
-                    <div class="timeline-title">Phase 3: Polish & Launch (Weeks 7-8)</div>
-                    <div class="timeline-date">Final Touches</div>
-                    <ul>
-                      <li>Performance Optimization</li>
-                      <li>Security Hardening</li>
-                      <li>Testing & Bug Fixes</li>
-                      <li>Deployment & Launch</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Security -->
-            <div id="security" class="section">
-              <h2><i class="fas fa-shield-alt"></i> Security Requirements</h2>
-              
-              <h3>Data Protection</h3>
-              <ul>
-                <li><strong>Encryption:</strong> AES-256 for data at rest</li>
-                <li><strong>HTTPS:</strong> TLS 1.3 for data in transit</li>
-                <li><strong>PII Handling:</strong> GDPR compliance for personal data</li>
-                <li><strong>Audit Logging:</strong> All user actions logged</li>
-              </ul>
-
-              <h3>Authentication & Authorization</h3>
-              <ul>
-                <li><strong>Multi-factor Authentication</strong> (MFA)</li>
-                <li><strong>Password Policies:</strong> Strong password requirements</li>
-                <li><strong>Session Management:</strong> Secure session handling</li>
-                <li><strong>Rate Limiting:</strong> Prevent abuse and attacks</li>
-              </ul>
-            </div>
-
-            <!-- Performance -->
-            <div id="performance" class="section">
-              <h2><i class="fas fa-tachometer-alt"></i> Performance Requirements</h2>
-              
-              <h3>Response Times</h3>
-              <div class="row">
-                <div class="col-md-3">
-                  <div class="metric-card">
-                    <div class="metric-icon">
-                      <i class="fas fa-search"></i>
-                    </div>
-                    <div class="metric-value">&lt; 500ms</div>
-                    <div class="metric-label">Search Results</div>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="metric-card">
-                    <div class="metric-icon">
-                      <i class="fas fa-keyboard"></i>
-                    </div>
-                    <div class="metric-value">&lt; 200ms</div>
-                    <div class="metric-label">Typeahead</div>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="metric-card">
-                    <div class="metric-icon">
-                      <i class="fas fa-globe"></i>
-                    </div>
-                    <div class="metric-value">&lt; 2s</div>
-                    <div class="metric-label">Page Load</div>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="metric-card">
-                    <div class="metric-icon">
-                      <i class="fas fa-server"></i>
-                    </div>
-                    <div class="metric-value">&lt; 1s</div>
-                    <div class="metric-label">API Calls</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Testing -->
-            <div id="testing" class="section">
-              <h2><i class="fas fa-vial"></i> Testing Strategy</h2>
-              
-              <h3>Testing Types</h3>
-              <ul>
-                <li><strong>Unit Testing:</strong> > 80% code coverage with Jest/Mocha</li>
-                <li><strong>Integration Testing:</strong> API testing with Postman/Newman</li>
-                <li><strong>End-to-End Testing:</strong> Cypress or Playwright</li>
-                <li><strong>Performance Testing:</strong> Load testing with JMeter/K6</li>
-              </ul>
-            </div>
-
-            <!-- Timeline -->
-            <div id="timeline" class="section">
-              <h2><i class="fas fa-calendar-alt"></i> Development Timeline</h2>
-              
-              <h3>8-Week Development Plan</h3>
-              <div class="row">
-                <div class="col-md-6">
-                  <h4>Week 1-2: Foundation</h4>
-                  <ul>
-                    <li>Project setup & environment configuration</li>
-                    <li>Database design and setup</li>
-                    <li>Basic API structure</li>
-                    <li>Frontend project setup</li>
-                  </ul>
-                </div>
-                <div class="col-md-6">
-                  <h4>Week 3-4: Core Development</h4>
-                  <ul>
-                    <li>User authentication system</li>
-                    <li>Basic search functionality</li>
-                    <li>Search results display</li>
-                    <li>Basic UI styling</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <div class="row">
-                <div class="col-md-6">
-                  <h4>Week 5-6: Advanced Features</h4>
-                  <ul>
-                    <li>Advanced search filters</li>
-                    <li>Typeahead/autocomplete</li>
-                    <li>User dashboard</li>
-                    <li>Basic analytics</li>
-                  </ul>
-                </div>
-                <div class="col-md-6">
-                  <h4>Week 7-8: Polish & Launch</h4>
-                  <ul>
-                    <li>Performance optimization</li>
-                    <li>Security testing</li>
-                    <li>Final testing & bug fixes</li>
-                    <li>Deployment & launch</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <!-- Cost Estimation -->
-            <div id="cost" class="section">
-              <h2><i class="fas fa-dollar-sign"></i> Cost Estimation</h2>
-              
-              <h3>Development Costs (8 weeks)</h3>
-              <div class="table-responsive">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Role</th>
-                      <th>Duration</th>
-                      <th>Cost</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Senior Full-Stack Developer</td>
-                      <td>8 weeks</td>
-                      <td>$15,000</td>
-                    </tr>
-                    <tr>
-                      <td>Frontend Developer</td>
-                      <td>8 weeks</td>
-                      <td>$12,000</td>
-                    </tr>
-                    <tr>
-                      <td>Backend Developer</td>
-                      <td>8 weeks</td>
-                      <td>$12,000</td>
-                    </tr>
-                    <tr>
-                      <td>Project Manager</td>
-                      <td>8 weeks</td>
-                      <td>$8,000</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Total Development</strong></td>
-                      <td><strong>8 weeks</strong></td>
-                      <td><strong>$47,000</strong></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <h3>Additional Costs</h3>
-              <ul>
-                <li><strong>UI/UX Design:</strong> $5,000</li>
-                <li><strong>Testing & QA:</strong> $3,000</li>
-                <li><strong>Legal Compliance:</strong> $2,000</li>
-                <li><strong>Infrastructure (Annual):</strong> $6,500</li>
-              </ul>
-
-              <div class="highlight-box">
-                <h4>Total Project Cost: $63,500</h4>
-                <p>This includes development, design, testing, and first-year infrastructure costs.</p>
-              </div>
-            </div>
-
-            <!-- Deployment -->
-            <div id="deployment" class="section">
-              <h2><i class="fas fa-rocket"></i> Deployment & Launch</h2>
-              
-              <h3>Pre-Launch Checklist</h3>
-              <ul>
-                <li>Security audit completed</li>
-                <li>Performance testing passed</li>
-                <li>Accessibility testing completed</li>
-                <li>Legal compliance verified</li>
-                <li>User acceptance testing passed</li>
-              </ul>
-
-              <h3>Launch Strategy</h3>
-              <ul>
-                <li><strong>Soft Launch:</strong> Limited users for testing</li>
-                <li><strong>Beta Testing:</strong> Invite-only access</li>
-                <li><strong>Public Launch:</strong> Full public access</li>
-                <li><strong>Marketing Campaign:</strong> Legal industry outreach</li>
-              </ul>
-            </div>
-
-            <!-- Success Metrics -->
-            <div id="metrics" class="section">
-              <h2><i class="fas fa-chart-line"></i> Success Metrics</h2>
-              
-              <h3>Technical Metrics</h3>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="metric-card">
-                    <div class="metric-icon">
-                      <i class="fas fa-server"></i>
-                    </div>
-                    <div class="metric-value">> 99.9%</div>
-                    <div class="metric-label">Uptime</div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="metric-card">
-                    <div class="metric-icon">
-                      <i class="fas fa-search"></i>
-                    </div>
-                    <div class="metric-value">&lt; 500ms</div>
-                    <div class="metric-label">Search Response</div>
-                  </div>
-                </div>
-              </div>
-
-              <h3>Business Metrics</h3>
-              <ul>
-                <li><strong>User Registration:</strong> 100+ users in first month</li>
-                <li><strong>Search Volume:</strong> 1000+ searches per day</li>
-                <li><strong>User Retention:</strong> > 70% monthly retention</li>
-                <li><strong>Conversion Rate:</strong> > 5% free to premium</li>
-              </ul>
-            </div>
-
-            <!-- Conclusion -->
-            <div class="section">
-              <h2><i class="fas fa-check-circle"></i> Conclusion</h2>
-              
-              <div class="highlight-box">
-                <h4>2-Month Timeline is Achievable</h4>
-                <p>The <strong>2-month timeline</strong> is achievable with a skilled development team of 3-4 developers. The system will be built in phases, ensuring core functionality is delivered early while advanced features are developed in parallel.</p>
-              </div>
-
-              <h3>Key Success Factors</h3>
-              <ol>
-                <li><strong>Clear requirements</strong> and specifications</li>
-                <li><strong>Experienced development team</strong></li>
-                <li><strong>Proper project management</strong> and communication</li>
-                <li><strong>Regular testing</strong> and quality assurance</li>
-                <li><strong>User feedback</strong> integration throughout development</li>
-              </ol>
-
-              <p>This specification provides a solid foundation for building a professional, scalable people search system that meets the needs of legal professionals and researchers.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Advanced Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h5><i class="fas fa-user-search"></i> Dennislaw SVD</h5>
-          <p>Your trusted partner for comprehensive people search and case history discovery.</p>
+          <p class="text-slate-300 text-sm">Your trusted partner for comprehensive people search and case history discovery.</p>
         </div>
         
-        <div class="footer-section">
-          <h5>Quick Links</h5>
-          <a href="index.html">Home</a>
-          <a href="advanced-search.html">Advanced Search</a>
-          <a href="people-database.html">People Database</a>
-          <a href="specification.html">Specification</a>
+        <div>
+          <h4 class="font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="index.html" class="hover:text-white">Home</a></li>
+            <li><a href="advanced-search.html" class="hover:text-white">Advanced Search</a></li>
+            <li><a href="people-database.html" class="hover:text-white">People Database</a></li>
+            <li><a href="specification.html" class="hover:text-white">Specification</a></li>
+          </ul>
         </div>
         
-        <div class="footer-section">
-          <h5>Support</h5>
-          <a href="#">Help Center</a>
-          <a href="contact.html">Contact Support</a>
-          <a href="#">Training Resources</a>
-          <a href="#">FAQ</a>
+        <div>
+          <h4 class="font-semibold mb-4">Support</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Help Center</a></li>
+            <li><a href="contact.html" class="hover:text-white">Contact Support</a></li>
+            <li><a href="#" class="hover:text-white">Training Resources</a></li>
+            <li><a href="#" class="hover:text-white">FAQ</a></li>
+          </ul>
         </div>
         
-        <div class="footer-section">
-          <h5>Connect</h5>
-          <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
-          <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
-          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
-          <a href="contact.html"><i class="fas fa-envelope"></i> Email</a>
+        <div>
+          <h4 class="font-semibold mb-4">Connect</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a href="#" class="hover:text-white">Twitter</a></li>
+            <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+            <li><a href="#" class="hover:text-white">Facebook</a></li>
+            <li><a href="contact.html" class="hover:text-white">Email</a></li>
+          </ul>
         </div>
       </div>
       
-      <div class="footer-bottom">
-        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
+      <div class="mt-8 pt-8 border-t border-slate-700 text-center text-sm text-slate-400">
+        <p>&copy; 2025 Ghana Legal Risk Index. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>
 
-  <!-- Bootstrap JS and Popper.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-  
-  <!-- Custom JavaScript for Specification Page -->
   <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.querySelector('button[aria-label="Open menu"]');
+    const nav = document.querySelector('nav');
+    
+    if (mobileMenuBtn && nav) {
+      mobileMenuBtn.addEventListener('click', function() {
+        nav.classList.toggle('hidden');
+      });
+    }
+
     // Smooth scrolling for navigation links
-    document.querySelectorAll('.spec-sidebar .nav-link').forEach(link => {
-      link.addEventListener('click', function(e) {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        
-        // Remove active class from all links
-        document.querySelectorAll('.spec-sidebar .nav-link').forEach(l => l.classList.remove('active'));
-        
-        // Add active class to clicked link
-        this.classList.add('active');
-        
-        // Get target section
-        const targetId = this.getAttribute('href').substring(1);
-        const targetSection = document.getElementById(targetId);
-        
-        if (targetSection) {
-          // Smooth scroll to target
-          targetSection.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      });
-    });
-
-    // Update active navigation based on scroll position
-    window.addEventListener('scroll', function() {
-      const sections = document.querySelectorAll('.section');
-      const navLinks = document.querySelectorAll('.spec-sidebar .nav-link');
-      
-      let current = '';
-      
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        
-        if (window.pageYOffset >= sectionTop - 200) {
-          current = section.getAttribute('id');
-        }
-      });
-      
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === '#' + current) {
-          link.classList.add('active');
-        }
-      });
-    });
-
-    // Add some interactive animations
-    document.addEventListener('DOMContentLoaded', function() {
-      // Animate metric cards on scroll
-      const observerOptions = {
-        threshold: 0.3,
-        rootMargin: '0px 0px -50px 0px'
-      };
-
-      const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-          }
-        });
-      }, observerOptions);
-
-      // Observe metric cards
-      document.querySelectorAll('.metric-card').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = 'all 0.8s ease';
-        observer.observe(card);
-      });
-
-      // Observe tech stack items
-      document.querySelectorAll('.tech-item').forEach(item => {
-        item.style.opacity = '0';
-        item.style.transform = 'translateY(20px)';
-        item.style.transition = 'all 0.6s ease';
-        observer.observe(item);
       });
     });
   </script>
