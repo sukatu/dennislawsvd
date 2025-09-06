@@ -30,10 +30,13 @@
         <span class="font-semibold">Dennislaw SVD</span>
       </div>
       <nav class="hidden md:flex items-center gap-6 text-sm/6 text-slate-200">
-        <a class="hover:text-white" href="#">People Search</a>
-        <a class="hover:text-white" href="#">Organization Lookup</a>
-        <a class="hover:text-white" href="#">Court Records</a>
-        <a class="hover:text-white" href="#">Risk Reports</a>
+        <a class="hover:text-white" href="index.html">Home</a>
+        <a class="hover:text-white" href="people-results.html">People Search</a>
+        <a class="hover:text-white" href="advanced-search.html">Advanced Search</a>
+        <a class="hover:text-white" href="people-database.html">People Database</a>
+        <a class="hover:text-white" href="about.html">About</a>
+        <a class="hover:text-white" href="contact.html">Contact</a>
+        <a class="hover:text-white" href="specification.html">Specification</a>
       </nav>
       <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/10" aria-label="Open menu">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,296 +46,488 @@
     </div>
   </header>
 
-  <!-- Hero -->
-  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 text-center">
-    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">Look Up Anyone!</h1>
-    <p class="mt-2 text-slate-600">Enter a Name Below to Get Started Now. Access Information Instantly!</p>
-    <div class="mt-3 flex items-center justify-center gap-6 text-sm text-slate-500">
-      <div class="flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.011 8.011 0 0 1 4.07 13H4a1 1 0 0 1 0-2h.07A8.011 8.011 0 0 1 11 4.07V4a1 1 0 0 1 2 0v.07A8.011 8.011 0 0 1 19.93 11H20a1 1 0 0 1 0 2h-.07A8.011 8.011 0 0 1 13 19.93Z"/></svg>
-        <span><span class="font-semibold">464</span> Courts Connected</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4a1 1 0 0 1 1-1h5a1 1 0 0 1 .894.553L11.382 6H20a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
-        <span><span class="font-semibold">16</span> Regions Covered</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 1-4 4 4.005 4.005 0 0 1 4-4Zm8-3h-3.586l-1.707-1.707A1 1 0 0 0 13.586 3H10.414a1 1 0 0 0-.707.293L8 5H5a2 2 0 0 0-2 2v11a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7a2 2 0 0 0-2-2Z"/></svg>
-        <span>Updated Daily</span>
-      </div>
+  <!-- Search Section -->
+  <div class="bg-white border-b border-slate-200">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 mb-2">Look Up Anyone!</h1>
+        <p class="text-lg text-slate-600">Search our comprehensive database of people and legal cases</p>
     </div>
 
-    <!-- Tabs -->
-    <div class="mt-6 inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
-      <button data-tab="name" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium bg-sky-50 text-sky-700 border border-sky-200">Name</button>
-      <button data-tab="phone" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Phone</button>
-      <button data-tab="address" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Address</button>
-    </div>
-
-    <!-- Search form (Name) -->
-    <div id="tab-name" class="mt-5">
-      <form class="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-2">
-        <div>
-          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">First Name</label>
-          <input id="firstName" type="text" placeholder="Enter first name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
+      <!-- Search Tabs -->
+      <div class="flex justify-center mb-6">
+        <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-1">
+          <button class="px-4 py-2 text-sm font-medium text-slate-900 bg-white rounded-md shadow-sm">Name</button>
+          <button class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900">Phone</button>
+          <button class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900">Address</button>
         </div>
-        <div>
-          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">Last Name</label>
-          <input id="lastName" type="text" placeholder="Enter last name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
         </div>
-        <div class="sm:col-span-2">
-          <button type="button" id="searchBtn" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 font-semibold text-white hover:bg-sky-700 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 20.586 16.243 15.83A8 8 0 1 0 15.83 16.243L20.586 21 21 20.586zM4 10a6 6 0 1 1 6 6 6.006 6.006 0 0 1-6-6z"/>
-            </svg>
+      
+      <!-- Search Form -->
+      <div class="max-w-2xl mx-auto">
+        <div class="flex gap-2">
+          <input type="text" placeholder="Enter name, phone, or address..." 
+                 class="flex-1 rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+          <button class="rounded-lg bg-sky-600 px-6 py-3 text-sm font-medium text-white hover:bg-sky-700">
             Search
           </button>
         </div>
-      </form>
+        <p class="text-center text-sm text-slate-500 mt-2">4 results found</p>
+      </div>
+    </div>
     </div>
 
-    <!-- Placeholder forms for other tabs -->
-    <div id="tab-phone" class="hidden mt-5">
-      <form class="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
-        <div class="sm:col-span-2">
-          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">Phone Number</label>
-          <input type="text" placeholder="Enter phone number" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
-        </div>
-        <div class="sm:col-span-1 flex items-end">
-          <button type="button" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 font-semibold text-white hover:bg-sky-700 transition">Search</button>
-        </div>
-      </form>
-    </div>
-
-    <div id="tab-address" class="hidden mt-5">
-      <form class="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
-        <div class="sm:col-span-2">
-          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">Address</label>
-          <input type="text" placeholder="Enter address" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
-        </div>
-        <div class="sm:col-span-1 flex items-end">
-          <button type="button" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 font-semibold text-white hover:bg-sky-700 transition">Search</button>
-        </div>
-      </form>
-    </div>
-  </section>
-
-  <!-- Results Section -->
-  <section class="border-t border-slate-200 bg-white">
+  <!-- Stats Section -->
+  <div class="bg-slate-50 border-b border-slate-200">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div class="text-sm text-slate-600">
-          <span class="font-semibold text-slate-900">Search Results</span>
-          <span class="ml-2">Showing <span id="count">4</span> results</span>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-slate-900">464</div>
+          <div class="text-sm text-slate-600">Courts Connected</div>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="relative">
-            <select id="sortSelect" class="appearance-none rounded-lg border border-slate-200 bg-white py-2 pl-3 pr-8 text-sm text-slate-700">
-              <option>Risk Score (High to Low)</option>
-              <option>Risk Score (Low to High)</option>
-              <option>Name (A–Z)</option>
-              <option>Name (Z–A)</option>
-            </select>
-            <div class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-400">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z" clip-rule="evenodd" />
-              </svg>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-slate-900">16</div>
+          <div class="text-sm text-slate-600">Regions Covered</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-slate-900">Daily</div>
+          <div class="text-sm text-slate-600">Updated</div>
+        </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
+      <!-- Filters -->
+      <div class="lg:col-span-1">
+        <div class="rounded-xl border border-slate-200 bg-white p-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">Filters</h3>
+          
+          <!-- Risk Level -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-slate-900 mb-3">Risk Level</h4>
+            <div class="space-y-2">
+              <label class="flex items-center">
+                <input type="checkbox" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500" checked>
+                <span class="ml-2 text-sm text-slate-700">Criminal</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                <span class="ml-2 text-sm text-slate-700">Civil</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                <span class="ml-2 text-sm text-slate-700">Family</span>
+              </label>
+            </div>
+        </div>
+          
+          <!-- Date Range -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-slate-900 mb-3">Date Range</h4>
+            <div class="space-y-2">
+              <input type="date" class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+              <input type="date" class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
             </div>
           </div>
-          <div class="inline-flex rounded-lg border border-slate-200 overflow-hidden">
-            <button id="gridBtn" class="px-2.5 py-2 text-slate-600 hover:bg-slate-50" title="Grid view">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg>
-            </button>
-            <button id="listBtn" class="px-2.5 py-2 text-slate-600 hover:bg-slate-50 border-l border-slate-200" title="List view">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v4H4zM4 14h16v4H4z"/></svg>
-            </button>
+          
+          <!-- Location -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-slate-900 mb-3">Location</h4>
+            <select class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+              <option>All Regions</option>
+              <option>Greater Accra</option>
+              <option>Ashanti</option>
+              <option>Western</option>
+            </select>
           </div>
-          <button class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21h10a2 2 0 0 0 2-2v-7H5v7a2 2 0 0 0 2 2ZM19 6h-3V4a1 1 0 0 0-2 0v2h-4V4a1 1 0 0 0-2 0v2H5a1 1 0 0 0-1 1v3h16V7a1 1 0 0 0-1-1Z"/></svg>
-            Export
+          
+          <button class="w-full rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+            Apply Filters
           </button>
         </div>
       </div>
 
-      <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-12">
-        <!-- Filters -->
-        <aside class="md:col-span-3 lg:col-span-3">
-          <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h3 class="text-sm font-semibold text-slate-900">Filters</h3>
-
-            <div class="mt-4">
-              <label class="text-xs font-semibold text-slate-600">Entity Type</label>
-              <div class="mt-2">
-                <select class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
-                  <option>All types</option>
-                  <option>Person</option>
-                  <option>Organization</option>
-                </select>
+      <!-- Results -->
+      <div class="lg:col-span-3">
+        <!-- Results Header with View Toggle and Export -->
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-semibold text-slate-900">Search Results</h2>
+          <div class="flex items-center gap-3">
+            <!-- View Toggle -->
+            <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-1">
+              <button id="gridViewBtn" class="px-3 py-2 text-sm font-medium text-slate-900 bg-white rounded-md shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"/>
+                </svg>
+              </button>
+              <button id="listViewBtn" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Export Button -->
+            <button id="exportBtn" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              Export
+            </button>
               </div>
             </div>
 
-            <div class="mt-4">
-              <label class="text-xs font-semibold text-slate-600">Legal Domain</label>
-              <ul class="mt-2 space-y-2 text-sm text-slate-700">
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Banking/Financial</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Criminal</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Labour/Employment</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Commercial</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Land/Property</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Family</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Human Rights</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Probate/Administration</label></li>
-              </ul>
+        <!-- Grid View -->
+        <div id="gridView" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Result 1 -->
+          <div class="rounded-xl border border-slate-200 bg-white p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-lg font-semibold text-slate-900">Albert Kweku Obeng</h3>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-200">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    Low Risk
+                  </span>
+                </div>
+                <p class="text-sm text-slate-600 mb-2">7 March 1962 – 9 March 2004 • KL1K-DXP</p>
+                <div class="flex items-center gap-4 text-sm text-slate-500">
+                  <span>2 Cases</span>
+                  <span>•</span>
+                  <span>Property Dispute</span>
+                  <span>•</span>
+                  <span>Family Law</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-2xl font-bold text-emerald-600">25</span>
+                <div class="text-right">
+                  <div class="text-xs text-slate-500">Risk Score</div>
+                  <div class="w-16 bg-slate-200 rounded-full h-1.5 mt-1">
+                    <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 25%"></div>
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <div class="mt-4">
-              <label class="text-xs font-semibold text-slate-600">Court Tier</label>
-              <ul class="mt-2 space-y-2 text-sm text-slate-700">
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Supreme</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Court of Appeal</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> High Court</label></li>
-                <li><label class="inline-flex items-center gap-2"><input type="checkbox" class="rounded border-slate-300"/> Circuit Court</label></li>
-              </ul>
+            <div class="flex gap-2">
+              <a href="person_profile.html" class="flex-1 text-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+                View Profile
+              </a>
+              <button class="px-3 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </button>
             </div>
           </div>
-        </aside>
-
-        <!-- Results Grid -->
-        <main class="md:col-span-9 lg:col-span-9">
-          <div id="results" class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-            <!-- Card 1 -->
-            <article class="result-card rounded-xl border border-slate-200 bg-white p-4 shadow-sm" data-name="Charles Ansah" data-risk="85">
-              <div class="flex items-start justify-between">
+          
+          <!-- Result 2 -->
+          <div class="rounded-xl border border-slate-200 bg-white p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-lg font-semibold text-slate-900">Sarah Mensah</h3>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-600 ring-1 ring-amber-200">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                    Medium Risk
+                  </span>
+                </div>
+                <p class="text-sm text-slate-600 mb-2">15 June 1975 • GH-123456789</p>
+                <div class="flex items-center gap-4 text-sm text-slate-500">
+                  <span>5 Cases</span>
+                  <span>•</span>
+                  <span>Business Dispute</span>
+                  <span>•</span>
+                  <span>Contract Law</span>
+                </div>
+              </div>
                 <div class="flex items-center gap-2">
-                  <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/></svg>
-                  </div>
-                  <div>
-                    <h4 class="font-semibold">Charles Ansah</h4>
-                    <p class="text-xs text-slate-500">Person</p>
-                  </div>
-                </div>
-                <div class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-600 ring-1 ring-rose-200">
-                  <span class="inline-block h-1.5 w-1.5 rounded-full bg-rose-500"></span> 85
-                  <span class="ml-1 font-medium text-rose-500">High Risk</span>
-                </div>
-              </div>
-              <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
-                <div><div class="font-semibold text-slate-800">Domains</div><div>Criminal</div></div>
-                <div><div class="font-semibold text-slate-800">Regions</div><div>Greater Accra</div></div>
-              </div>
-              <div class="mt-3 flex items-center justify-between text-xs text-slate-500">
-                <div class="flex gap-4">
-                  <span><span class="font-semibold text-slate-700">0</span> Pending</span>
-                  <span><span class="font-semibold text-slate-700">1</span> Resolved</span>
-                </div>
-                <div>Last: 2025-05-14</div>
-              </div>
-              <div class="mt-4">
-                          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
-
-              </div>
-            </article>
-
-            <!-- Card 2 -->
-            <article class="result-card rounded-xl border border-slate-200 bg-white p-4 shadow-sm" data-name="First Atlantic Bank Ltd" data-risk="49">
-              <div class="flex items-start justify-between">
-                <div class="flex items-center gap-2">
-                  <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-6v-6H10v6H4a1 1 0 0 1-1-1z"/></svg>
-                  </div>
-                  <div>
-                    <h4 class="font-semibold">First Atlantic Bank Ltd</h4>
-                    <p class="text-xs text-slate-500">Organization</p>
+                <span class="text-2xl font-bold text-amber-600">65</span>
+                <div class="text-right">
+                  <div class="text-xs text-slate-500">Risk Score</div>
+                  <div class="w-16 bg-slate-200 rounded-full h-1.5 mt-1">
+                    <div class="bg-amber-500 h-1.5 rounded-full" style="width: 65%"></div>
                   </div>
                 </div>
-                <div class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-600 ring-1 ring-amber-200">
-                  <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span> 49
-                  <span class="ml-1 font-medium text-amber-500">Medium Risk</span>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <a href="#" class="flex-1 text-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+                View Profile
+              </a>
+              <button class="px-3 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Result 3 -->
+          <div class="rounded-xl border border-slate-200 bg-white p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-lg font-semibold text-slate-900">Kwame Asante</h3>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-xs font-semibold text-red-600 ring-1 ring-red-200">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    High Risk
+                  </span>
+                </div>
+                <p class="text-sm text-slate-600 mb-2">22 September 1980 • GH-987654321</p>
+                <div class="flex items-center gap-4 text-sm text-slate-500">
+                  <span>12 Cases</span>
+                  <span>•</span>
+                  <span>Criminal</span>
+                  <span>•</span>
+                  <span>Fraud</span>
                 </div>
               </div>
-              <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
-                <div><div class="font-semibold text-slate-800">Also known as:</div><div>First Atlantic Bank Limited, FAB</div></div>
-                <div><div class="font-semibold text-slate-800">Regions</div><div>Greater Accra, Ashanti</div></div>
-              </div>
-              <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
-                <div><div class="font-semibold text-slate-800">Domains</div><div>Banking/Financial, Labour/Employment</div></div>
-                <div class="text-right"><div class="text-slate-500">Last: 2020-12-02</div></div>
-              </div>
-              <div class="mt-3 flex items-center gap-4 text-xs text-slate-500">
-                <span><span class="font-semibold text-slate-700">1</span> Pending</span>
-                <span><span class="font-semibold text-slate-700">2</span> Resolved</span>
-              </div>
-              <div class="mt-4">
-          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
-              </div>
-            </article>
-
-            <!-- Card 3 -->
-            <article class="result-card rounded-xl border border-slate-200 bg-white p-4 shadow-sm" data-name="Masud Ibrahim" data-risk="32">
-              <div class="flex items-start justify-between">
-                <div class="flex items-center gap-2">
-                  <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/></svg>
+              <div class="flex items-center gap-2">
+                <span class="text-2xl font-bold text-red-600">85</span>
+                <div class="text-right">
+                  <div class="text-xs text-slate-500">Risk Score</div>
+                  <div class="w-16 bg-slate-200 rounded-full h-1.5 mt-1">
+                    <div class="bg-red-500 h-1.5 rounded-full" style="width: 85%"></div>
                   </div>
-                  <div>
-                    <h4 class="font-semibold">Masud Ibrahim</h4>
-                    <p class="text-xs text-slate-500">Person</p>
-                  </div>
-                </div>
-                <div class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-200">
-                  <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span> 32
-                  <span class="ml-1 font-medium text-emerald-600">Low Risk</span>
                 </div>
               </div>
-              <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
-                <div><div class="font-semibold text-slate-800">Also known as:</div><div>M. Ibrahim</div></div>
-                <div><div class="font-semibold text-slate-800">Regions</div><div>Greater Accra</div></div>
+            </div>
+            <div class="flex gap-2">
+              <a href="#" class="flex-1 text-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+                View Profile
+              </a>
+              <button class="px-3 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Result 4 -->
+          <div class="rounded-xl border border-slate-200 bg-white p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-lg font-semibold text-slate-900">Ama Serwaa</h3>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-200">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    Low Risk
+                  </span>
+                </div>
+                <p class="text-sm text-slate-600 mb-2">3 January 1990 • GH-456789123</p>
+                <div class="flex items-center gap-4 text-sm text-slate-500">
+                  <span>1 Case</span>
+                  <span>•</span>
+                  <span>Traffic Violation</span>
+                </div>
               </div>
-              <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
-                <div><div class="font-semibold text-slate-800">Domains</div><div>Land/Property, Human Rights</div></div>
-                <div class="text-right"><div class="text-slate-500">Last: 2025-04-15</div></div>
+              <div class="flex items-center gap-2">
+                <span class="text-2xl font-bold text-emerald-600">15</span>
+                <div class="text-right">
+                  <div class="text-xs text-slate-500">Risk Score</div>
+                  <div class="w-16 bg-slate-200 rounded-full h-1.5 mt-1">
+                    <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 15%"></div>
               </div>
-              <div class="mt-3 flex items-center gap-4 text-xs text-slate-500">
-                <span><span class="font-semibold text-slate-700">1</span> Pending</span>
-                <span><span class="font-semibold text-slate-700">0</span> Resolved</span>
+                </div>
               </div>
-              <div class="mt-4">
-          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
-
+            </div>
+            <div class="flex gap-2">
+              <a href="#" class="flex-1 text-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+                View Profile
+              </a>
+              <button class="px-3 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
-            </article>
-
-            <!-- Card 4 -->
-            <article class="result-card rounded-xl border border-slate-200 bg-white p-4 shadow-sm" data-name="Rufina Acquah Kane" data-risk="15">
-              <div class="flex items-start justify-between">
+        
+        <!-- List View (Hidden by default) -->
+        <div id="listView" class="hidden space-y-4">
+          <!-- Result 1 -->
+          <div class="rounded-xl border border-slate-200 bg-white p-6">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-lg font-semibold text-slate-900">Albert Kweku Obeng</h3>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-200">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    Low Risk
+                  </span>
+                </div>
+                <p class="text-sm text-slate-600 mb-2">7 March 1962 – 9 March 2004 • KL1K-DXP</p>
+                <div class="flex items-center gap-4 text-sm text-slate-500">
+                  <span>2 Cases</span>
+                  <span>•</span>
+                  <span>Property Dispute</span>
+                  <span>•</span>
+                  <span>Family Law</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2">
-                  <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/></svg>
+                  <span class="text-2xl font-bold text-emerald-600">25</span>
+                  <div class="text-right">
+                    <div class="text-xs text-slate-500">Risk Score</div>
+                    <div class="w-16 bg-slate-200 rounded-full h-1.5 mt-1">
+                      <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 25%"></div>
                   </div>
-                  <div>
-                    <h4 class="font-semibold">Rufina Acquah Kane</h4>
-                    <p class="text-xs text-slate-500">Person</p>
                   </div>
                 </div>
-                <div class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-200">
-                  <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span> 15
-                  <span class="ml-1 font-medium text-emerald-600">Low Risk</span>
+                <div class="flex gap-2">
+                  <a href="person_profile.html" class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+                    View Profile
+                  </a>
+                  <button class="px-3 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  </button>
                 </div>
               </div>
-              <div class="mt-3 text-xs text-slate-600">
-                <div class="font-semibold text-slate-800">Also known as:</div>
-                <div class="">Rufina A. Kane</div>
+            </div>
               </div>
-              <div class="mt-4">
-          <a href="person_profile.html" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">View Full Profile →</a>
+          
+          <!-- Result 2 -->
+          <div class="rounded-xl border border-slate-200 bg-white p-6">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-lg font-semibold text-slate-900">Sarah Mensah</h3>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-600 ring-1 ring-amber-200">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                    Medium Risk
+                  </span>
               </div>
-            </article>
+                <p class="text-sm text-slate-600 mb-2">15 June 1975 • GH-123456789</p>
+                <div class="flex items-center gap-4 text-sm text-slate-500">
+                  <span>5 Cases</span>
+                  <span>•</span>
+                  <span>Business Dispute</span>
+                  <span>•</span>
+                  <span>Contract Law</span>
+              </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl font-bold text-amber-600">65</span>
+                  <div class="text-right">
+                    <div class="text-xs text-slate-500">Risk Score</div>
+                    <div class="w-16 bg-slate-200 rounded-full h-1.5 mt-1">
+                      <div class="bg-amber-500 h-1.5 rounded-full" style="width: 65%"></div>
+                  </div>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <a href="#" class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+                    View Profile
+                  </a>
+                  <button class="px-3 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </main>
+          
+          <!-- Result 3 -->
+          <div class="rounded-xl border border-slate-200 bg-white p-6">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-lg font-semibold text-slate-900">Kwame Asante</h3>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-xs font-semibold text-red-600 ring-1 ring-red-200">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    High Risk
+                  </span>
+              </div>
+                <p class="text-sm text-slate-600 mb-2">22 September 1980 • GH-987654321</p>
+                <div class="flex items-center gap-4 text-sm text-slate-500">
+                  <span>12 Cases</span>
+                  <span>•</span>
+                  <span>Criminal</span>
+                  <span>•</span>
+                  <span>Fraud</span>
+              </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl font-bold text-red-600">85</span>
+                  <div class="text-right">
+                    <div class="text-xs text-slate-500">Risk Score</div>
+                    <div class="w-16 bg-slate-200 rounded-full h-1.5 mt-1">
+                      <div class="bg-red-500 h-1.5 rounded-full" style="width: 85%"></div>
+                  </div>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <a href="#" class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+                    View Profile
+                  </a>
+                  <button class="px-3 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Result 4 -->
+          <div class="rounded-xl border border-slate-200 bg-white p-6">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-lg font-semibold text-slate-900">Ama Serwaa</h3>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-200">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    Low Risk
+                  </span>
+                </div>
+                <p class="text-sm text-slate-600 mb-2">3 January 1990 • GH-456789123</p>
+                <div class="flex items-center gap-4 text-sm text-slate-500">
+                  <span>1 Case</span>
+                  <span>•</span>
+                  <span>Traffic Violation</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl font-bold text-emerald-600">15</span>
+                  <div class="text-right">
+                    <div class="text-xs text-slate-500">Risk Score</div>
+                    <div class="w-16 bg-slate-200 rounded-full h-1.5 mt-1">
+                      <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 15%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <a href="#" class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+                    View Profile
+                  </a>
+                  <button class="px-3 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-slate-900 text-white">
@@ -341,7 +536,7 @@
         <div>
           <div class="flex items-center gap-2 mb-4">
             <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
-            <span class="font-semibold">Ghana Legal Risk Index</span>
+            <span class="font-semibold">Dennislaw SVD</span>
           </div>
           <p class="text-slate-300 text-sm">Your trusted partner for comprehensive people search and case history discovery.</p>
         </div>
@@ -378,85 +573,72 @@
       </div>
       
       <div class="mt-8 pt-8 border-t border-slate-700 text-center text-sm text-slate-400">
-        <p>&copy; 2025 Ghana Legal Risk Index. All rights reserved. | Privacy Policy | Terms of Service</p>
+        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>
 
   <script>
-    // Tabs
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const sections = {
-      name: document.getElementById('tab-name'),
-      phone: document.getElementById('tab-phone'),
-      address: document.getElementById('tab-address'),
-    };
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabButtons.forEach(b => b.classList.remove('active','bg-sky-50','text-sky-700','border','border-sky-200'));
-        btn.classList.add('active','bg-sky-50','text-sky-700','border','border-sky-200');
-        Object.values(sections).forEach(sec => sec.classList.add('hidden'));
-        sections[btn.dataset.tab].classList.remove('hidden');
-      });
-    });
-
-    // Mock search button: filter by name partials
-    const searchBtn = document.getElementById('searchBtn');
-    searchBtn.addEventListener('click', () => {
-      const fn = (document.getElementById('firstName').value || '').toLowerCase();
-      const ln = (document.getElementById('lastName').value || '').toLowerCase();
-      const cards = Array.from(document.querySelectorAll('.result-card'));
-      let count = 0;
-      cards.forEach(card => {
-        const name = card.dataset.name.toLowerCase();
-        const show = (!fn && !ln) || name.includes(fn) || name.includes(ln);
-        card.classList.toggle('hidden', !show);
-        if (show) count++;
-      });
-      document.getElementById('count').textContent = count.toString();
-    });
-
-    // Sort
-    const sortSelect = document.getElementById('sortSelect');
-    sortSelect.addEventListener('change', () => {
-      const results = document.getElementById('results');
-      const cards = Array.from(results.children);
-      const val = sortSelect.value;
-      cards.sort((a,b) => {
-        const an = a.dataset.name.toLowerCase();
-        const bn = b.dataset.name.toLowerCase();
-        const ar = Number(a.dataset.risk);
-        const br = Number(b.dataset.risk);
-        if (val.includes('High to Low')) return br - ar;
-        if (val.includes('Low to High')) return ar - br;
-        if (val.includes('A–Z')) return an.localeCompare(bn);
-        if (val.includes('Z–A')) return bn.localeCompare(an);
-        return 0;
-      });
-      cards.forEach(c => results.appendChild(c));
-    });
-
-    // Grid/List toggle
-    const gridBtn = document.getElementById('gridBtn');
-    const listBtn = document.getElementById('listBtn');
-    function toList(){ 
-      const container = document.getElementById('results');
-      container.className = 'space-y-4';
-      document.querySelectorAll('.result-card').forEach(card => {
-        card.classList.add('md:flex','md:items-center','md:gap-6');
-        card.querySelector('.mt-4')?.classList.add('md:ml-auto');
+    // Mobile menu toggle
+    const mobileMenuBtn = document.querySelector('button[aria-label="Open menu"]');
+    const nav = document.querySelector('nav');
+    
+    if (mobileMenuBtn && nav) {
+      mobileMenuBtn.addEventListener('click', function() {
+        nav.classList.toggle('hidden');
       });
     }
-    function toGrid(){ 
-      const container = document.getElementById('results');
-      container.className = 'grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3';
-      document.querySelectorAll('.result-card').forEach(card => {
-        card.classList.remove('md:flex','md:items-center','md:gap-6');
-        card.querySelector('.mt-4')?.classList.remove('md:ml-auto');
-      });
-    }
-    gridBtn.addEventListener('click', toGrid);
-    listBtn.addEventListener('click', toList);
+
+    // View toggle functionality
+    const gridViewBtn = document.getElementById('gridViewBtn');
+    const listViewBtn = document.getElementById('listViewBtn');
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+
+    gridViewBtn.addEventListener('click', function() {
+      gridView.classList.remove('hidden');
+      listView.classList.add('hidden');
+      gridViewBtn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+      gridViewBtn.classList.remove('text-slate-600');
+      listViewBtn.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+      listViewBtn.classList.add('text-slate-600');
+    });
+
+    listViewBtn.addEventListener('click', function() {
+      listView.classList.remove('hidden');
+      gridView.classList.add('hidden');
+      listViewBtn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+      listViewBtn.classList.remove('text-slate-600');
+      gridViewBtn.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+      gridViewBtn.classList.add('text-slate-600');
+    });
+
+    // Export functionality
+    const exportBtn = document.getElementById('exportBtn');
+    exportBtn.addEventListener('click', function() {
+      // Create CSV data
+      const csvData = [
+        ['Name', 'ID Number', 'Risk Level', 'Risk Score', 'Cases', 'Location'],
+        ['Albert Kweku Obeng', 'KL1K-DXP', 'Low Risk', '25', '2', 'Greater Accra'],
+        ['Sarah Mensah', 'GH-123456789', 'Medium Risk', '65', '5', 'Ashanti'],
+        ['Kwame Asante', 'GH-987654321', 'High Risk', '85', '12', 'Western'],
+        ['Ama Serwaa', 'GH-456789123', 'Low Risk', '15', '1', 'Central']
+      ];
+
+      // Convert to CSV string
+      const csvString = csvData.map(row => row.join(',')).join('\n');
+
+      // Create and download file
+      const blob = new Blob([csvString], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'people_search_results.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    });
   </script>
 </body>
 </html>

@@ -3,18 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Case Detail</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Case Detail - Dennislaw SVD</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --brand:#0ea5e9; /* sky-500 */
+      --brand-dark:#0284c7; /* sky-600 */
+      --text:#0f172a; /* slate-900 */
+    }
+    body{font-family:'Inter',sans-serif;background:#f8fafc}
+  </style>
 </head>
 <body>
-  <div class="container mt-4">
-    <h1>Case Detail</h1>
-    <div id="case-detail">
-      <!-- Case details will be dynamically injected here -->
+  <!-- Header -->
+  <header class="bg-slate-900 text-white">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-shield-alt text-sky-400 text-2xl"></i>
+          <h1 class="text-xl font-bold">Dennislaw SVD</h1>
+        </div>
+        <nav class="hidden md:flex space-x-6">
+          <a href="index.html" class="hover:text-sky-400 transition-colors">Home</a>
+          <a href="people-database.html" class="hover:text-sky-400 transition-colors">People Database</a>
+          <a href="advanced-search.html" class="hover:text-sky-400 transition-colors">Advanced Search</a>
+          <a href="about.html" class="hover:text-sky-400 transition-colors">About</a>
+          <a href="contact.html" class="hover:text-sky-400 transition-colors">Contact</a>
+        </nav>
+        <button class="md:hidden text-white">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
     </div>
+  </header>
 
-    <a href="results.html" class="btn btn-secondary mt-4">Back to Results</a>
-  </div>
+  <!-- Main Content -->
+  <main class="min-h-screen bg-slate-50 py-12">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto">
+        <!-- Back Button -->
+        <div class="mb-6">
+          <a href="results.html" class="inline-flex items-center text-sky-600 hover:text-sky-700 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Results
+          </a>
+        </div>
+
+        <!-- Case Detail Card -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <div id="case-detail">
+            <!-- Case details will be dynamically injected here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <i class="fas fa-shield-alt text-sky-400 text-2xl"></i>
+            <h3 class="text-xl font-bold">Dennislaw SVD</h3>
+          </div>
+          <p class="text-slate-400">Comprehensive legal database for Ghana</p>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2 text-slate-400">
+            <li><a href="index.html" class="hover:text-white transition-colors">Home</a></li>
+            <li><a href="people-database.html" class="hover:text-white transition-colors">People Database</a></li>
+            <li><a href="advanced-search.html" class="hover:text-white transition-colors">Advanced Search</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Resources</h4>
+          <ul class="space-y-2 text-slate-400">
+            <li><a href="about.html" class="hover:text-white transition-colors">About</a></li>
+            <li><a href="contact.html" class="hover:text-white transition-colors">Contact</a></li>
+            <li><a href="specification.html" class="hover:text-white transition-colors">Specification</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Contact Info</h4>
+          <div class="space-y-2 text-slate-400">
+            <p><i class="fas fa-envelope mr-2"></i> info@dennislawgh.com</p>
+            <p><i class="fas fa-phone mr-2"></i> +233 302 123 456</p>
+            <p><i class="fas fa-map-marker-alt mr-2"></i> Accra, Ghana</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
+        <p>&copy; 2024 Dennislaw SVD. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
   <script>
     // Simulate case data
@@ -28,21 +122,64 @@
     const caseDetails = caseData.find(c => c.caseId == caseId);
 
     if (!caseDetails) {
-      document.getElementById('case-detail').innerHTML = '<p>Case not found.</p>';
+      document.getElementById('case-detail').innerHTML = '<p class="text-red-600">Case not found.</p>';
     } else {
       document.getElementById('case-detail').innerHTML = `
-        <h2>${caseDetails.title}</h2>
-        <p><strong>Date:</strong> ${caseDetails.date}</p>
-        <p><strong>Presiding Judge:</strong> ${caseDetails.judge}</p>
-        <p><strong>Lawyers:</strong> ${caseDetails.lawyers}</p>
-        <p><strong>Region:</strong> ${caseDetails.region}</p>
-        <p><strong>Court Type:</strong> ${caseDetails.courtType}</p>
-        <p><strong>Judgement:</strong> ${caseDetails.judgement}</p>
-        <a href="https://dennislawgh.com" class="btn btn-primary">View Full Case</a>
+        <div class="mb-6">
+          <h1 class="text-3xl font-bold text-slate-900 mb-4">${caseDetails.title}</h1>
+          <div class="flex items-center space-x-4 text-slate-600">
+            <span class="flex items-center">
+              <i class="fas fa-calendar mr-2"></i>
+              ${caseDetails.date}
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-gavel mr-2"></i>
+              ${caseDetails.courtType}
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div class="bg-slate-50 rounded-lg p-4">
+            <h3 class="font-semibold text-slate-900 mb-2">Presiding Judge</h3>
+            <p class="text-slate-600">${caseDetails.judge}</p>
+          </div>
+          
+          <div class="bg-slate-50 rounded-lg p-4">
+            <h3 class="font-semibold text-slate-900 mb-2">Region</h3>
+            <p class="text-slate-600">${caseDetails.region}</p>
+          </div>
+          
+          <div class="bg-slate-50 rounded-lg p-4">
+            <h3 class="font-semibold text-slate-900 mb-2">Lawyers</h3>
+            <p class="text-slate-600">${caseDetails.lawyers}</p>
+          </div>
+          
+          <div class="bg-slate-50 rounded-lg p-4">
+            <h3 class="font-semibold text-slate-900 mb-2">Court Type</h3>
+            <p class="text-slate-600">${caseDetails.courtType}</p>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="font-semibold text-slate-900 mb-4">Judgement</h3>
+          <div class="bg-slate-50 rounded-lg p-6">
+            <p class="text-slate-700 leading-relaxed">${caseDetails.judgement}</p>
+          </div>
+        </div>
+
+        <div class="flex space-x-4">
+          <a href="https://dennislawgh.com" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center">
+            <i class="fas fa-external-link-alt mr-2"></i>
+            View Full Case
+          </a>
+          <button class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 px-6 rounded-lg transition-colors flex items-center">
+            <i class="fas fa-download mr-2"></i>
+            Download PDF
+          </button>
+        </div>
       `;
     }
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

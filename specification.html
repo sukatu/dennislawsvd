@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>System Specification - Ghana Legal Risk Index</title>
+  <title>System Specification - Dennislaw SVD</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
   <style>
     :root{
       --brand:#0ea5e9; /* sky-500 */
@@ -30,7 +29,7 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
-        <span class="font-semibold">Ghana Legal Risk Index</span>
+        <span class="font-semibold">Dennislaw SVD</span>
       </div>
       <nav class="hidden md:flex items-center gap-6 text-sm/6 text-slate-200">
         <a class="hover:text-white" href="index.html">Home</a>
@@ -39,7 +38,7 @@
         <a class="hover:text-white" href="people-database.html">People Database</a>
         <a class="hover:text-white" href="about.html">About</a>
         <a class="hover:text-white" href="contact.html">Contact</a>
-        <a class="hover:text-white text-sky-400" href="specification.html">Specification</a>
+        <a class="hover:text-white" href="specification.html">Specification</a>
       </nav>
       <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/10" aria-label="Open menu">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,400 +48,381 @@
     </div>
   </header>
 
-  <!-- Page Header -->
+  <!-- Hero Section -->
   <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 text-center">
     <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">System Specification</h1>
-    <p class="mt-2 text-slate-600">Comprehensive technical documentation for the Ghana Legal Risk Index platform architecture, features, and implementation details.</p>
+    <p class="mt-2 text-slate-600">Comprehensive technical documentation for the Dennislaw SVD platform architecture, features, and implementation details.</p>
   </section>
 
-  <!-- Specification Content -->
-  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-10">
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
-      <!-- Sidebar Navigation -->
-      <aside class="lg:col-span-1">
-        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sticky top-6">
-          <h3 class="text-sm font-semibold text-slate-900 mb-4">Table of Contents</h3>
-          <nav class="space-y-2">
-            <a href="#overview" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Overview</a>
-            <a href="#architecture" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Architecture</a>
-            <a href="#features" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Features</a>
-            <a href="#api" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">API Documentation</a>
-            <a href="#database" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Database Schema</a>
-            <a href="#security" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Security</a>
-            <a href="#deployment" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Deployment</a>
-            <a href="#maintenance" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg">Maintenance</a>
-          </nav>
-        </div>
-      </aside>
+  <!-- Main Content -->
+  <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pb-20">
+    <div class="prose prose-slate max-w-none">
+      <!-- Table of Contents -->
+      <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold text-slate-900 mb-4">Table of Contents</h2>
+        <ul class="space-y-2 text-sm">
+          <li><a href="#overview" class="text-sky-600 hover:text-sky-700">1. System Overview</a></li>
+          <li><a href="#architecture" class="text-sky-600 hover:text-sky-700">2. System Architecture</a></li>
+          <li><a href="#features" class="text-sky-600 hover:text-sky-700">3. Core Features</a></li>
+          <li><a href="#database" class="text-sky-600 hover:text-sky-700">4. Database Schema</a></li>
+          <li><a href="#api" class="text-sky-600 hover:text-sky-700">5. API Documentation</a></li>
+          <li><a href="#security" class="text-sky-600 hover:text-sky-700">6. Security Features</a></li>
+          <li><a href="#performance" class="text-sky-600 hover:text-sky-700">7. Performance Requirements</a></li>
+          <li><a href="#deployment" class="text-sky-600 hover:text-sky-700">8. Deployment Guide</a></li>
+        </ul>
+      </div>
 
-      <!-- Main Content -->
-      <main class="lg:col-span-3">
-        <div class="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-          <!-- Overview Section -->
-          <section id="overview" class="mb-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.011 8.011 0 0 1 4.07 13H4a1 1 0 0 1 0-2h.07A8.011 8.011 0 0 1 11 4.07V4a1 1 0 0 1 2 0v.07A8.011 8.011 0 0 1 19.93 11H20a1 1 0 0 1 0 2h-.07A8.011 8.011 0 0 1 13 19.93Z"/>
-              </svg>
-              System Overview
-            </h2>
-            <p class="text-slate-600 mb-4">The Ghana Legal Risk Index is a comprehensive legal database platform designed to provide instant access to legal case information, people search capabilities, and risk assessment tools for legal professionals, researchers, and the general public.</p>
-            
-            <div class="bg-sky-50 border border-sky-200 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-slate-900 mb-3">Key Objectives</h3>
-              <ul class="space-y-2 text-slate-600">
-                <li class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                  </svg>
-                  Provide instant access to legal case information across Ghana
-                </li>
-                <li class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                  </svg>
-                  Enable comprehensive people search by case involvement
-                </li>
-                <li class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                  </svg>
-                  Offer risk assessment and scoring capabilities
-                </li>
-                <li class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                  </svg>
-                  Support advanced search and filtering options
-                </li>
-              </ul>
-            </div>
-          </section>
+      <!-- System Overview -->
+      <section id="overview" class="mb-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">
+          System Overview
+        </h2>
+        <p class="text-slate-600 mb-4">The Dennislaw SVD is a comprehensive legal database platform designed to provide instant access to legal case information, people search capabilities, and risk assessment tools for legal professionals, researchers, and the general public.</p>
+        
+        <div class="bg-sky-50 border border-sky-200 rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-3">Key Objectives</h3>
+          <ul class="space-y-2 text-slate-700">
+            <li>• Provide comprehensive legal case database access</li>
+            <li>• Enable efficient people search and verification</li>
+            <li>• Offer risk assessment and scoring capabilities</li>
+            <li>• Ensure data security and privacy compliance</li>
+            <li>• Support multiple user roles and permissions</li>
+          </ul>
+    </div>
 
-          <!-- Architecture Section -->
-          <section id="architecture" class="mb-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-6v-6H10v6H4a1 1 0 0 1-1-1z"/>
-              </svg>
-              System Architecture
-            </h2>
-            <p class="text-slate-600 mb-4">The platform is built using modern web technologies with a focus on scalability, performance, and user experience.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div class="rounded-lg border border-slate-200 p-4">
-                <h3 class="text-lg font-semibold text-slate-900 mb-3">Frontend Technologies</h3>
-                <ul class="space-y-2 text-sm text-slate-600">
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    HTML5 & CSS3
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    Tailwind CSS
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    JavaScript (ES6+)
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    Font Awesome Icons
-                  </li>
-                </ul>
-              </div>
-              
-              <div class="rounded-lg border border-slate-200 p-4">
-                <h3 class="text-lg font-semibold text-slate-900 mb-3">Backend Technologies</h3>
-                <ul class="space-y-2 text-sm text-slate-600">
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    Node.js / Python
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    PostgreSQL / MongoDB
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    RESTful API
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    Redis Cache
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          <!-- Features Section -->
-          <section id="features" class="mb-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-              </svg>
-              Core Features
-            </h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="rounded-lg border border-slate-200 p-6">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
-                    </svg>
-                  </div>
-                  <h3 class="text-lg font-semibold text-slate-900">People Search</h3>
-                </div>
-                <p class="text-slate-600 text-sm">Advanced search functionality to find individuals by name, case involvement, and legal history.</p>
-              </div>
-
-              <div class="rounded-lg border border-slate-200 p-6">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                    </svg>
-                  </div>
-                  <h3 class="text-lg font-semibold text-slate-900">Case Management</h3>
-                </div>
-                <p class="text-slate-600 text-sm">Comprehensive case tracking with detailed information about judgments, rulings, and outcomes.</p>
-              </div>
-
-              <div class="rounded-lg border border-slate-200 p-6">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
-                  </div>
-                  <h3 class="text-lg font-semibold text-slate-900">Risk Assessment</h3>
-                </div>
-                <p class="text-slate-600 text-sm">Automated risk scoring system based on legal history and case involvement patterns.</p>
-              </div>
-
-              <div class="rounded-lg border border-slate-200 p-6">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M21 20.586 16.243 15.83A8 8 0 1 0 15.83 16.243L20.586 21 21 20.586zM4 10a6 6 0 1 1 6 6 6.006 6.006 0 0 1-6-6z"/>
-                    </svg>
-                  </div>
-                  <h3 class="text-lg font-semibold text-slate-900">Advanced Search</h3>
-                </div>
-                <p class="text-slate-600 text-sm">Multi-criteria search with filters for court type, date range, legal domain, and more.</p>
-              </div>
-            </div>
-          </section>
-
-          <!-- API Documentation Section -->
-          <section id="api" class="mb-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-              </svg>
-              API Documentation
-            </h2>
-            <p class="text-slate-600 mb-4">The platform provides RESTful API endpoints for programmatic access to legal data.</p>
-            
-            <div class="bg-slate-900 rounded-lg p-6 mb-4">
-              <h3 class="text-white font-semibold mb-3">Search People Endpoint</h3>
-              <code class="text-green-400 text-sm">GET /api/v1/people/search?name=John&case_type=criminal</code>
-            </div>
-            
-            <div class="bg-slate-900 rounded-lg p-6 mb-4">
-              <h3 class="text-white font-semibold mb-3">Get Case Details</h3>
-              <code class="text-green-400 text-sm">GET /api/v1/cases/{case_id}</code>
-            </div>
-            
-            <div class="bg-slate-900 rounded-lg p-6">
-              <h3 class="text-white font-semibold mb-3">Risk Assessment</h3>
-              <code class="text-green-400 text-sm">POST /api/v1/risk/assess</code>
-            </div>
-          </section>
-
-          <!-- Database Schema Section -->
-          <section id="database" class="mb-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 4a1 1 0 0 1 1-1h5a1 1 0 0 1 .894.553L11.382 6H20a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
-              </svg>
-              Database Schema
-            </h2>
-            <p class="text-slate-600 mb-4">The database is designed to efficiently store and retrieve legal case information with proper indexing and relationships.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="rounded-lg border border-slate-200 p-4">
-                <h3 class="text-lg font-semibold text-slate-900 mb-3">Core Tables</h3>
-                <ul class="space-y-2 text-sm text-slate-600">
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    people
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    cases
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    case_participants
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    courts
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    judges
-                  </li>
-                </ul>
-              </div>
-              
-              <div class="rounded-lg border border-slate-200 p-4">
-                <h3 class="text-lg font-semibold text-slate-900 mb-3">Key Relationships</h3>
-                <ul class="space-y-2 text-sm text-slate-600">
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    Many-to-many: People ↔ Cases
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    One-to-many: Courts → Cases
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    One-to-many: Judges → Cases
-                  </li>
-                  <li class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-500 rounded-full"></span>
-                    One-to-many: Cases → Judgments
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          <!-- Security Section -->
-          <section id="security" class="mb-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 1l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 1z"/>
-              </svg>
-              Security & Privacy
-            </h2>
-            <p class="text-slate-600 mb-4">The platform implements comprehensive security measures to protect sensitive legal data and ensure user privacy.</p>
-            
-            <div class="bg-amber-50 border border-amber-200 rounded-lg p-6">
-              <h3 class="text-lg font-semibold text-slate-900 mb-3">Security Features</h3>
-              <ul class="space-y-2 text-slate-600">
-                <li class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                  </svg>
-                  End-to-end encryption for all data transmission
-                </li>
-                <li class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                  </svg>
-                  Role-based access control (RBAC)
-                </li>
-                <li class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                  </svg>
-                  Regular security audits and penetration testing
-                </li>
-                <li class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                  </svg>
-                  GDPR compliance for data protection
-                </li>
-              </ul>
-            </div>
-          </section>
-
-          <!-- Deployment Section -->
-          <section id="deployment" class="mb-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 8a4 4 0 1 1-4 4 4.005 4.005 0 0 1 4-4Zm8-3h-3.586l-1.707-1.707A1 1 0 0 0 13.586 3H10.414a1 1 0 0 0-.707.293L8 5H5a2 2 0 0 0-2 2v11a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7a2 2 0 0 0-2-2Z"/>
-              </svg>
-              Deployment & Infrastructure
-            </h2>
-            <p class="text-slate-600 mb-4">The platform is deployed using modern cloud infrastructure with high availability and scalability.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div class="rounded-lg border border-slate-200 p-4 text-center">
-                <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-6v-6H10v6H4a1 1 0 0 1-1-1z"/>
-                  </svg>
-                </div>
-                <h3 class="font-semibold text-slate-900">Cloud Hosting</h3>
-                <p class="text-sm text-slate-600">AWS/Azure</p>
-              </div>
-              
-              <div class="rounded-lg border border-slate-200 p-4 text-center">
-                <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 8a4 4 0 1 1-4 4 4.005 4.005 0 0 1 4-4Zm8-3h-3.586l-1.707-1.707A1 1 0 0 0 13.586 3H10.414a1 1 0 0 0-.707.293L8 5H5a2 2 0 0 0-2 2v11a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7a2 2 0 0 0-2-2Z"/>
-                  </svg>
-                </div>
-                <h3 class="font-semibold text-slate-900">Load Balancing</h3>
-                <p class="text-sm text-slate-600">Auto-scaling</p>
-              </div>
-              
-              <div class="rounded-lg border border-slate-200 p-4 text-center">
-                <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.011 8.011 0 0 1 4.07 13H4a1 1 0 0 1 0-2h.07A8.011 8.011 0 0 1 11 4.07V4a1 1 0 0 1 2 0v.07A8.011 8.011 0 0 1 19.93 11H20a1 1 0 0 1 0 2h-.07A8.011 8.011 0 0 1 13 19.93Z"/>
-                  </svg>
-                </div>
-                <h3 class="font-semibold text-slate-900">Monitoring</h3>
-                <p class="text-sm text-slate-600">24/7 Support</p>
-              </div>
-            </div>
-          </section>
-
-          <!-- Maintenance Section -->
-          <section id="maintenance" class="mb-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-              </svg>
-              Maintenance & Support
-            </h2>
-            <p class="text-slate-600 mb-4">Regular maintenance and updates ensure optimal performance and security of the platform.</p>
-            
-            <div class="bg-slate-50 rounded-lg p-6">
-              <h3 class="text-lg font-semibold text-slate-900 mb-3">Maintenance Schedule</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h4 class="font-medium text-slate-900 mb-2">Daily</h4>
-                  <ul class="text-sm text-slate-600 space-y-1">
-                    <li>• Database backups</li>
-                    <li>• Security monitoring</li>
-                    <li>• Performance checks</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 class="font-medium text-slate-900 mb-2">Weekly</h4>
-                  <ul class="text-sm text-slate-600 space-y-1">
-                    <li>• System updates</li>
-                    <li>• Data validation</li>
-                    <li>• User feedback review</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-      </main>
+        <h3 class="text-xl font-semibold text-slate-900 mb-4">Target Users</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="bg-white border border-slate-200 rounded-lg p-4">
+            <h4 class="font-semibold text-slate-900 mb-2">Legal Professionals</h4>
+            <p class="text-sm text-slate-600">Lawyers, judges, and legal researchers who need quick access to case information and people verification.</p>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-lg p-4">
+            <h4 class="font-semibold text-slate-900 mb-2">Government Agencies</h4>
+            <p class="text-sm text-slate-600">Government departments requiring background checks and legal history verification.</p>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-lg p-4">
+            <h4 class="font-semibold text-slate-900 mb-2">Private Sector</h4>
+            <p class="text-sm text-slate-600">Companies conducting due diligence and background verification for employment or partnerships.</p>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-lg p-4">
+            <h4 class="font-semibold text-slate-900 mb-2">General Public</h4>
+            <p class="text-sm text-slate-600">Individuals seeking information about legal cases or people for personal or business purposes.</p>
+          </div>
     </div>
   </section>
+
+      <!-- System Architecture -->
+      <section id="architecture" class="mb-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">System Architecture</h2>
+        
+        <div class="bg-white border border-slate-200 rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">Technology Stack</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="font-medium text-slate-900 mb-2">Frontend</h4>
+              <ul class="space-y-1 text-sm text-slate-600">
+                <li>• HTML5 & CSS3</li>
+                <li>• Tailwind CSS</li>
+                <li>• JavaScript (ES6+)</li>
+                <li>• Responsive Design</li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-medium text-slate-900 mb-2">Backend</h4>
+              <ul class="space-y-1 text-sm text-slate-600">
+                <li>• Node.js / Python</li>
+                <li>• Express.js / Django</li>
+                <li>• RESTful API</li>
+                <li>• JWT Authentication</li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-medium text-slate-900 mb-2">Database</h4>
+              <ul class="space-y-1 text-sm text-slate-600">
+                <li>• PostgreSQL</li>
+                <li>• Redis (Caching)</li>
+                <li>• Elasticsearch (Search)</li>
+                <li>• Data Encryption</li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-medium text-slate-900 mb-2">Infrastructure</h4>
+              <ul class="space-y-1 text-sm text-slate-600">
+                <li>• Cloud Hosting (AWS/Azure)</li>
+                <li>• CDN (Content Delivery)</li>
+                <li>• SSL/TLS Security</li>
+                <li>• Load Balancing</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">System Components</h3>
+          <div class="space-y-4">
+            <div class="flex items-start gap-3">
+              <div class="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-sm font-semibold text-sky-600">1</span>
+              </div>
+              <div>
+                <h4 class="font-medium text-slate-900">Web Interface</h4>
+                <p class="text-sm text-slate-600">Responsive web application providing user-friendly access to all system features.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-sm font-semibold text-sky-600">2</span>
+              </div>
+              <div>
+                <h4 class="font-medium text-slate-900">API Gateway</h4>
+                <p class="text-sm text-slate-600">Centralized entry point for all API requests with authentication and rate limiting.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-sm font-semibold text-sky-600">3</span>
+              </div>
+              <div>
+                <h4 class="font-medium text-slate-900">Search Engine</h4>
+                <p class="text-sm text-slate-600">Advanced search capabilities with full-text search and filtering options.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-sm font-semibold text-sky-600">4</span>
+              </div>
+              <div>
+                <h4 class="font-medium text-slate-900">Data Processing</h4>
+                <p class="text-sm text-slate-600">Automated data ingestion, validation, and processing from various court systems.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Core Features -->
+      <section id="features" class="mb-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">Core Features</h2>
+        
+        <div class="space-y-6">
+          <div class="bg-white border border-slate-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-3">People Search</h3>
+            <ul class="space-y-2 text-slate-600">
+              <li>• Search by name, ID number, phone, or address</li>
+              <li>• Advanced filtering options</li>
+              <li>• Risk assessment scoring</li>
+              <li>• Detailed profile information</li>
+              <li>• Case history and legal records</li>
+              </ul>
+            </div>
+
+          <div class="bg-white border border-slate-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-3">Case Management</h3>
+            <ul class="space-y-2 text-slate-600">
+              <li>• Comprehensive case database</li>
+              <li>• Case status tracking</li>
+              <li>• Court information and jurisdiction</li>
+              <li>• Judge and lawyer details</li>
+              <li>• Case outcome and resolution</li>
+                    </ul>
+                </div>
+                
+          <div class="bg-white border border-slate-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-3">Risk Assessment</h3>
+            <ul class="space-y-2 text-slate-600">
+              <li>• Automated risk scoring algorithm</li>
+              <li>• Risk level categorization (Low, Medium, High)</li>
+              <li>• Historical data analysis</li>
+              <li>• Predictive risk modeling</li>
+              <li>• Risk trend analysis</li>
+                    </ul>
+                </div>
+                
+          <div class="bg-white border border-slate-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-3">Reporting & Analytics</h3>
+            <ul class="space-y-2 text-slate-600">
+              <li>• Custom report generation</li>
+              <li>• Data export capabilities</li>
+              <li>• Statistical analysis</li>
+              <li>• Trend visualization</li>
+              <li>• Performance metrics</li>
+                    </ul>
+                  </div>
+                </div>
+      </section>
+
+      <!-- Database Schema -->
+      <section id="database" class="mb-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">Database Schema</h2>
+        
+        <div class="bg-white border border-slate-200 rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">Core Tables</h3>
+          <div class="space-y-4">
+            <div class="border-l-4 border-sky-500 pl-4">
+              <h4 class="font-medium text-slate-900">People</h4>
+              <p class="text-sm text-slate-600">Stores personal information, contact details, and identification data.</p>
+              <div class="mt-2 text-xs text-slate-500">
+                Fields: id, first_name, last_name, date_of_birth, id_number, phone, email, address, created_at, updated_at
+              </div>
+            </div>
+            <div class="border-l-4 border-sky-500 pl-4">
+              <h4 class="font-medium text-slate-900">Cases</h4>
+              <p class="text-sm text-slate-600">Contains case information, court details, and legal proceedings.</p>
+              <div class="mt-2 text-xs text-slate-500">
+                Fields: id, case_number, title, description, court_id, judge_id, status, outcome, date_filed, date_resolved
+              </div>
+            </div>
+            <div class="border-l-4 border-sky-500 pl-4">
+              <h4 class="font-medium text-slate-900">People_Cases</h4>
+              <p class="text-sm text-slate-600">Junction table linking people to their associated cases.</p>
+              <div class="mt-2 text-xs text-slate-500">
+                Fields: person_id, case_id, role, involvement_type, created_at
+                  </div>
+                </div>
+            <div class="border-l-4 border-sky-500 pl-4">
+              <h4 class="font-medium text-slate-900">Courts</h4>
+              <p class="text-sm text-slate-600">Court information including jurisdiction and contact details.</p>
+              <div class="mt-2 text-xs text-slate-500">
+                Fields: id, name, type, region, address, phone, email, created_at
+                  </div>
+                </div>
+              </div>
+            </div>
+      </section>
+
+      <!-- API Documentation -->
+      <section id="api" class="mb-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">API Documentation</h2>
+        
+        <div class="bg-white border border-slate-200 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">Endpoints</h3>
+          <div class="space-y-4">
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="px-2 py-1 text-xs font-semibold text-white bg-green-600 rounded">GET</span>
+                <code class="text-sm font-mono">/api/people/search</code>
+              </div>
+              <p class="text-sm text-slate-600">Search for people by various criteria</p>
+                </div>
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded">POST</span>
+                <code class="text-sm font-mono">/api/people</code>
+              </div>
+              <p class="text-sm text-slate-600">Create a new person record</p>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="px-2 py-1 text-xs font-semibold text-white bg-green-600 rounded">GET</span>
+                <code class="text-sm font-mono">/api/cases/search</code>
+              </div>
+              <p class="text-sm text-slate-600">Search for cases by various criteria</p>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="px-2 py-1 text-xs font-semibold text-white bg-green-600 rounded">GET</span>
+                <code class="text-sm font-mono">/api/risk-assessment/{person_id}</code>
+              </div>
+              <p class="text-sm text-slate-600">Get risk assessment for a specific person</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Security Features -->
+      <section id="security" class="mb-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">Security Features</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white border border-slate-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-3">Authentication & Authorization</h3>
+            <ul class="space-y-2 text-slate-600">
+              <li>• JWT-based authentication</li>
+              <li>• Role-based access control</li>
+              <li>• Multi-factor authentication</li>
+              <li>• Session management</li>
+              <li>• Password policies</li>
+            </ul>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-3">Data Protection</h3>
+            <ul class="space-y-2 text-slate-600">
+              <li>• End-to-end encryption</li>
+              <li>• Data anonymization</li>
+              <li>• Secure data transmission</li>
+              <li>• Regular security audits</li>
+              <li>• GDPR compliance</li>
+              </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Performance Requirements -->
+      <section id="performance" class="mb-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">Performance Requirements</h2>
+        
+        <div class="bg-white border border-slate-200 rounded-lg p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-semibold text-slate-900 mb-3">Response Times</h3>
+              <ul class="space-y-2 text-slate-600">
+                <li>• Search queries: &lt; 2 seconds</li>
+                <li>• Page load: &lt; 3 seconds</li>
+                <li>• API responses: &lt; 1 second</li>
+                <li>• Database queries: &lt; 500ms</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-slate-900 mb-3">Scalability</h3>
+              <ul class="space-y-2 text-slate-600">
+                <li>• Support 10,000+ concurrent users</li>
+                <li>• Handle 1M+ records</li>
+                <li>• 99.9% uptime</li>
+                <li>• Auto-scaling capabilities</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Deployment Guide -->
+      <section id="deployment" class="mb-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">Deployment Guide</h2>
+        
+        <div class="bg-white border border-slate-200 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">Prerequisites</h3>
+          <ul class="space-y-2 text-slate-600 mb-6">
+            <li>• Node.js 18+ or Python 3.9+</li>
+            <li>• PostgreSQL 13+</li>
+            <li>• Redis 6+</li>
+            <li>• Elasticsearch 7+</li>
+            <li>• SSL certificate</li>
+          </ul>
+          
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">Installation Steps</h3>
+          <div class="bg-slate-900 text-slate-100 rounded-lg p-4 font-mono text-sm">
+            <div class="space-y-2">
+              <div># Clone repository</div>
+              <div>git clone https://github.com/dennislaw/svd.git</div>
+              <div>cd svd</div>
+              <div></div>
+              <div># Install dependencies</div>
+              <div>npm install</div>
+              <div></div>
+              <div># Configure environment</div>
+              <div>cp .env.example .env</div>
+              <div></div>
+              <div># Run database migrations</div>
+              <div>npm run migrate</div>
+              <div></div>
+              <div># Start application</div>
+              <div>npm start</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-slate-900 text-white">
@@ -451,7 +431,7 @@
         <div>
           <div class="flex items-center gap-2 mb-4">
             <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
-            <span class="font-semibold">Ghana Legal Risk Index</span>
+            <span class="font-semibold">Dennislaw SVD</span>
           </div>
           <p class="text-slate-300 text-sm">Your trusted partner for comprehensive people search and case history discovery.</p>
         </div>
@@ -488,7 +468,7 @@
       </div>
       
       <div class="mt-8 pt-8 border-t border-slate-700 text-center text-sm text-slate-400">
-        <p>&copy; 2025 Ghana Legal Risk Index. All rights reserved. | Privacy Policy | Terms of Service</p>
+        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>
@@ -503,17 +483,6 @@
         nav.classList.toggle('hidden');
       });
     }
-
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    });
   </script>
 </body>
 </html>

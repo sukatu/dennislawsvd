@@ -3,14 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ghana Legal Risk Index - Look Up Anyone!</title>
+  <title>Dennislaw SVD - Look Up Anyone!</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
   <style>
     :root{
       --brand:#0ea5e9; /* sky-500 */
@@ -30,14 +28,16 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
-        <span class="font-semibold">Ghana Legal Risk Index</span>
+        <span class="font-semibold">Dennislaw SVD</span>
       </div>
       <nav class="hidden md:flex items-center gap-6 text-sm/6 text-slate-200">
         <a class="hover:text-white" href="index.html">Home</a>
+        <a class="hover:text-white" href="people-results.html">People Search</a>
         <a class="hover:text-white" href="advanced-search.html">Advanced Search</a>
         <a class="hover:text-white" href="people-database.html">People Database</a>
         <a class="hover:text-white" href="about.html">About</a>
         <a class="hover:text-white" href="contact.html">Contact</a>
+        <a class="hover:text-white" href="specification.html">Specification</a>
       </nav>
       <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/10" aria-label="Open menu">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -47,183 +47,132 @@
     </div>
   </header>
 
-  <!-- Hero -->
-  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 text-center">
-    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">Look Up Anyone!</h1>
-    <p class="mt-2 text-slate-600">Search for individuals involved in legal cases with Ghana's most comprehensive legal risk database. Find case history, presiding judges, lawyers, and case outcomes.</p>
-    <div class="mt-3 flex items-center justify-center gap-6 text-sm text-slate-500">
-      <div class="flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.011 8.011 0 0 1 4.07 13H4a1 1 0 0 1 0-2h.07A8.011 8.011 0 0 1 11 4.07V4a1 1 0 0 1 2 0v.07A8.011 8.011 0 0 1 19.93 11H20a1 1 0 0 1 0 2h-.07A8.011 8.011 0 0 1 13 19.93Z"/></svg>
-        <span><span class="font-semibold">464</span> Courts Connected</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4a1 1 0 0 1 1-1h5a1 1 0 0 1 .894.553L11.382 6H20a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
-        <span><span class="font-semibold">16</span> Regions Covered</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 1-4 4 4.005 4.005 0 0 1 4-4Zm8-3h-3.586l-1.707-1.707A1 1 0 0 0 13.586 3H10.414a1 1 0 0 0-.707.293L8 5H5a2 2 0 0 0-2 2v11a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7a2 2 0 0 0-2-2Z"/></svg>
-        <span>Updated Daily</span>
-      </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="mt-6 inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
-      <button data-tab="name" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium bg-sky-50 text-sky-700 border border-sky-200">Name</button>
-      <button data-tab="phone" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Phone</button>
-      <button data-tab="address" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Address</button>
-    </div>
-
-    <!-- Search form (Name) -->
-    <div id="tab-name" class="mt-5">
-      <form class="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-2" id="searchForm">
-        <div>
-          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">First Name</label>
-          <input id="firstName" type="text" placeholder="Enter first name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
-        </div>
-        <div>
-          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">Last Name</label>
-          <input id="lastName" type="text" placeholder="Enter last name" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
-        </div>
-        <div class="sm:col-span-2">
-          <button type="submit" id="searchBtn" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 font-semibold text-white hover:bg-sky-700 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 20.586 16.243 15.83A8 8 0 1 0 15.83 16.243L20.586 21 21 20.586zM4 10a6 6 0 1 1 6 6 6.006 6.006 0 0 1-6-6z"/>
-            </svg>
-            Search
+  <!-- Hero Section -->
+  <section class="bg-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+      <div class="text-center">
+        <h1 class="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
+          Look Up Anyone!
+        </h1>
+        <p class="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
+          Search our comprehensive database of people and legal cases. Get instant access to legal history, risk assessments, and detailed profiles.
+        </p>
+        
+        <!-- Search Form -->
+        <div class="max-w-2xl mx-auto mb-12">
+          <div class="flex gap-2">
+            <input type="text" placeholder="Enter name, ID number, phone, or address..." 
+                   class="flex-1 rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+            <button class="rounded-lg bg-sky-600 px-6 py-3 text-sm font-medium text-white hover:bg-sky-700">
+              Search
           </button>
+          </div>
         </div>
-      </form>
-    </div>
 
-    <!-- Placeholder forms for other tabs -->
-    <div id="tab-phone" class="hidden mt-5">
-      <form class="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
-        <div class="sm:col-span-2">
-          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">Phone Number</label>
-          <input type="text" placeholder="Enter phone number" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 max-w-2xl mx-auto">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-slate-900">464</div>
+            <div class="text-sm text-slate-600">Courts Connected</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-slate-900">16</div>
+            <div class="text-sm text-slate-600">Regions Covered</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-slate-900">Daily</div>
+            <div class="text-sm text-slate-600">Updated</div>
+          </div>
         </div>
-        <div class="sm:col-span-1 flex items-end">
-          <button type="button" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 font-semibold text-white hover:bg-sky-700 transition">Search</button>
-        </div>
-      </form>
-    </div>
-
-    <div id="tab-address" class="hidden mt-5">
-      <form class="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
-        <div class="sm:col-span-2">
-          <label class="mb-1 block text-left text-xs font-semibold text-slate-600">Address</label>
-          <input type="text" placeholder="Enter address" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"/>
-        </div>
-        <div class="sm:col-span-1 flex items-end">
-          <button type="button" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 font-semibold text-white hover:bg-sky-700 transition">Search</button>
-        </div>
-      </form>
+      </div>
     </div>
   </section>
 
-  <!-- Statistics Section -->
-  <section class="border-t border-slate-200 bg-white">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-      <div class="text-center mb-8">
-        <h2 class="text-3xl font-bold text-slate-900">Why Choose Ghana Legal Risk Index?</h2>
+  <!-- Features Section -->
+  <section class="bg-slate-50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-slate-900">Why Choose Dennislaw SVD?</h2>
         <p class="mt-2 text-slate-600">Advanced features designed for legal professionals and researchers</p>
       </div>
       
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 12a5 5 0 1 0-5-5 5.006 5.006 0 0 0 5 5zm0 2c-5.33 0-8 2.667-8 4v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-1.333-2.67-4-8-4z"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-slate-900">People Search</h3>
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+          <div class="h-12 w-12 rounded-lg bg-sky-100 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
           </div>
-          <p class="text-slate-600">Find individuals by searching case titles with comprehensive results showing case history and involvement.</p>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Comprehensive Search</h3>
+          <p class="text-slate-600">Search by name, ID number, phone, address, or any combination of criteria for accurate results.</p>
         </div>
         
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-slate-900">Case Summaries</h3>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+          <div class="h-12 w-12 rounded-lg bg-sky-100 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
           </div>
-          <p class="text-slate-600">Detailed case summaries with judgments, presiding judges, lawyers, and case outcomes for each person.</p>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Risk Assessment</h3>
+          <p class="text-slate-600">Get instant risk scores and assessments based on legal history and case outcomes.</p>
         </div>
         
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-slate-900">DennislawGH Integration</h3>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+          <div class="h-12 w-12 rounded-lg bg-sky-100 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
           </div>
-          <p class="text-slate-600">Direct access to full case details on dennislawgh.com with one-click navigation.</p>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Real-time Updates</h3>
+          <p class="text-slate-600">Our database is updated daily with the latest legal cases and information from courts nationwide.</p>
         </div>
         
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-slate-900">Case History</h3>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+          <div class="h-12 w-12 rounded-lg bg-sky-100 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
           </div>
-          <p class="text-slate-600">Track complete legal history showing how many times a person appeared in different cases.</p>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Secure & Private</h3>
+          <p class="text-slate-600">Your searches are secure and private. We use industry-standard encryption to protect your data.</p>
         </div>
         
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-slate-900">Legal Professionals</h3>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+          <div class="h-12 w-12 rounded-lg bg-sky-100 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
           </div>
-          <p class="text-slate-600">Identify presiding judges and lawyers involved in cases for comprehensive legal research.</p>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Easy to Use</h3>
+          <p class="text-slate-600">Intuitive interface designed for both legal professionals and general users.</p>
         </div>
         
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 18a6 6 0 0 0 6-6V6a6 6 0 0 0-12 0v6a6 6 0 0 0 6 6Z"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-slate-900">Mobile Optimized</h3>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+          <div class="h-12 w-12 rounded-lg bg-sky-100 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
           </div>
-          <p class="text-slate-600">Access people search anywhere with our responsive design and mobile app.</p>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">24/7 Access</h3>
+          <p class="text-slate-600">Access our database anytime, anywhere with our reliable and fast platform.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Additional Stats Section -->
-  <section class="bg-slate-50">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <div class="text-center">
-          <div class="text-3xl font-bold text-sky-600">500K+</div>
-          <div class="text-sm text-slate-600">People in Database</div>
-        </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-sky-600">2.5M+</div>
-          <div class="text-sm text-slate-600">Case Records</div>
-        </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-sky-600">25+</div>
-          <div class="text-sm text-slate-600">Years of Data</div>
-        </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-sky-600">99.9%</div>
-          <div class="text-sm text-slate-600">Accuracy Rate</div>
+  <!-- CTA Section -->
+  <section class="bg-sky-600">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
+        <p class="text-xl text-sky-100 mb-8">Join thousands of legal professionals who trust Dennislaw SVD for their research needs.</p>
+        <div class="flex gap-4 justify-center">
+          <a href="people-results.html" class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-medium text-sky-600 hover:bg-slate-50">
+            Start Searching
+          </a>
+          <a href="about.html" class="inline-flex items-center gap-2 rounded-lg border border-white px-6 py-3 text-sm font-medium text-white hover:bg-white/10">
+            Learn More
+          </a>
         </div>
       </div>
     </div>
@@ -236,7 +185,7 @@
         <div>
           <div class="flex items-center gap-2 mb-4">
             <span class="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
-            <span class="font-semibold">Ghana Legal Risk Index</span>
+            <span class="font-semibold">Dennislaw SVD</span>
           </div>
           <p class="text-slate-300 text-sm">Your trusted partner for comprehensive people search and case history discovery.</p>
         </div>
@@ -273,46 +222,12 @@
       </div>
       
       <div class="mt-8 pt-8 border-t border-slate-700 text-center text-sm text-slate-400">
-        <p>&copy; 2025 Ghana Legal Risk Index. All rights reserved. | Privacy Policy | Terms of Service</p>
+        <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>
 
   <script>
-    // Tabs
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const sections = {
-      name: document.getElementById('tab-name'),
-      phone: document.getElementById('tab-phone'),
-      address: document.getElementById('tab-address'),
-    };
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabButtons.forEach(b => b.classList.remove('active','bg-sky-50','text-sky-700','border','border-sky-200'));
-        btn.classList.add('active','bg-sky-50','text-sky-700','border','border-sky-200');
-        Object.values(sections).forEach(sec => sec.classList.add('hidden'));
-        sections[btn.dataset.tab].classList.remove('hidden');
-      });
-    });
-
-    // Form submission
-    const searchForm = document.getElementById('searchForm');
-    if (searchForm) {
-      searchForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        
-        if (firstName || lastName) {
-          const params = new URLSearchParams({
-            firstName: firstName,
-            lastName: lastName
-          });
-          window.location.href = 'people-results.html?' + params.toString();
-        }
-      });
-    }
-
     // Mobile menu toggle
     const mobileMenuBtn = document.querySelector('button[aria-label="Open menu"]');
     const nav = document.querySelector('nav');
