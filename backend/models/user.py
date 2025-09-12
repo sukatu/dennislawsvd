@@ -1,0 +1,92 @@
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Enum
+from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from database import Base
+import enum
+
+class UserRole(str, enum.Enum):
+    ADMIN = "admin"
+    USER = "user"
+    PREMIUM = "premium"
+
+class UserStatus(str, enum.Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    SUSPENDED = "suspended"
+    PENDING = "pending"
+
+class User(Base):
+    __tablename__ = "users"
+    
+    # Primary key
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    
+    # Basic user information
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    username = Column(String(50), unique=True, index=True, nullable=True)
+    first_name = Column(String(100), nullable=False)
+    last_name = Column(String(100), nullable=False)
+    phone_number = Column(String(20), nullable=True)
+    
+    # Authentication
+    hashed_password = Column(String(255), nullable=True)  # Nullable for OAuth users
+    is_verified = Column(Boolean, default=False, nullable=False)
+    verification_token = Column(String(255), nullable=True)
+    
+    # OAuth
+    google_id = Column(String(255), unique=True, nullable=True, index=True)
+    google_email = Column(String(255), nullable=True)
+    oauth_provider = Column(String(50), nullable=True)  # 'google', 'facebook', etc.
+    
+    # Password reset
+    reset_token = Column(String(255), nullable=True)
+    reset_token_expires = Column(DateTime, nullable=True)
+    
+    # User status and role
+    role = Column(Enum(UserRole), default=UserRole.USER, nullable=False)
+    status = Column(Enum(UserStatus), default=UserStatus.PENDING, nullable=False)
+    
+    # Profile information
+    profile_picture = Column(String(500), nullable=True)
+    bio = Column(Text, nullable=True)
+    organization = Column(String(200), nullable=True)
+    job_title = Column(String(100), nullable=True)
+    
+    # Preferences
+    email_notifications = Column(Boolean, default=True, nullable=False)
+    sms_notifications = Column(Boolean, default=False, nullable=False)
+    language = Column(String(10), default="en", nullable=False)
+    timezone = Column(String(50), default="UTC", nullable=False)
+    
+    # Subscription and billing
+    subscription_plan = Column(String(50), nullable=True)  # 'free', 'basic', 'premium'
+    subscription_expires = Column(DateTime, nullable=True)
+    is_premium = Column(Boolean, default=False, nullable=False)
+    
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    last_login = Column(DateTime(timezone=True), nullable=True)
+    
+    # Security
+    failed_login_attempts = Column(Integer, default=0, nullable=False)
+    locked_until = Column(DateTime, nullable=True)
+    
+    # Relationships
+    # cases = relationship("Case", back_populates="user")
+    # searches = relationship("Search", back_populates="user")
+    
+    def __repr__(self):
+        return f"<User(id={self.id}, email='{self.email}', name='{self.first_name} {self.last_name}')>"
+    
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+    
+    @property
+    def is_active(self):
+        return self.status == UserStatus.ACTIVE and not self.locked_until
+    
+    @property
+    def is_locked(self):
+        return self.locked_until is not None and self.locked_until > func.now()

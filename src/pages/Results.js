@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, Download, Gavel, User, Search, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Eye, Gavel, User, Search, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Building2, Shield } from 'lucide-react';
 
 const Results = () => {
   const [searchParams] = useSearchParams();
@@ -18,9 +18,165 @@ const Results = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-  // Enhanced mock data with more details
+  // Mixed search results including people, banks, and insurance companies
   const mockSearchResults = [
+    // People Results
     {
+      id: 1,
+      type: 'person',
+      name: 'Albert Kweku Obeng',
+      dob: '7 March 1962 – 9 March 2004',
+      idNumber: 'KL1K-DXP',
+      riskLevel: 'Low',
+      riskScore: 25,
+      cases: 2,
+      caseTypes: ['Property Dispute', 'Family Law'],
+      location: 'Greater Accra',
+      lastUpdated: '2 hours ago',
+      summary: 'Individual with low risk profile, involved in property and family law cases.'
+    },
+    {
+      id: 2,
+      type: 'person',
+      name: 'Sarah Mensah',
+      dob: '15 June 1975',
+      idNumber: 'GH-123456789',
+      riskLevel: 'Medium',
+      riskScore: 65,
+      cases: 5,
+      caseTypes: ['Business Dispute', 'Contract Law'],
+      location: 'Ashanti',
+      lastUpdated: '1 day ago',
+      summary: 'Business professional with moderate risk profile, involved in commercial disputes.'
+    },
+    {
+      id: 3,
+      type: 'person',
+      name: 'Kwame Asante',
+      dob: '22 September 1980',
+      idNumber: 'GH-987654321',
+      riskLevel: 'High',
+      riskScore: 85,
+      cases: 12,
+      caseTypes: ['Criminal', 'Fraud'],
+      location: 'Western',
+      lastUpdated: '3 days ago',
+      summary: 'High-risk individual with multiple criminal and fraud cases.'
+    },
+    // Bank Results
+    {
+      id: 4,
+      type: 'bank',
+      name: 'Ghana Commercial Bank',
+      logo: '🏦',
+      established: '1953',
+      headquarters: 'Accra, Ghana',
+      phone: '+233 302 666 100',
+      email: 'info@gcb.com.gh',
+      website: 'www.gcb.com.gh',
+      totalCases: 45,
+      activeCases: 12,
+      resolvedCases: 33,
+      riskLevel: 'Medium',
+      riskScore: 60,
+      lastActivity: '2024-01-15',
+      summary: 'Leading commercial bank with moderate legal risk profile.'
+    },
+    {
+      id: 5,
+      type: 'bank',
+      name: 'Ecobank Ghana',
+      logo: '🏦',
+      established: '1990',
+      headquarters: 'Accra, Ghana',
+      phone: '+233 302 666 200',
+      email: 'info@ecobank.com.gh',
+      website: 'www.ecobank.com.gh',
+      totalCases: 28,
+      activeCases: 8,
+      resolvedCases: 20,
+      riskLevel: 'Low',
+      riskScore: 35,
+      lastActivity: '2024-01-10',
+      summary: 'Pan-African bank with low legal risk profile.'
+    },
+    {
+      id: 6,
+      type: 'bank',
+      name: 'Standard Chartered Bank Ghana',
+      logo: '🏦',
+      established: '1896',
+      headquarters: 'Accra, Ghana',
+      phone: '+233 302 666 300',
+      email: 'info@sc.com.gh',
+      website: 'www.sc.com.gh',
+      totalCases: 67,
+      activeCases: 18,
+      resolvedCases: 49,
+      riskLevel: 'High',
+      riskScore: 75,
+      lastActivity: '2024-01-20',
+      summary: 'International bank with higher legal risk due to complex operations.'
+    },
+    // Insurance Company Results
+    {
+      id: 7,
+      type: 'insurance',
+      name: 'SIC Insurance Company',
+      logo: '🛡️',
+      established: '1962',
+      headquarters: 'Accra, Ghana',
+      phone: '+233 302 666 400',
+      email: 'info@sic.com.gh',
+      website: 'www.sic.com.gh',
+      totalCases: 28,
+      activeCases: 8,
+      resolvedCases: 20,
+      riskLevel: 'Medium',
+      riskScore: 55,
+      lastActivity: '2024-01-14',
+      summary: 'Leading insurance company with moderate legal risk profile.'
+    },
+    {
+      id: 8,
+      type: 'insurance',
+      name: 'Enterprise Insurance',
+      logo: '🛡️',
+      established: '1924',
+      headquarters: 'Accra, Ghana',
+      phone: '+233 302 666 500',
+      email: 'info@enterprise.com.gh',
+      website: 'www.enterprise.com.gh',
+      totalCases: 35,
+      activeCases: 10,
+      resolvedCases: 25,
+      riskLevel: 'Low',
+      riskScore: 40,
+      lastActivity: '2024-01-12',
+      summary: 'Established insurance company with low legal risk profile.'
+    },
+    {
+      id: 9,
+      type: 'insurance',
+      name: 'Vida Insurance Company',
+      logo: '🛡️',
+      established: '1995',
+      headquarters: 'Accra, Ghana',
+      phone: '+233 302 666 600',
+      email: 'info@vida.com.gh',
+      website: 'www.vida.com.gh',
+      totalCases: 42,
+      activeCases: 15,
+      resolvedCases: 27,
+      riskLevel: 'High',
+      riskScore: 80,
+      lastActivity: '2024-01-18',
+      summary: 'Insurance company with higher legal risk due to complex claims.'
+    },
+    // Case Results
+    {
+      id: 10,
+      type: 'case',
       caseId: 1,
       title: 'Property Dispute vs. Estate of John Doe',
       date: '2022-01-01',
@@ -33,6 +189,8 @@ const Results = () => {
       region: 'Greater Accra'
     },
     {
+      id: 11,
+      type: 'case',
       caseId: 2,
       title: 'Business Contract Dispute',
       date: '2021-02-01',
@@ -45,6 +203,8 @@ const Results = () => {
       region: 'Greater Accra'
     },
     {
+      id: 12,
+      type: 'case',
       caseId: 3,
       title: 'Family Inheritance Matter',
       date: '2021-03-15',
@@ -151,14 +311,25 @@ const Results = () => {
     fetchResults();
   }, [searchParams]);
 
-  const handleViewCase = (caseId) => {
-    navigate(`/case-detail?caseId=${caseId}&source=search`);
+  const handleViewResult = (result) => {
+    switch (result.type) {
+      case 'person':
+        navigate(`/person-profile/${result.id}?source=search`);
+        break;
+      case 'bank':
+        navigate(`/bank-detail?id=${result.id}&source=search`);
+        break;
+      case 'insurance':
+        navigate(`/insurance-detail?id=${result.id}&source=search`);
+        break;
+      case 'case':
+        navigate(`/case-detail?caseId=${result.caseId}&source=search`);
+        break;
+      default:
+        console.log('Unknown result type:', result.type);
+    }
   };
 
-  const handleDownload = (caseId) => {
-    // Handle download logic
-    console.log('Downloading case:', caseId);
-  };
 
   if (loading) {
     return (
@@ -191,13 +362,13 @@ const Results = () => {
                 Home
               </button>
               <button
-                onClick={() => navigate('/people-database')}
+                onClick={() => navigate('/people')}
                 className="hover:text-sky-400 transition-colors"
               >
                 People Database
               </button>
               <button
-                onClick={() => navigate('/advanced-search')}
+                onClick={() => navigate('/people')}
                 className="hover:text-sky-400 transition-colors"
               >
                 Advanced Search
@@ -229,7 +400,7 @@ const Results = () => {
                 <div>
                   <h1 className="text-3xl font-bold text-slate-900 mb-2">Search Results</h1>
                   <p className="text-slate-600">
-                    Found <span className="font-semibold">{filteredResults.length}</span> cases matching your search
+                    Found <span className="font-semibold">{filteredResults.length}</span> results matching your search
                   </p>
                 </div>
                 <button
@@ -342,59 +513,188 @@ const Results = () => {
               <div className="space-y-6">
                 {currentResults.map((result) => (
                   <div
-                    key={result.caseId}
-                    className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+                    key={result.id}
+                    className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+                    onClick={() => handleViewResult(result)}
                   >
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-semibold text-slate-900">{result.title}</h3>
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          result.status === 'Active' ? 'bg-amber-100 text-amber-700' :
-                          result.status === 'Resolved' ? 'bg-emerald-100 text-emerald-700' :
-                          'bg-slate-100 text-slate-700'
-                        }`}>
-                          {result.status}
-                        </span>
-                        <span className="text-sm text-slate-500">{result.date}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div className="flex items-center text-slate-600">
-                        <Gavel className="h-4 w-4 mr-2" />
-                        <span>{result.judge}</span>
-                      </div>
-                      <div className="flex items-center text-slate-600">
-                        <User className="h-4 w-4 mr-2" />
-                        <span>{result.lawyers}</span>
-                      </div>
-                    </div>
-                    
-                    <p className="text-slate-600 mb-6">{result.summary}</p>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-slate-500">
-                        <span>Court: <span className="font-medium text-slate-700">{result.courtType}</span></span>
-                        <span>Region: <span className="font-medium text-slate-700">{result.region}</span></span>
-                      </div>
-                      
-                      <div className="flex space-x-4">
-                        <button
-                          onClick={() => handleViewCase(result.caseId)}
-                          className="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors flex items-center"
-                        >
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Case Details
-                        </button>
-                        <button
-                          onClick={() => handleDownload(result.caseId)}
-                          className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-6 rounded-lg transition-colors flex items-center"
-                        >
-                          <Download className="h-4 w-4 mr-2" />
-                          Download
-                        </button>
-                      </div>
-                    </div>
+                    {/* Person Result */}
+                    {result.type === 'person' && (
+                      <>
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center">
+                            <User className="h-6 w-6 text-slate-600" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="text-xl font-semibold text-slate-900">{result.name}</h3>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                result.riskLevel === 'Low' ? 'bg-emerald-100 text-emerald-700' :
+                                result.riskLevel === 'Medium' ? 'bg-amber-100 text-amber-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {result.riskLevel} Risk
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-500">ID: {result.idNumber}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                          <div className="flex items-center text-slate-600">
+                            <span className="text-sm">Date of Birth: <span className="font-medium text-slate-700">{result.dob}</span></span>
+                          </div>
+                          <div className="flex items-center text-slate-600">
+                            <span className="text-sm">Cases: <span className="font-medium text-slate-700">{result.cases}</span></span>
+                          </div>
+                          <div className="flex items-center text-slate-600">
+                            <span className="text-sm">Location: <span className="font-medium text-slate-700">{result.location}</span></span>
+                          </div>
+                        </div>
+                        <p className="text-slate-600 mb-4">{result.summary}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <span>Last Updated: {result.lastUpdated}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-slate-500">Click to view details</span>
+                            <Eye className="h-4 w-4 text-slate-400" />
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Bank Result */}
+                    {result.type === 'bank' && (
+                      <>
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center text-2xl">
+                            {result.logo}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="text-xl font-semibold text-slate-900">{result.name}</h3>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                result.riskLevel === 'Low' ? 'bg-emerald-100 text-emerald-700' :
+                                result.riskLevel === 'Medium' ? 'bg-amber-100 text-amber-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {result.riskLevel} Risk
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-500">Established: {result.established}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                          <div className="flex items-center text-slate-600">
+                            <span className="text-sm">Total Cases: <span className="font-medium text-slate-700">{result.totalCases}</span></span>
+                          </div>
+                          <div className="flex items-center text-slate-600">
+                            <span className="text-sm">Active Cases: <span className="font-medium text-slate-700">{result.activeCases}</span></span>
+                          </div>
+                          <div className="flex items-center text-slate-600">
+                            <span className="text-sm">Location: <span className="font-medium text-slate-700">{result.headquarters}</span></span>
+                          </div>
+                        </div>
+                        <p className="text-slate-600 mb-4">{result.summary}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <span>Last Activity: {result.lastActivity}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-slate-500">Click to view details</span>
+                            <Building2 className="h-4 w-4 text-slate-400" />
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Insurance Result */}
+                    {result.type === 'insurance' && (
+                      <>
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center text-2xl">
+                            {result.logo}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="text-xl font-semibold text-slate-900">{result.name}</h3>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                result.riskLevel === 'Low' ? 'bg-emerald-100 text-emerald-700' :
+                                result.riskLevel === 'Medium' ? 'bg-amber-100 text-amber-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {result.riskLevel} Risk
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-500">Established: {result.established}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                          <div className="flex items-center text-slate-600">
+                            <span className="text-sm">Total Cases: <span className="font-medium text-slate-700">{result.totalCases}</span></span>
+                          </div>
+                          <div className="flex items-center text-slate-600">
+                            <span className="text-sm">Active Cases: <span className="font-medium text-slate-700">{result.activeCases}</span></span>
+                          </div>
+                          <div className="flex items-center text-slate-600">
+                            <span className="text-sm">Location: <span className="font-medium text-slate-700">{result.headquarters}</span></span>
+                          </div>
+                        </div>
+                        <p className="text-slate-600 mb-4">{result.summary}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <span>Last Activity: {result.lastActivity}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-slate-500">Click to view details</span>
+                            <Shield className="h-4 w-4 text-slate-400" />
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Case Result */}
+                    {result.type === 'case' && (
+                      <>
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="text-xl font-semibold text-slate-900">{result.title}</h3>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              result.status === 'Active' ? 'bg-amber-100 text-amber-700' :
+                              result.status === 'Resolved' ? 'bg-emerald-100 text-emerald-700' :
+                              'bg-slate-100 text-slate-700'
+                            }`}>
+                              {result.status}
+                            </span>
+                            <span className="text-sm text-slate-500">{result.date}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div className="flex items-center text-slate-600">
+                            <Gavel className="h-4 w-4 mr-2" />
+                            <span>{result.judge}</span>
+                          </div>
+                          <div className="flex items-center text-slate-600">
+                            <User className="h-4 w-4 mr-2" />
+                            <span>{result.lawyers}</span>
+                          </div>
+                        </div>
+                        
+                        <p className="text-slate-600 mb-6">{result.summary}</p>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4 text-sm text-slate-500">
+                            <span>Court: <span className="font-medium text-slate-700">{result.courtType}</span></span>
+                            <span>Region: <span className="font-medium text-slate-700">{result.region}</span></span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-slate-500">Click to view details</span>
+                            <Eye className="h-4 w-4 text-slate-400" />
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>

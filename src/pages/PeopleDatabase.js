@@ -308,7 +308,7 @@ const PeopleDatabase = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{person.lastUpdated}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button
-                            onClick={() => navigate(`/person-profile?id=${person.id}`)}
+                            onClick={() => navigate(`/person-profile/${person.id}?source=search`)}
                             className="text-sky-600 hover:text-sky-900 transition-colors"
                           >
                             View

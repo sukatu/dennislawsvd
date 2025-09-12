@@ -63,7 +63,7 @@ const AdvancedSearch = () => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-slate-900 mb-2">Advanced Search</h1>
-            <p className="text-lg text-slate-600">Use advanced filters to find exactly what you're looking for</p>
+            <p className="text-lg text-slate-600">Search people, banks, and insurance companies with detailed criteria</p>
           </div>
         </div>
       </div>

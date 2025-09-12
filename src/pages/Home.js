@@ -1,65 +1,124 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Star, Shield, Clock, Users, Database } from 'lucide-react';
+import { Search, Shield, Clock, Users, Database } from 'lucide-react';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
 
-  // Mock suggestions data
-  const mockSuggestions = [
-    'Albert Kweku Obeng',
-    'Sarah Mensah',
-    'Kwame Asante',
-    'Ama Serwaa',
-    'John Smith',
-    'Mary Johnson',
-    'David Brown',
-    'Ghana Commercial Bank',
-    'Ecobank Ghana',
-    'SIC Insurance Company',
-    'Enterprise Insurance',
-    'Accra High Court',
-    'Kumasi Circuit Court',
-    'Property Dispute',
-    'Business Law',
-    'Criminal Case',
-    'Family Law',
-    'Contract Dispute'
-  ];
+  // Check authentication status on component mount
+  useEffect(() => {
+    const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+    const token = localStorage.getItem('accessToken');
+    setIsAuthenticated(authStatus && !!token);
+  }, []);
+
+  // Load search suggestions from API - Only people names
+  const loadSuggestions = async (query) => {
+    console.log('loadSuggestions called with query:', query);
+    if (query.length < 2) {
+      console.log('Query too short, clearing suggestions');
+      setSuggestions([]);
+      return;
+    }
+
+    console.log('Starting to load suggestions...');
+    setIsLoadingSuggestions(true);
+    try {
+      const token = localStorage.getItem('accessToken') || 'test-token-123';
+      console.log('Using token:', token);
+      
+      // Only load people suggestions - no case titles, banks, or insurance
+      const url = `http://localhost:8000/api/people/search?query=${encodeURIComponent(query)}&limit=8`;
+      console.log('Making request to:', url);
+      
+      const peopleResponse = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Response status:', peopleResponse.status);
+      console.log('Response ok:', peopleResponse.ok);
+
+      let allSuggestions = [];
+      
+      if (peopleResponse.ok) {
+        const peopleData = await peopleResponse.json();
+        console.log('People data received:', peopleData);
+        const peopleSuggestions = (peopleData.people || []).map(person => ({
+          name: person.full_name,
+          text: person.full_name,
+          type: 'person',
+          category: 'Person',
+          id: person.id,
+          city: person.city,
+          occupation: person.occupation
+        }));
+        allSuggestions = [...peopleSuggestions];
+        console.log('Mapped suggestions:', allSuggestions);
+      } else {
+        console.error('API response not ok:', peopleResponse.status, peopleResponse.statusText);
+      }
+      
+      setSuggestions(allSuggestions);
+    } catch (error) {
+      console.error('Error loading suggestions:', error);
+      setSuggestions([]);
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  };
+
+  // Debounced search suggestions
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.trim()) {
+        loadSuggestions(searchQuery);
+      } else {
+        setSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle search input changes
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-    
-    if (value.length > 0) {
-      const filteredSuggestions = mockSuggestions.filter(suggestion =>
-        suggestion.toLowerCase().includes(value.toLowerCase())
-      );
-      setSuggestions(filteredSuggestions.slice(0, 8)); // Limit to 8 suggestions
-      setShowSuggestions(true);
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
+    setShowSuggestions(value.length > 0);
   };
 
-  // Handle suggestion selection
+  // Handle suggestion selection - Only people names
   const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion);
+    setSearchQuery(suggestion.text || suggestion.name || suggestion);
     setShowSuggestions(false);
-    navigate(`/people-results?search=${encodeURIComponent(suggestion)}`);
+    
+    // All suggestions are people names, navigate to people results
+    navigate(`/people-results?search=${encodeURIComponent(suggestion.name)}`);
   };
+
 
   // Handle search form submission
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       setShowSuggestions(false);
+      
+      if (!isAuthenticated) {
+        // Redirect to login if not authenticated
+        navigate('/login');
+        return;
+      }
+      
+      // Navigate to people search results to show names, not case titles
       navigate(`/people-results?search=${encodeURIComponent(searchQuery)}`);
     }
   };
@@ -81,18 +140,18 @@ const Home = () => {
   const features = [
     {
       icon: <Search className="h-6 w-6 text-sky-600" />,
-      title: "Comprehensive Search",
-      description: "Search by name, ID number, phone, address, or any combination of criteria for accurate results."
+      title: "People Name Search",
+      description: "Search people by name with detailed profiles and comprehensive information from our legal database."
     },
     {
       icon: <Shield className="h-6 w-6 text-sky-600" />,
-      title: "Risk Assessment",
-      description: "Get instant risk scores and assessments based on legal history and case outcomes."
+      title: "Legal History",
+      description: "Get instant access to legal history and case information for any person in our database."
     },
     {
       icon: <Clock className="h-6 w-6 text-sky-600" />,
       title: "Real-time Updates",
-      description: "Our database is updated daily with the latest legal cases and information from courts nationwide."
+      description: "Our database is updated daily with the latest information on people and their legal records."
     },
     {
       icon: <Shield className="h-6 w-6 text-sky-600" />,
@@ -118,12 +177,33 @@ const Home = () => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
-              Look Up Anyone!
+              Search People Names
             </h1>
             <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
-              Search our comprehensive database of people and legal cases. Get instant access to legal history, risk assessments, and detailed profiles.
+              Search our comprehensive database of people by name. Get instant access to detailed profiles, legal history, and case information.
             </p>
             
+            {/* Authentication Notice */}
+            {!isAuthenticated && (
+              <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4 max-w-2xl mx-auto">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-amber-800">
+                      Authentication Required
+                    </h3>
+                    <div className="mt-2 text-sm text-amber-700">
+                      <p>Please <a href="/login" className="font-medium underline text-amber-800 hover:text-amber-900">login</a> to use the search functionality.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Search Form */}
             <div className="max-w-2xl mx-auto mb-12">
               <div className="relative" ref={searchRef}>
@@ -131,29 +211,48 @@ const Home = () => {
                   <div className="flex-1 relative">
                     <input
                       type="text"
-                      placeholder="Enter name, ID number, or address..."
+                      placeholder={isAuthenticated ? "Search for people by name..." : "Please login to search..."}
                       value={searchQuery}
                       onChange={handleInputChange}
                       onFocus={() => searchQuery.length > 0 && setShowSuggestions(true)}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                      disabled={!isAuthenticated}
+                      className={`w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500 ${!isAuthenticated ? 'bg-slate-100 cursor-not-allowed' : ''}`}
                     />
                     
                     {/* Suggestions Dropdown */}
-                    {showSuggestions && suggestions.length > 0 && (
+                    {showSuggestions && (
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-                        {suggestions.map((suggestion, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => handleSuggestionClick(suggestion)}
-                            className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 last:border-b-0 transition-colors"
-                          >
-                            <div className="flex items-center gap-2">
-                              <Search className="h-4 w-4 text-slate-400" />
-                              <span>{suggestion}</span>
-                            </div>
-                          </button>
-                        ))}
+                        {isLoadingSuggestions ? (
+                          <div className="px-4 py-3 text-sm text-slate-500 text-center">
+                            Loading suggestions...
+                          </div>
+                        ) : suggestions.length > 0 ? (
+                          suggestions.map((suggestion, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() => handleSuggestionClick(suggestion)}
+                              className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 last:border-b-0 transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <Users className="h-4 w-4 text-blue-500" />
+                                <div className="flex-1">
+                                  <div className="font-medium">{suggestion.text || suggestion.name}</div>
+                                  {suggestion.category && (
+                                    <div className="text-xs text-slate-500">{suggestion.category}</div>
+                                  )}
+                                  {suggestion.city && (
+                                    <div className="text-xs text-slate-500">{suggestion.city} • {suggestion.occupation}</div>
+                                  )}
+                                </div>
+                              </div>
+                            </button>
+                          ))
+                        ) : searchQuery.length > 1 ? (
+                          <div className="px-4 py-3 text-sm text-slate-500 text-center">
+                            No suggestions found
+                          </div>
+                        ) : null}
                       </div>
                     )}
                   </div>
@@ -216,7 +315,7 @@ const Home = () => {
             <p className="text-xl text-sky-100 mb-8">Join thousands of legal professionals who trust Dennislaw SVD for their research needs.</p>
             <div className="flex gap-4 justify-center">
               <button
-                onClick={() => navigate('/people-results')}
+                onClick={() => navigate('/results')}
                 className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-medium text-sky-600 hover:bg-slate-50 transition-colors"
               >
                 Start Searching

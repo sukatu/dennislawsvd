@@ -1,207 +1,309 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Star, User, Calendar, MapPin, Mail } from 'lucide-react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Star, User, Calendar, MapPin, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PersonProfile = () => {
-  const [searchParams] = useSearchParams();
+  const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
+  
   const [personData, setPersonData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [relatedCases, setRelatedCases] = useState([]);
+  const [filteredCases, setFilteredCases] = useState([]);
+  const [caseSearchQuery, setCaseSearchQuery] = useState('');
+  const [caseSortBy, setCaseSortBy] = useState('date');
+  const [caseSortOrder, setCaseSortOrder] = useState('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [casesPerPage] = useState(10);
 
-  // Mock data - in real app, this would come from API
-  const mockPersonData = {
-    id: 1,
-    name: 'Albert Kweku Obeng',
-    dob: '7 March 1962',
-    dod: '9 March 2004',
-    idNumber: 'KL1K-DXP',
+  // Region mapping function
+  const getRegionName = (regionCode) => {
+    const regionMap = {
+      'GAR': 'Greater Accra Region',
+      'ASR': 'Ashanti Region',
+      'AR': 'Ashanti Region',
+      'VR': 'Volta Region',
+      'ER': 'Eastern Region',
+      'WR': 'Western Region',
+      'CR': 'Central Region',
+      'NR': 'Northern Region',
+      'UER': 'Upper East Region',
+      'UWR': 'Upper West Region',
+      'BR': 'Brong-Ahafo Region',
+      'WNR': 'Western North Region',
+      'AHR': 'Ahafo Region',
+      'BER': 'Bono East Region',
+      'NER': 'North East Region',
+      'SR': 'Savannah Region',
+      'OR': 'Oti Region',
+      'gar': 'Greater Accra Region',
+      'asr': 'Ashanti Region',
+      'Greater Accra Region': 'Greater Accra Region',
+      'Ashanti Region': 'Ashanti Region',
+      'Volta Region': 'Volta Region',
+      'Eastern Region': 'Eastern Region',
+      'Western Region': 'Western Region',
+      'Central Region': 'Central Region',
+      'Northern Region': 'Northern Region',
+      'Upper East Region': 'Upper East Region',
+      'Upper West Region': 'Upper West Region',
+      'Brong-Ahafo Region': 'Brong-Ahafo Region',
+      'Western North Region': 'Western North Region',
+      'Ahafo Region': 'Ahafo Region',
+      'Bono East Region': 'Bono East Region',
+      'North East Region': 'North East Region',
+      'Savannah Region': 'Savannah Region',
+      'Oti Region': 'Oti Region'
+    };
+    return regionMap[regionCode] || regionCode;
+  };
+
+  // Load person data
+  useEffect(() => {
+    const loadPersonData = async () => {
+      try {
+        setIsLoading(true);
+        const token = localStorage.getItem('accessToken') || 'test-token-123';
+        
+        const response = await fetch(`http://localhost:8000/api/people/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPersonData(data);
+        } else {
+          // Fallback to mock data
+          setPersonData({
+            id: id,
+            full_name: 'JOHN DRAMANI MAHAMA',
+            date_of_birth: 'February 21, 1962',
+            occupation: 'Retired',
     gender: 'Male',
-    nationality: 'Ghanaian',
-    riskLevel: 'Low',
-    riskScore: 25,
-    totalCases: 5,
-    resolvedCases: 4,
-    pendingCases: 1,
-    favorableOutcomes: 3,
-    cases: [
+            id_number: 'N/A',
+            region: 'BR',
+            city: 'Takoradi',
+            country: 'Ghana',
+            education: 'N/A',
+            marital_status: 'N/A',
+            phone: '+2330544448789',
+            email: 'john.mahama@powers.com',
+            address: '4269 Chambers Heights, South Michelle, TX 78850',
+            emergency_contact: 'N/A',
+            languages: ['Akan', 'English', 'Ewe'],
+            risk_level: 'Low',
+            risk_score: 0,
+            total_cases: 12,
+            resolved_cases: 12,
+            pending_cases: 0,
+            favorable_outcomes: 12,
+            verification_status: 'Not Verified',
+            verified_on: 'N/A'
+          });
+        }
+      } catch (error) {
+        console.error('Error loading person data:', error);
+        setError('Failed to load person data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) {
+      loadPersonData();
+    }
+  }, [id]);
+
+  // Load related cases
+  useEffect(() => {
+    const loadRelatedCases = async () => {
+      try {
+        const token = localStorage.getItem('accessToken') || 'test-token-123';
+        const response = await fetch(`http://localhost:8000/api/case-search/search?query=${encodeURIComponent(personData?.full_name || '')}&limit=50`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('API Response for related cases:', data);
+          console.log('Results:', data.results);
+          if (data.results && data.results.length > 0) {
+            console.log('First case:', data.results[0]);
+          }
+          setRelatedCases(data.results || []);
+          setFilteredCases(data.results || []);
+        } else {
+          // Fallback to mock data
+          const mockCases = [
       {
         id: 1,
-        title: 'Property Dispute Case',
-        caseNumber: 'GJ/123/2003',
+              title: '[2020 ELECTION PETITION JUDGMENT] JOHN DRAMANI MAHAMA vs. ELECTORAL COMMISSION AND NANA ADDO DANKWA AKUFO-ADDO',
+              suit_number: 'WRIT NO. J1/05/2021',
+              court: 'SC',
+              date: '04/03/2021',
+              judge: 'YEBOAH CJ (PRESIDING), APPAU, JSC, MARFUL-SAU JSC, AMEGATCHER JSC, PROF. KOTEY JSC, OWUSU (MS.) JSC',
         status: 'Resolved',
-        date: '2003-2004',
-        type: 'Property Dispute',
-        outcome: 'Favorable',
-        court: 'High Court, Accra',
-        judge: 'Justice Sarah Mensah'
+              type: 'Civil'
       },
       {
         id: 2,
-        title: 'Family Law Matter',
-        caseNumber: 'GJ/456/2002',
+              title: 'JOHN DRAMANI MAHAMA vs. ELECTORAL COMMISSION',
+              suit_number: 'WRIT NO. J1/06/2020',
+              court: 'SC',
+              date: '15/12/2020',
+              judge: 'YEBOAH CJ (PRESIDING)',
         status: 'Resolved',
-        date: '2002-2003',
-        type: 'Family Law',
-        outcome: 'Favorable',
-        court: 'Family Court, Kumasi',
-        judge: 'Justice Kwame Nkrumah'
-      },
-      {
-        id: 3,
-        title: 'Contract Dispute with ABC Bank',
-        caseNumber: 'GJ/789/2001',
-        status: 'Resolved',
-        date: '2001-2002',
-        type: 'Commercial Law',
-        outcome: 'Unfavorable',
-        court: 'Commercial Court, Accra',
-        judge: 'Justice Ama Serwaa'
-      },
-      {
-        id: 4,
-        title: 'Insurance Claim Dispute',
-        caseNumber: 'GJ/101/2000',
-        status: 'Resolved',
-        date: '2000-2001',
-        type: 'Insurance Law',
-        outcome: 'Favorable',
-        court: 'High Court, Accra',
-        judge: 'Justice Kofi Annan'
-      },
-      {
-        id: 5,
-        title: 'Employment Dispute',
-        caseNumber: 'GJ/202/2004',
-        status: 'Pending',
-        date: '2004-Present',
-        type: 'Labor Law',
-        outcome: 'Pending',
-        court: 'Labor Court, Accra',
-        judge: 'Justice Nana Addo'
+              type: 'Civil'
+            }
+          ];
+          setRelatedCases(mockCases);
+          setFilteredCases(mockCases);
+        }
+      } catch (error) {
+        console.error('Error loading related cases:', error);
       }
-    ],
-    caseDetails: [
-      {
-        title: 'Property Dispute vs. Estate of John Doe',
-        description: 'This case involved a property dispute between Albert Kweku Obeng and the estate of John Doe. The dispute centered around the ownership of a residential property in Accra. The case was resolved in favor of Mr. Obeng, with the court ruling that he had legitimate claim to the property based on inheritance documents.',
-        judge: 'Justice Sarah Mensah',
-        court: 'High Court, Accra',
-        lawyer: 'Kwame Asante',
-        outcome: 'Favorable'
-      },
-      {
-        title: 'Contract Dispute with ABC Bank',
-        description: 'A commercial dispute involving loan repayment terms and interest calculations. The bank claimed default on a business loan, while Mr. Obeng argued that the interest rates were unfairly applied. The court ruled in favor of the bank.',
-        judge: 'Justice Ama Serwaa',
-        court: 'Commercial Court, Accra',
-        lawyer: 'Ama Serwaa',
-        outcome: 'Unfavorable'
+    };
+
+    if (personData?.full_name) {
+      loadRelatedCases();
+    }
+  }, [personData]);
+
+  // Filter and sort cases
+  useEffect(() => {
+    let filtered = [...relatedCases];
+
+    // Apply search filter
+    if (caseSearchQuery) {
+      filtered = filtered.filter(case_ => 
+        case_.title.toLowerCase().includes(caseSearchQuery.toLowerCase()) ||
+        case_.suit_number.toLowerCase().includes(caseSearchQuery.toLowerCase()) ||
+        case_.judge.toLowerCase().includes(caseSearchQuery.toLowerCase())
+      );
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (caseSortBy) {
+        case 'date':
+          aValue = new Date(a.date);
+          bValue = new Date(b.date);
+          break;
+        case 'title':
+          aValue = a.title.toLowerCase();
+          bValue = b.title.toLowerCase();
+          break;
+        case 'suit_number':
+          aValue = a.suit_number.toLowerCase();
+          bValue = b.suit_number.toLowerCase();
+          break;
+        default:
+          aValue = a.title.toLowerCase();
+          bValue = b.title.toLowerCase();
       }
-    ],
-    relatedPeople: [
-      { name: 'John Doe', role: 'Estate Representative' },
-      { name: 'Kwame Asante', role: 'Legal Counsel' },
-      { name: 'ABC Bank Ltd', role: 'Opposing Party' },
-      { name: 'XYZ Insurance Co.', role: 'Insurance Provider' }
-    ]
+
+      if (caseSortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    setFilteredCases(filtered);
+    setCurrentPage(1);
+  }, [relatedCases, caseSearchQuery, caseSortBy, caseSortOrder]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredCases.length / casesPerPage);
+  const startIndex = (currentPage - 1) * casesPerPage;
+  const endIndex = startIndex + casesPerPage;
+  const currentCases = filteredCases.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
-  useEffect(() => {
-    const personId = searchParams.get('id');
-    if (personId) {
-      // In real app, fetch person data by ID
-      setPersonData(mockPersonData);
-    }
-  }, [searchParams]);
+  const clearFilters = () => {
+    setCaseSearchQuery('');
+    setCaseSortBy('date');
+    setCaseSortOrder('desc');
+  };
 
-  if (!personData) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-sky-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Loading profile...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading person profile...</p>
         </div>
       </div>
     );
   }
 
-  const getRiskColor = (level) => {
-    switch (level) {
-      case 'Low':
-        return 'bg-emerald-50 text-emerald-600 ring-emerald-200';
-      case 'Medium':
-        return 'bg-amber-50 text-amber-600 ring-amber-200';
-      case 'High':
-        return 'bg-red-50 text-red-600 ring-red-200';
-      default:
-        return 'bg-slate-50 text-slate-600 ring-slate-200';
-    }
-  };
-
-  const getRiskScoreColor = (score) => {
-    if (score <= 30) return 'text-emerald-600';
-    if (score <= 70) return 'text-amber-600';
-    return 'text-red-600';
-  };
-
-  const getProgressBarColor = (score) => {
-    if (score <= 30) return 'bg-emerald-500';
-    if (score <= 70) return 'bg-amber-500';
-    return 'bg-red-500';
-  };
-
+  if (error) {
   return (
-    <div>
-      {/* Breadcrumb */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
-          <nav className="flex items-center space-x-2 text-sm text-slate-600">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600">{error}</p>
             <button
-              onClick={() => navigate('/')}
-              className="hover:text-slate-900 transition-colors"
-            >
-              Home
+            onClick={() => navigate('/people-results')}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Go Back
             </button>
-            <span>/</span>
-            <button
-              onClick={() => navigate('/people-results')}
-              className="hover:text-slate-900 transition-colors"
-            >
-              People Search
-            </button>
-            <span>/</span>
-            <span className="text-slate-900">{personData.name}</span>
-          </nav>
         </div>
       </div>
+    );
+  }
 
-      {/* Profile Header */}
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
       <div className="bg-white border-b border-slate-200">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center gap-6">
-            <div className="h-20 w-20 rounded-full bg-sky-100 flex items-center justify-center">
-              <User className="h-10 w-10 text-sky-600" />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-slate-900">{personData.name}</h1>
-              <p className="text-lg text-slate-600">
-                {personData.dob} {personData.dod && `– ${personData.dod}`} • {personData.idNumber}
-              </p>
-              <div className="mt-2 flex items-center gap-4">
-                <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold ring-1 ${getRiskColor(personData.riskLevel)}`}>
-                  <span className={`inline-block h-2 w-2 rounded-full ${getRiskColor(personData.riskLevel).split(' ')[1].replace('text-', 'bg-')}`}></span>
-                  {personData.riskLevel} Risk
-                </span>
-                <span className="text-sm text-slate-500">Risk Score: {personData.riskScore}</span>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate('/people-results')}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </button>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900">
+                  {personData?.full_name || 'Loading...'}
+                </h1>
+                <p className="text-slate-600 text-lg">
+                  {getRegionName(personData?.region)}
+                </p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-                <Download className="h-4 w-4" />
-                Export
-              </button>
-              <button className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  personData?.risk_level === 'High' ? 'bg-red-500' :
+                  personData?.risk_level === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'
+                }`}></div>
+                <span className="text-sm font-medium text-slate-700">
+                  {personData?.risk_level || 'Low'} Risk
+                </span>
+              </div>
+              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                 <Star className="h-4 w-4" />
-                Add to Watchlist
+                Watchlist
               </button>
             </div>
           </div>
@@ -211,182 +313,291 @@ const PersonProfile = () => {
       {/* Main Content */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {/* Left Column */}
+          {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Personal Information */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Personal Information</h2>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="text-sm font-medium text-slate-600">Full Name</label>
-                  <p className="text-slate-900">{personData.name}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-600">Date of Birth</label>
-                  <p className="text-slate-900">{personData.dob}</p>
-                </div>
-                {personData.dod && (
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">Date of Death</label>
-                    <p className="text-slate-900">{personData.dod}</p>
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <User className="h-5 w-5 text-blue-600" />
+                  Personal Information
+                </h2>
+                <button className="text-slate-400 hover:text-slate-600">
+                  <RefreshCw className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <User className="w-4 h-4 text-blue-600" />
+                      <span className="text-xs font-medium text-blue-800 uppercase tracking-wide">Full Name</span>
+                    </div>
+                    <p className="text-sm font-semibold text-blue-900">{personData?.full_name}</p>
                   </div>
-                )}
-                <div>
-                  <label className="text-sm font-medium text-slate-600">ID Number</label>
-                  <p className="text-slate-900">{personData.idNumber}</p>
+                  
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <Calendar className="w-4 h-4 text-gray-600" />
+                      <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Date of Birth</span>
+                    </div>
+                    <p className="text-sm font-semibold text-gray-900">{personData?.date_of_birth || 'N/A'}</p>
+                  </div>
+                  
+                  
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-600">Gender</label>
-                  <p className="text-slate-900">{personData.gender}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-600">Nationality</label>
-                  <p className="text-slate-900">{personData.nationality}</p>
+                
+                <div className="space-y-4">
+                  <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <MapPin className="w-4 h-4 text-green-600" />
+                      <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Location</span>
+                    </div>
+                    <p className="text-sm font-semibold text-green-900">
+                      {getRegionName(personData?.region)}
+                    </p>
+                    <p className="text-xs text-green-700">{personData?.city}, {personData?.country}</p>
+                  </div>
+                  
+                  
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <Users className="w-4 h-4 text-gray-600" />
+                      <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Gender</span>
+                    </div>
+                    <p className="text-sm font-semibold text-gray-900">{personData?.gender || 'N/A'}</p>
+                  </div>
+                  
                 </div>
               </div>
-            </section>
+            </div>
 
-            {/* Legal History */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Legal History ({personData.totalCases} Cases)</h2>
+            {/* Contact Information */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <Phone className="h-5 w-5 text-blue-600" />
+                  Contact Information
+                </h2>
+                <button className="text-slate-400 hover:text-slate-600">
+                  <RefreshCw className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="max-w-md">
+                <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <MapPin className="w-4 h-4 text-green-600" />
+                    <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Address</span>
+                  </div>
+                  <p className="text-sm font-semibold text-green-900">{personData?.address || 'N/A'}</p>
+                  <p className="text-xs text-green-700">N/A</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Related Cases */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <Scale className="h-5 w-5 text-blue-600" />
+                  Related Cases ({filteredCases.length} of {relatedCases.length})
+                </h2>
+                <button className="text-slate-400 hover:text-slate-600">
+                  <RefreshCw className="h-5 w-5" />
+                </button>
+              </div>
+              
+              {/* Search and Filter Controls */}
+              <div className="mb-6 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder="Search cases..."
+                        value={caseSearchQuery}
+                        onChange={(e) => setCaseSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <select
+                    value={caseSortBy}
+                    onChange={(e) => setCaseSortBy(e.target.value)}
+                    className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="date">Sort by Date</option>
+                    <option value="title">Sort by Title</option>
+                    <option value="suit_number">Sort by Suit Number</option>
+                  </select>
+                  <select
+                    value={caseSortOrder}
+                    onChange={(e) => setCaseSortOrder(e.target.value)}
+                    className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                  </select>
+                  <button
+                    onClick={clearFilters}
+                    className="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+                  >
+                    Clear
+                  </button>
+                </div>
+                
+                {/* Case Types */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-slate-600">Case Types:</span>
+                  <div className="flex gap-2">
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Civil</span>
+                    <span className="px-3 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Criminal</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cases List */}
               <div className="space-y-4">
-                {personData.cases.map((caseItem, index) => (
-                  <div key={caseItem.id} className="border-l-4 border-sky-500 pl-4 py-3 hover:bg-slate-50 rounded-r-lg transition-colors">
-                    <div className="flex justify-between items-start">
+                {currentCases.map((case_) => (
+                  <div key={case_.id} className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-medium text-slate-900 mb-1">{caseItem.title}</h3>
-                        <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
-                          <p><span className="font-medium">Case No:</span> {caseItem.caseNumber}</p>
-                          <p><span className="font-medium">Type:</span> {caseItem.type}</p>
-                          <p><span className="font-medium">Status:</span> 
-                            <span className={`ml-1 px-2 py-1 rounded-full text-xs font-medium ${
-                              caseItem.status === 'Resolved' ? 'bg-emerald-100 text-emerald-700' : 
-                              caseItem.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 
-                              'bg-slate-100 text-slate-700'
-                            }`}>
-                              {caseItem.status}
-                            </span>
-                          </p>
-                          <p><span className="font-medium">Outcome:</span> 
-                            <span className={`ml-1 px-2 py-1 rounded-full text-xs font-medium ${
-                              caseItem.outcome === 'Favorable' ? 'bg-emerald-100 text-emerald-700' : 
-                              caseItem.outcome === 'Unfavorable' ? 'bg-red-100 text-red-700' : 
-                              'bg-slate-100 text-slate-700'
-                            }`}>
-                              {caseItem.outcome}
-                            </span>
-                          </p>
-                          <p><span className="font-medium">Court:</span> {caseItem.court}</p>
-                          <p><span className="font-medium">Judge:</span> {caseItem.judge}</p>
+                        <h3 className="font-semibold text-slate-900 mb-2">{case_.title}</h3>
+                        <div className="grid grid-cols-2 gap-4 text-sm text-slate-600">
+                          <div>
+                            <span className="font-medium">Suit Number:</span> {case_.suit_reference_number || case_.suit_number || 'N/A'}
+                          </div>
+                          <div>
+                            <span className="font-medium">Court:</span> {case_.court_type || case_.court || 'N/A'}
+                          </div>
+                          <div>
+                            <span className="font-medium">Date:</span> {case_.date ? new Date(case_.date).toLocaleDateString() : 'N/A'}
+                          </div>
+                          <div>
+                            <span className="font-medium">Judge:</span> {case_.presiding_judge || case_.judge || 'N/A'}
+                          </div>
                         </div>
-                        <p className="text-sm text-slate-500 mt-2"><span className="font-medium">Date:</span> {caseItem.date}</p>
                       </div>
-                      <button 
-                        onClick={() => navigate(`/case-detail?caseId=${caseItem.id}&source=search`)}
-                        className="ml-4 text-sky-600 hover:text-sky-700 text-sm font-medium"
-                      >
-                        View Details →
+                      <button className="ml-4 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                        View Case
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
-            </section>
-
-            {/* Case Details */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Case Details</h2>
-              <div className="space-y-6">
-                {personData.caseDetails.map((detail, index) => (
-                  <div key={index}>
-                    <h3 className="font-medium text-slate-900 mb-2">{detail.title}</h3>
-                    <div className="bg-slate-50 rounded-lg p-4">
-                      <p className="text-sm text-slate-700 leading-relaxed">{detail.description}</p>
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-6 flex items-center justify-between">
+                  <div className="text-sm text-slate-600">
+                    Page {currentPage} of {totalPages}
                     </div>
-                    <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="font-medium text-slate-600">Judge:</span>
-                        <span className="text-slate-900 ml-1">{detail.judge}</span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-slate-600">Court:</span>
-                        <span className="text-slate-900 ml-1">{detail.court}</span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-slate-600">Lawyer:</span>
-                        <span className="text-slate-900 ml-1">{detail.lawyer}</span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-slate-600">Outcome:</span>
-                        <span className="text-slate-900 ml-1">{detail.outcome}</span>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 text-slate-600 hover:text-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 text-slate-600 hover:text-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
                   </div>
-                ))}
+                </div>
+              )}
               </div>
-            </section>
           </div>
 
-          {/* Right Column */}
+          {/* Right Column - Side Panel */}
           <div className="space-y-6">
             {/* Risk Assessment */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Risk Assessment</h2>
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <Shield className="h-5 w-5 text-blue-600" />
+                Risk Assessment
+              </h3>
               <div className="text-center">
-                <div className={`text-3xl font-bold mb-2 ${getRiskScoreColor(personData.riskScore)}`}>
-                  {personData.riskScore}
+                <div className="text-4xl font-bold text-green-600 mb-2">
+                  {personData?.risk_score || 0}%
                 </div>
-                <div className="text-sm text-slate-600 mb-4">{personData.riskLevel} Risk Score</div>
-                <div className="w-full bg-slate-200 rounded-full h-2">
+                <div className="text-sm text-slate-600 mb-4">Low Risk Score</div>
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                   <div
-                    className={`h-2 rounded-full ${getProgressBarColor(personData.riskScore)}`}
-                    style={{ width: `${personData.riskScore}%` }}
+                    className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${personData?.risk_score || 0}%` }}
                   ></div>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">Based on legal history and case outcomes</p>
+                <p className="text-xs text-slate-500">Based on legal history and case outcomes</p>
               </div>
-            </section>
+            </div>
 
             {/* Quick Stats */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Quick Stats</h2>
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <Clock className="h-5 w-5 text-blue-600" />
+                Quick Stats
+              </h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Total Cases</span>
-                  <span className="text-sm font-medium text-slate-900">{personData.totalCases}</span>
+                  <span className="text-sm text-slate-600">Total Cases:</span>
+                  <span className="text-sm font-semibold text-slate-900">{personData?.total_cases || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Resolved Cases</span>
-                  <span className="text-sm font-medium text-slate-900">{personData.resolvedCases}</span>
+                  <span className="text-sm text-slate-600">Resolved Cases:</span>
+                  <span className="text-sm font-semibold text-slate-900">{personData?.resolved_cases || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Pending Cases</span>
-                  <span className="text-sm font-medium text-slate-900">{personData.pendingCases}</span>
+                  <span className="text-sm text-slate-600">Pending Cases:</span>
+                  <span className="text-sm font-semibold text-slate-900">{personData?.pending_cases || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Favorable Outcomes</span>
-                  <span className="text-sm font-medium text-slate-900">{personData.favorableOutcomes}</span>
+                  <span className="text-sm text-slate-600">Favorable Outcomes:</span>
+                  <span className="text-sm font-semibold text-slate-900">{personData?.favorable_outcomes || 0}</span>
                 </div>
               </div>
-            </section>
+            </div>
 
-            {/* Related People */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Related People</h2>
-              <div className="space-y-3">
-                {personData.relatedPeople.map((person, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
-                      <User className="h-4 w-4 text-slate-500" />
+            {/* Verification Status */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <XCircle className="h-5 w-5 text-red-600" />
+                Verification Status
+              </h3>
+              <div className="text-center">
+                <div className="text-lg font-semibold text-red-600 mb-2">
+                  {personData?.verification_status || 'Not Verified'}
+                </div>
+                <div className="text-sm text-slate-600">
+                  Verified on: {personData?.verified_on || 'N/A'}
+                </div>
+                <div className="text-sm text-slate-600">
+                  {personData?.verified_on || 'N/A'}
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-900">{person.name}</p>
-                      <p className="text-xs text-slate-500">{person.role}</p>
                     </div>
                   </div>
+
+            {/* Languages */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <Users className="h-5 w-5 text-blue-600" />
+                Languages
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {(personData?.languages || []).map((language, index) => (
+                  <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                    {language}
+                  </span>
                 ))}
               </div>
-            </section>
+            </div>
           </div>
         </div>
       </div>

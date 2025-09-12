@@ -1,101 +1,263 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Search, FileCheck, FileText, Clock, Shield, CreditCard, MessageCircle, Phone, Mail, MapPin } from 'lucide-react';
 
 const About = () => {
   return (
     <div>
-      {/* Page Header */}
-      <section className="bg-slate-900 text-white py-16">
+      {/* Hero Section */}
+      <section className="bg-slate-900 text-white py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">About Dennislaw SVD</h1>
-          <p className="mt-4 text-xl text-slate-300 max-w-3xl mx-auto">
-            Your comprehensive legal research platform for finding people, cases, and legal information across Ghana's court system.
+          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
+            Your Trusted Partner for Court Searches, Verification of Document & Document Request
+          </h1>
+          <p className="text-2xl text-slate-300 max-w-4xl mx-auto mb-8">
+            COURT DUE DILIGENCE SIMPLIFIED!
           </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-6 py-3 text-lg font-medium text-white hover:bg-sky-700 transition-colors">
+              Request For Service
+            </button>
+            <button className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-6 py-3 text-lg font-medium text-white hover:bg-slate-800 transition-colors">
+              View Pricing
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="prose prose-slate max-w-none">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Our Mission</h2>
-              <p className="text-slate-600 mb-6">
-                Dennislaw SVD is dedicated to providing comprehensive legal research tools that make it easier for legal professionals, researchers, and the public to access and analyze legal information across Ghana's court system.
-              </p>
-              
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">What We Do</h2>
-              <p className="text-slate-600 mb-6">
-                Our platform offers advanced search capabilities to find people involved in legal cases, track case history, and access detailed information about legal proceedings. We connect data from over 464 courts across 16 regions in Ghana.
-              </p>
-              
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Key Features</h2>
-              <ul className="list-disc list-inside text-slate-600 mb-6 space-y-2">
-                <li>Comprehensive people search by case title</li>
-                <li>Advanced filtering and search options</li>
-                <li>Case history tracking and analysis</li>
-                <li>Integration with DennislawGH platform</li>
-                <li>Mobile-optimized interface</li>
-                <li>Real-time data updates</li>
-              </ul>
-              
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Our Data</h2>
-              <p className="text-slate-600 mb-6">
-                We maintain a comprehensive database of over 2.5 million case records spanning more than 25 years of legal history. Our data is updated daily and maintains a 99.9% accuracy rate.
-              </p>
-            </div>
+      {/* Our Services */}
+      <section className="py-16 bg-slate-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Our Services</h2>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+              We offer a Subscription-Based and On-Demand Due Diligence Search at the Ghanaian courts, Document Verification, and Document Request services to enable corporations and individuals access, verify, and request for documents and cases efficiently in Ghana.
+            </p>
           </div>
           
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Stats</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">People in Database</span>
-                  <span className="font-semibold text-slate-900">500K+</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Case Records</span>
-                  <span className="font-semibold text-slate-900">2.5M+</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Courts Connected</span>
-                  <span className="font-semibold text-slate-900">464</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Regions Covered</span>
-                  <span className="font-semibold text-slate-900">16</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Years of Data</span>
-                  <span className="font-semibold text-slate-900">25+</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Accuracy Rate</span>
-                  <span className="font-semibold text-slate-900">99.9%</span>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
+              <div className="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="h-8 w-8 text-sky-600" />
               </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Court Search</h3>
+              <p className="text-slate-600">Comprehensive search across Ghanaian courts for case information and legal records.</p>
             </div>
             
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm mt-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Contact Us</h3>
-              <p className="text-slate-600 text-sm mb-4">
-                Have questions about our platform or need support? We're here to help.
-              </p>
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-2 text-sky-600 hover:text-sky-700 font-medium"
-              >
-                Get in Touch
-                <ExternalLink className="h-4 w-4" />
-              </Link>
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
+              <div className="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileCheck className="h-8 w-8 text-sky-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Verify of Court Documents</h3>
+              <p className="text-slate-600">Authenticate and verify the validity of court documents and legal papers.</p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
+              <div className="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-8 w-8 text-sky-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Request for Court Documents</h3>
+              <p className="text-slate-600">Request and obtain official court documents and legal records efficiently.</p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Why Choose DL SVD */}
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Why Choose DL SVD</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-8 w-8 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Efficiency</h3>
+              <p className="text-slate-600">We simplify the process of searching, verifying, and retrieving court documents, saving you time.</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Accuracy</h3>
+              <p className="text-slate-600">Our direct access to court records ensures reliable and verified information.</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="h-8 w-8 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Convenience</h3>
+              <p className="text-slate-600">Request services via WhatsApp, email, phone call, or SMS.</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Secure Digital Access</h3>
+              <p className="text-slate-600">Easily track and receive documents via our secured online portal.</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CreditCard className="h-8 w-8 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Flexible Payment Options</h3>
+              <p className="text-slate-600">Choose between subscription plans, pay-as-you-go, and expedited processing.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 bg-slate-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">How It Works</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-sky-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Make a Request</h3>
+              <ul className="text-slate-600 text-sm space-y-1">
+                <li>• Contact us via WhatsApp, phone call, email, or SMS.</li>
+                <li>• Provide details of your search, document request, or verification need.</li>
+              </ul>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-sky-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Evaluation & Invoice Generation</h3>
+              <p className="text-slate-600 text-sm">Our team will assess your request and provide an invoice for payment.</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-sky-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Payment & Processing</h3>
+              <p className="text-slate-600 text-sm">Complete payment and our team processes your request efficiently.</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-sky-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">4</div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Receive Your Results</h3>
+              <p className="text-slate-600 text-sm">Get your verified court documents or search results via email, WhatsApp, or our online platform.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Who Can Benefit */}
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Who Can Benefit?</h2>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+              We offer a Subscription-Based and On-Demand Search, Document, and Verification (SVD) service to help businesses, individuals, law firms, litigators, banks and corporations to access, verify, and request court-related documents efficiently.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Banks & Financial Institutions</h3>
+              <p className="text-slate-600">Due diligence and background verification for loans and financial services.</p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Law Firms & Legal Department</h3>
+              <p className="text-slate-600">Access to comprehensive legal research and case information.</p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Insurance Companies</h3>
+              <p className="text-slate-600">Risk assessment and claims verification through court records.</p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Researchers & Academics</h3>
+              <p className="text-slate-600">Access to legal data for research and academic purposes.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Commitment to Excellence */}
+      <section className="py-16 bg-slate-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Our Commitment to Excellence</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">Direct Court Access & Legal Expertise</h3>
+              <p className="text-slate-600">We work closely with the court registrars and the judicial service of Ghana, ensuring legitimate and certified access to court-related information.</p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">Fast Turnaround & Priority Processing</h3>
+              <p className="text-slate-600">We understand urgency in legal matters—which is why we prioritize timely delivery and provide same-day service for urgent requests.</p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">Technology-Driven Efficiency</h3>
+              <p className="text-slate-600">Our digital-first approach ensures seamless, lightning-fast processes, allowing companies to request, access, and manage court documents efficiently.</p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">Data Security & Confidentiality</h3>
+              <p className="text-slate-600">All requests and documents are securely processed to guarantee confidentiality and data protection laws.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Information */}
+      <section className="py-16 bg-slate-900 text-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Contact Us</h2>
+            <p className="text-slate-300 max-w-2xl mx-auto">
+              Dennislaw SVD Services - Your trusted partner for comprehensive court search, document verification, and document request across Ghana.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-sky-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MapPin className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Address</h3>
+              <p className="text-slate-300">No. 15 Netflix Street,<br />Madina Estate, Off-UPSA Road</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-sky-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Phone className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Phone</h3>
+              <p className="text-slate-300">+233 596 252 127</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-sky-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Email</h3>
+              <p className="text-slate-300">dlservices@dennislawgh.com</p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-8">
+            <p className="text-slate-300">Mon - Fri: 9:00 AM - 5:00 PM</p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
