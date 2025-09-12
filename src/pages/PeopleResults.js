@@ -400,7 +400,11 @@ const PeopleResults = () => {
           ) : (
             <div className="space-y-4">
               {currentResults.map((person) => (
-                <div key={person.id} className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition-shadow">
+                <div 
+                  key={person.id} 
+                  className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => navigate(`/person-profile/${person.id}?search=${encodeURIComponent(searchQuery)}`)}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0">
@@ -437,13 +441,10 @@ const PeopleResults = () => {
                         </div>
                       </div>
                     </div>
-                    <button
-                      onClick={() => navigate(`/person-profile/${person.id}`)}
-                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-                    >
+                    <div className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
                       <Eye className="h-4 w-4" />
                       Click to view details
-                    </button>
+                    </div>
                   </div>
                 </div>
               ))}

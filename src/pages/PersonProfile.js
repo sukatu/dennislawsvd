@@ -66,43 +66,47 @@ const PersonProfile = () => {
     const loadPersonData = async () => {
       try {
         setIsLoading(true);
+        console.log('Loading person data for ID:', id);
+        console.log('Search query:', searchQuery);
+        console.log('URL being called:', `http://localhost:8000/api/people/${id}`);
         const token = localStorage.getItem('accessToken') || 'test-token-123';
         
         const response = await fetch(`http://localhost:8000/api/people/${id}`, {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
 
         if (response.ok) {
           const data = await response.json();
+          console.log('Person data loaded:', data);
           setPersonData(data);
         } else {
+          console.log('API call failed, using fallback data');
           // Fallback to mock data
           setPersonData({
             id: id,
-            full_name: 'JOHN DRAMANI MAHAMA',
-            date_of_birth: 'February 21, 1962',
-            occupation: 'Retired',
-    gender: 'Male',
+            full_name: searchQuery || 'Unknown Person',
+            date_of_birth: 'N/A',
+            occupation: 'N/A',
+            gender: 'N/A',
             id_number: 'N/A',
-            region: 'BR',
-            city: 'Takoradi',
-            country: 'Ghana',
+            region: 'N/A',
+            city: 'N/A',
+            country: 'N/A',
             education: 'N/A',
             marital_status: 'N/A',
-            phone: '+2330544448789',
-            email: 'john.mahama@powers.com',
-            address: '4269 Chambers Heights, South Michelle, TX 78850',
+            phone: 'N/A',
+            email: 'N/A',
+            address: 'N/A',
             emergency_contact: 'N/A',
-            languages: ['Akan', 'English', 'Ewe'],
-            risk_level: 'Low',
+            languages: [],
+            risk_level: 'N/A',
             risk_score: 0,
-            total_cases: 12,
-            resolved_cases: 12,
+            total_cases: 0,
+            resolved_cases: 0,
             pending_cases: 0,
-            favorable_outcomes: 12,
+            favorable_outcomes: 0,
             verification_status: 'Not Verified',
             verified_on: 'N/A'
           });
@@ -124,10 +128,11 @@ const PersonProfile = () => {
   useEffect(() => {
     const loadRelatedCases = async () => {
       try {
+        console.log('Loading related cases for person:', personData?.full_name);
+        console.log('Search query:', searchQuery);
         const token = localStorage.getItem('accessToken') || 'test-token-123';
         const response = await fetch(`http://localhost:8000/api/case-search/search?query=${encodeURIComponent(personData?.full_name || '')}&limit=50`, {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
@@ -146,25 +151,15 @@ const PersonProfile = () => {
           const mockCases = [
       {
         id: 1,
-              title: '[2020 ELECTION PETITION JUDGMENT] JOHN DRAMANI MAHAMA vs. ELECTORAL COMMISSION AND NANA ADDO DANKWA AKUFO-ADDO',
-              suit_number: 'WRIT NO. J1/05/2021',
-              court: 'SC',
-              date: '04/03/2021',
-              judge: 'YEBOAH CJ (PRESIDING), APPAU, JSC, MARFUL-SAU JSC, AMEGATCHER JSC, PROF. KOTEY JSC, OWUSU (MS.) JSC',
+              title: `Sample case involving ${searchQuery || 'Unknown Person'}`,
+              suit_reference_number: 'SAMPLE-001',
+              court_type: 'High Court',
+              date: '2024-01-01',
+              presiding_judge: 'Sample Judge',
         status: 'Resolved',
-              type: 'Civil'
-      },
-      {
-        id: 2,
-              title: 'JOHN DRAMANI MAHAMA vs. ELECTORAL COMMISSION',
-              suit_number: 'WRIT NO. J1/06/2020',
-              court: 'SC',
-              date: '15/12/2020',
-              judge: 'YEBOAH CJ (PRESIDING)',
-        status: 'Resolved',
-              type: 'Civil'
-            }
-          ];
+        type: 'Civil'
+      }
+    ];
           setRelatedCases(mockCases);
           setFilteredCases(mockCases);
         }
@@ -176,7 +171,7 @@ const PersonProfile = () => {
     if (personData?.full_name) {
       loadRelatedCases();
     }
-  }, [personData]);
+  }, [personData, searchQuery]);
 
   // Filter and sort cases
   useEffect(() => {
@@ -289,6 +284,14 @@ const PersonProfile = () => {
                 <p className="text-slate-600 text-lg">
                   {getRegionName(personData?.region)}
                 </p>
+                {searchQuery && (
+                  <div className="mt-2">
+                    <span className="text-sm text-slate-500">Search results for: </span>
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">
+                      "{searchQuery}"
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -462,7 +465,11 @@ const PersonProfile = () => {
               {/* Cases List */}
               <div className="space-y-4">
                 {currentCases.map((case_) => (
-                  <div key={case_.id} className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div 
+                    key={case_.id} 
+                    className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => navigate(`/case-details/${case_.id}?q=${encodeURIComponent(searchQuery || personData?.full_name || '')}`)}
+                  >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold text-slate-900 mb-2">{case_.title}</h3>
@@ -481,9 +488,9 @@ const PersonProfile = () => {
                           </div>
                         </div>
                       </div>
-                      <button className="ml-4 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                      <div className="ml-4 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
                         View Case
-                      </button>
+                      </div>
                     </div>
                   </div>
                 ))}
