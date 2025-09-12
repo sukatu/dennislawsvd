@@ -237,7 +237,33 @@ const PeopleResults = () => {
     }
   }, [searchParams]);
 
-  // Pagination logic
+  // Group results alphabetically
+  const groupResultsAlphabetically = (peopleList) => {
+    // Sort alphabetically by full_name
+    const sortedResults = [...peopleList].sort((a, b) => {
+      const nameA = (a.full_name || '').toLowerCase();
+      const nameB = (b.full_name || '').toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+
+    // Group by first letter
+    const grouped = {};
+    sortedResults.forEach(person => {
+      const firstLetter = (person.full_name || 'Unknown').charAt(0).toUpperCase();
+      if (!grouped[firstLetter]) {
+        grouped[firstLetter] = [];
+      }
+      grouped[firstLetter].push(person);
+    });
+
+    return grouped;
+  };
+
+  // Get alphabetically grouped results
+  const groupedResults = groupResultsAlphabetically(results);
+  const alphabetSections = Object.keys(groupedResults).sort();
+
+  // Pagination logic for grouped results
   const displayTotalPages = Math.ceil(results.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, results.length);
@@ -388,63 +414,107 @@ const PeopleResults = () => {
         </div>
       )}
 
+      {/* Alphabet Navigation */}
+      {!loading && !error && results.length > 0 && alphabetSections.length > 1 && (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
+          <div className="bg-white rounded-lg border border-slate-200 p-4">
+            <div className="flex flex-wrap gap-2 justify-center">
+              {alphabetSections.map((letter) => (
+                <button
+                  key={letter}
+                  onClick={() => {
+                    const element = document.getElementById(`section-${letter}`);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  className="px-3 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-slate-200 hover:border-blue-300"
+                >
+                  {letter}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Results */}
       {!loading && !error && (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          {currentResults.length === 0 ? (
+          {results.length === 0 ? (
             <div className="text-center py-12">
               <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-slate-900 mb-2">No results found</h3>
               <p className="text-slate-600">Try adjusting your search terms or filters.</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {currentResults.map((person) => (
-                <div 
-                  key={person.id} 
-                  className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/person-profile/${person.id}?search=${encodeURIComponent(searchQuery)}`)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                          <Users className="h-6 w-6 text-blue-600" />
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-1">
-                          {person.full_name}
-                        </h3>
-                        <p className="text-slate-600 text-sm mb-2">
-                          {person.notes || 'Name extracted from case titles.'}
-                          {person.occupation && ` ${person.occupation}`}
-                          {person.languages && person.languages.length > 0 && ` with ${person.languages.length} language${person.languages.length > 1 ? 's' : ''}`}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-slate-500">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            <span>Just now</span>
+            <div className="space-y-8">
+              {alphabetSections.map((letter) => (
+                <div key={letter} id={`section-${letter}`} className="space-y-4">
+                  {/* Section Header */}
+                  <div className="sticky top-0 bg-slate-50 border-b border-slate-200 py-3 px-4 rounded-t-lg">
+                    <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+                      <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                        {letter}
+                      </span>
+                      {letter}
+                      <span className="text-sm font-normal text-slate-500">
+                        ({groupedResults[letter].length} {groupedResults[letter].length === 1 ? 'person' : 'people'})
+                      </span>
+                    </h2>
+                  </div>
+                  
+                  {/* People in this section */}
+                  <div className="space-y-3 pl-4">
+                    {groupedResults[letter].map((person) => (
+                      <div 
+                        key={person.id} 
+                        className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => navigate(`/person-profile/${person.id}?search=${encodeURIComponent(searchQuery)}`)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-4">
+                            <div className="flex-shrink-0">
+                              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <Users className="h-6 w-6 text-blue-600" />
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                                {person.full_name}
+                              </h3>
+                              <p className="text-slate-600 text-sm mb-2">
+                                {person.notes || 'Name extracted from case titles.'}
+                                {person.occupation && ` ${person.occupation}`}
+                                {person.languages && person.languages.length > 0 && ` with ${person.languages.length} language${person.languages.length > 1 ? 's' : ''}`}
+                              </p>
+                              <div className="flex items-center gap-4 text-sm text-slate-500">
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-4 w-4" />
+                                  <span>Just now</span>
+                                </div>
+                                {person.region && (
+                                  <div className="flex items-center gap-1">
+                                    <MapPin className="h-4 w-4" />
+                                    <span>{getRegionName(person.region)}</span>
+                                  </div>
+                                )}
+                                {person.court && (
+                                  <div className="flex items-center gap-1">
+                                    <Scale className="h-4 w-4" />
+                                    <span>{person.court}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          {person.region && (
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4" />
-                              <span>{getRegionName(person.region)}</span>
-                            </div>
-                          )}
-                          {person.court && (
-                            <div className="flex items-center gap-1">
-                              <Scale className="h-4 w-4" />
-                              <span>{person.court}</span>
-                            </div>
-                          )}
+                          <div className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
+                            <Eye className="h-4 w-4" />
+                            Click to view details
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
-                      <Eye className="h-4 w-4" />
-                      Click to view details
-                    </div>
+                    ))}
                   </div>
                 </div>
               ))}

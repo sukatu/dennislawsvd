@@ -411,7 +411,7 @@ const CaseDetails = () => {
                         <p className="text-sm font-semibold text-green-900">{getCourtTypeName(caseData.court_type)}</p>
                       </div>
                     </div>
-                  </div>
+                  </div> 
 
                   {/* Publication & Location Grid */}
                   <div className="space-y-4">
