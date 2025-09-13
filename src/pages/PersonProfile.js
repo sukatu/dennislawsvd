@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Star, User, Calendar, MapPin, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle } from 'lucide-react';
 
 const PersonProfile = () => {
   const { id } = useParams();
@@ -18,47 +18,71 @@ const PersonProfile = () => {
   const [caseSortOrder, setCaseSortOrder] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [casesPerPage] = useState(10);
+  const [analytics, setAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
+  const [caseStats, setCaseStats] = useState(null);
+  const [caseStatsLoading, setCaseStatsLoading] = useState(true);
 
-  // Region mapping function
-  const getRegionName = (regionCode) => {
-    const regionMap = {
-      'GAR': 'Greater Accra Region',
-      'ASR': 'Ashanti Region',
-      'AR': 'Ashanti Region',
-      'VR': 'Volta Region',
-      'ER': 'Eastern Region',
-      'WR': 'Western Region',
-      'CR': 'Central Region',
-      'NR': 'Northern Region',
-      'UER': 'Upper East Region',
-      'UWR': 'Upper West Region',
-      'BR': 'Brong-Ahafo Region',
-      'WNR': 'Western North Region',
-      'AHR': 'Ahafo Region',
-      'BER': 'Bono East Region',
-      'NER': 'North East Region',
-      'SR': 'Savannah Region',
-      'OR': 'Oti Region',
-      'gar': 'Greater Accra Region',
-      'asr': 'Ashanti Region',
-      'Greater Accra Region': 'Greater Accra Region',
-      'Ashanti Region': 'Ashanti Region',
-      'Volta Region': 'Volta Region',
-      'Eastern Region': 'Eastern Region',
-      'Western Region': 'Western Region',
-      'Central Region': 'Central Region',
-      'Northern Region': 'Northern Region',
-      'Upper East Region': 'Upper East Region',
-      'Upper West Region': 'Upper West Region',
-      'Brong-Ahafo Region': 'Brong-Ahafo Region',
-      'Western North Region': 'Western North Region',
-      'Ahafo Region': 'Ahafo Region',
-      'Bono East Region': 'Bono East Region',
-      'North East Region': 'North East Region',
-      'Savannah Region': 'Savannah Region',
-      'Oti Region': 'Oti Region'
+  // Court name mapping function
+  const getCourtFullName = (courtCode) => {
+    const courtMap = {
+      'SC': 'Supreme Court',
+      'CA': 'Court of Appeal',
+      'HC': 'High Court',
+      'DC': 'District Court',
+      'MC': 'Magistrate Court',
+      'CC': 'Circuit Court',
+      'FC': 'Family Court',
+      'LC': 'Labour Court',
+      'TC': 'Tribunal Court',
+      'sc': 'Supreme Court',
+      'ca': 'Court of Appeal',
+      'hc': 'High Court',
+      'dc': 'District Court',
+      'mc': 'Magistrate Court',
+      'cc': 'Circuit Court',
+      'fc': 'Family Court',
+      'lc': 'Labour Court',
+      'tc': 'Tribunal Court',
+      'Supreme Court': 'Supreme Court',
+      'Court of Appeal': 'Court of Appeal',
+      'High Court': 'High Court',
+      'District Court': 'District Court',
+      'Magistrate Court': 'Magistrate Court',
+      'Circuit Court': 'Circuit Court',
+      'Family Court': 'Family Court',
+      'Labour Court': 'Labour Court',
+      'Tribunal Court': 'Tribunal Court'
     };
-    return regionMap[regionCode] || regionCode;
+    return courtMap[courtCode] || courtCode;
+  };
+
+  // Human-readable date formatting function
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // If date is within the last 30 days, show relative format
+    if (diffDays <= 30) {
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays < 14) return '1 week ago';
+      if (diffDays < 21) return '2 weeks ago';
+      if (diffDays < 28) return '3 weeks ago';
+      return '1 month ago';
+    }
+    
+    // For older dates, show full date
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
   };
 
   // Load person data
@@ -87,7 +111,6 @@ const PersonProfile = () => {
           setPersonData({
             id: id,
             full_name: searchQuery || 'Unknown Person',
-            date_of_birth: 'N/A',
             occupation: 'N/A',
             gender: 'N/A',
             id_number: 'N/A',
@@ -124,6 +147,122 @@ const PersonProfile = () => {
     }
   }, [id]);
 
+  // Load analytics data
+  useEffect(() => {
+    const loadAnalytics = async () => {
+      if (!id) return;
+      
+      try {
+        setAnalyticsLoading(true);
+        const response = await fetch(`http://localhost:8000/api/person/${id}/analytics`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Analytics data loaded:', data);
+          setAnalytics(data);
+        } else {
+          console.log('Analytics API call failed, using fallback data');
+          // Fallback to mock data
+          setAnalytics({
+            risk_score: 0,
+            risk_level: 'Low',
+            risk_factors: [],
+            total_monetary_amount: 0,
+            average_case_value: 0,
+            financial_risk_level: 'Low',
+            primary_subject_matter: 'N/A',
+            subject_matter_categories: [],
+            legal_issues: [],
+            financial_terms: [],
+            case_complexity_score: 0,
+            success_rate: 0
+          });
+        }
+      } catch (error) {
+        console.error('Error loading analytics data:', error);
+        // Use fallback data on error
+        setAnalytics({
+          risk_score: 0,
+          risk_level: 'Low',
+          risk_factors: [],
+          total_monetary_amount: 0,
+          average_case_value: 0,
+          financial_risk_level: 'Low',
+          primary_subject_matter: 'N/A',
+          subject_matter_categories: [],
+          legal_issues: [],
+          financial_terms: [],
+          case_complexity_score: 0,
+          success_rate: 0
+        });
+      } finally {
+        setAnalyticsLoading(false);
+      }
+    };
+
+    if (id) {
+      loadAnalytics();
+    }
+  }, [id]);
+
+  // Load case statistics
+  useEffect(() => {
+    const loadCaseStats = async () => {
+      if (!id) return;
+      
+      try {
+        setCaseStatsLoading(true);
+        const response = await fetch(`http://localhost:8000/api/person-case-statistics/person/${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Case statistics loaded:', data);
+          setCaseStats(data);
+        } else {
+          console.log('Case statistics API call failed, using fallback data');
+          // Fallback to mock data
+          setCaseStats({
+            total_cases: 0,
+            resolved_cases: 0,
+            unresolved_cases: 0,
+            favorable_cases: 0,
+            unfavorable_cases: 0,
+            mixed_cases: 0,
+            case_outcome: 'N/A'
+          });
+        }
+      } catch (error) {
+        console.error('Error loading case statistics:', error);
+        // Use fallback data on error
+        setCaseStats({
+          total_cases: 0,
+          resolved_cases: 0,
+          unresolved_cases: 0,
+          favorable_cases: 0,
+          unfavorable_cases: 0,
+          mixed_cases: 0,
+          case_outcome: 'N/A'
+        });
+      } finally {
+        setCaseStatsLoading(false);
+      }
+    };
+
+    if (id) {
+      loadCaseStats();
+    }
+  }, [id]);
+
   // Load related cases
   useEffect(() => {
     const loadRelatedCases = async () => {
@@ -154,10 +293,33 @@ const PersonProfile = () => {
               title: `Sample case involving ${searchQuery || 'Unknown Person'}`,
               suit_reference_number: 'SAMPLE-001',
               court_type: 'High Court',
-              date: '2024-01-01',
-              presiding_judge: 'Sample Judge',
+              date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 days ago
         status: 'Resolved',
-        type: 'Civil'
+        type: 'Civil',
+        area_of_law: 'Contract Dispute',
+        nature: 'Contract Dispute'
+      },
+      {
+        id: 2,
+              title: `Another case involving ${searchQuery || 'Unknown Person'}`,
+              suit_reference_number: 'SAMPLE-002',
+              court_type: 'Supreme Court',
+              date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 week ago
+        status: 'Pending',
+        type: 'Criminal',
+        area_of_law: 'Fraud',
+        nature: 'Fraud'
+      },
+      {
+        id: 3,
+              title: `Third case involving ${searchQuery || 'Unknown Person'}`,
+              suit_reference_number: 'SAMPLE-003',
+              court_type: 'Court of Appeal',
+              date: '2023-06-15', // Older date
+        status: 'Resolved',
+        type: 'Commercial',
+        area_of_law: 'Property Dispute',
+        nature: 'Property Dispute'
       }
     ];
           setRelatedCases(mockCases);
@@ -181,8 +343,7 @@ const PersonProfile = () => {
     if (caseSearchQuery) {
       filtered = filtered.filter(case_ => 
         case_.title.toLowerCase().includes(caseSearchQuery.toLowerCase()) ||
-        case_.suit_number.toLowerCase().includes(caseSearchQuery.toLowerCase()) ||
-        case_.judge.toLowerCase().includes(caseSearchQuery.toLowerCase())
+        case_.suit_number.toLowerCase().includes(caseSearchQuery.toLowerCase())
       );
     }
 
@@ -265,9 +426,9 @@ const PersonProfile = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -278,16 +439,13 @@ const PersonProfile = () => {
                 Back
               </button>
               <div>
-                <h1 className="text-3xl font-bold text-slate-900">
+                <h1 className="text-2xl font-bold text-slate-900 truncate max-w-md">
                   {personData?.full_name || 'Loading...'}
                 </h1>
-                <p className="text-slate-600 text-lg">
-                  {getRegionName(personData?.region)}
-                </p>
                 {searchQuery && (
-                  <div className="mt-2">
-                    <span className="text-sm text-slate-500">Search results for: </span>
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">
+                  <div className="mt-1">
+                    <span className="text-xs text-slate-500">Search results for: </span>
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
                       "{searchQuery}"
                     </span>
                   </div>
@@ -313,8 +471,8 @@ const PersonProfile = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content with top padding to account for fixed header */}
+      <div className="pt-24 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
@@ -328,7 +486,7 @@ const PersonProfile = () => {
                 <button className="text-slate-400 hover:text-slate-600">
                   <RefreshCw className="h-5 w-5" />
                 </button>
-              </div>
+                </div>
               
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-4">
@@ -336,32 +494,14 @@ const PersonProfile = () => {
                     <div className="flex items-center space-x-2 mb-1">
                       <User className="w-4 h-4 text-blue-600" />
                       <span className="text-xs font-medium text-blue-800 uppercase tracking-wide">Full Name</span>
-                    </div>
+                </div>
                     <p className="text-sm font-semibold text-blue-900">{personData?.full_name}</p>
-                  </div>
-                  
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <Calendar className="w-4 h-4 text-gray-600" />
-                      <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Date of Birth</span>
-                    </div>
-                    <p className="text-sm font-semibold text-gray-900">{personData?.date_of_birth || 'N/A'}</p>
                   </div>
                   
                   
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <MapPin className="w-4 h-4 text-green-600" />
-                      <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Location</span>
-                    </div>
-                    <p className="text-sm font-semibold text-green-900">
-                      {getRegionName(personData?.region)}
-                    </p>
-                    <p className="text-xs text-green-700">{personData?.city}, {personData?.country}</p>
-                  </div>
                   
                   
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -370,7 +510,7 @@ const PersonProfile = () => {
                       <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Gender</span>
                     </div>
                     <p className="text-sm font-semibold text-gray-900">{personData?.gender || 'N/A'}</p>
-                  </div>
+                </div>
                   
                 </div>
               </div>
@@ -388,17 +528,10 @@ const PersonProfile = () => {
                 </button>
               </div>
               
-              <div className="max-w-md">
-                <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <MapPin className="w-4 h-4 text-green-600" />
-                    <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Address</span>
-                  </div>
-                  <p className="text-sm font-semibold text-green-900">{personData?.address || 'N/A'}</p>
-                  <p className="text-xs text-green-700">N/A</p>
-                </div>
-              </div>
-            </div>
+              <div className="text-center py-8">
+                <p className="text-lg text-slate-500">N/A</p>
+                        </div>
+                      </div>
 
             {/* Related Cases */}
             <div className="bg-white rounded-lg border border-slate-200 p-6">
@@ -409,7 +542,7 @@ const PersonProfile = () => {
                 </h2>
                 <button className="text-slate-400 hover:text-slate-600">
                   <RefreshCw className="h-5 w-5" />
-                </button>
+                      </button>
               </div>
               
               {/* Search and Filter Controls */}
@@ -452,14 +585,6 @@ const PersonProfile = () => {
                   </button>
                 </div>
                 
-                {/* Case Types */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-slate-600">Case Types:</span>
-                  <div className="flex gap-2">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Civil</span>
-                    <span className="px-3 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Criminal</span>
-                  </div>
-                </div>
               </div>
 
               {/* Cases List */}
@@ -476,15 +601,15 @@ const PersonProfile = () => {
                         <div className="grid grid-cols-2 gap-4 text-sm text-slate-600">
                           <div>
                             <span className="font-medium">Suit Number:</span> {case_.suit_reference_number || case_.suit_number || 'N/A'}
-                          </div>
-                          <div>
-                            <span className="font-medium">Court:</span> {case_.court_type || case_.court || 'N/A'}
-                          </div>
-                          <div>
-                            <span className="font-medium">Date:</span> {case_.date ? new Date(case_.date).toLocaleDateString() : 'N/A'}
-                          </div>
-                          <div>
-                            <span className="font-medium">Judge:</span> {case_.presiding_judge || case_.judge || 'N/A'}
+                    </div>
+                      <div>
+                            <span className="font-medium">Court:</span> {getCourtFullName(case_.court_type || case_.court) || 'N/A'}
+                      </div>
+                      <div>
+                            <span className="font-medium">Date:</span> {formatDate(case_.date)}
+                      </div>
+                      <div>
+                            <span className="font-medium">Nature:</span> {case_.area_of_law || case_.type || case_.case_type || case_.nature || 'N/A'}
                           </div>
                         </div>
                       </div>
@@ -529,21 +654,179 @@ const PersonProfile = () => {
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
                 <Shield className="h-5 w-5 text-blue-600" />
-                Risk Assessment
+                Financial Risk Assessment
+                {(caseStatsLoading || analyticsLoading) && <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />}
               </h3>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-green-600 mb-2">
-                  {personData?.risk_score || 0}%
+              {(caseStatsLoading || analyticsLoading) ? (
+                <div className="text-center py-4">
+                  <div className="animate-pulse">
+                    <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-2 bg-gray-200 rounded"></div>
+                  </div>
                 </div>
-                <div className="text-sm text-slate-600 mb-4">Low Risk Score</div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${personData?.risk_score || 0}%` }}
-                  ></div>
+              ) : (
+                <div className="text-center">
+                  {(() => {
+                    // Calculate risk score based on case statistics and financial factors
+                    let riskScore = 0;
+                    let riskLevel = 'Low';
+                    let riskFactors = [];
+                    
+                    if (caseStats) {
+                      const totalCases = caseStats.total_cases || 0;
+                      const unfavorableCases = caseStats.unfavorable_cases || 0;
+                      const mixedCases = caseStats.mixed_cases || 0;
+                      const unresolvedCases = caseStats.unresolved_cases || 0;
+                      
+                      // Base risk from unfavorable cases (40% weight)
+                      if (totalCases > 0) {
+                        const unfavorableRate = (unfavorableCases / totalCases) * 100;
+                        riskScore += (unfavorableRate * 0.4);
+                        
+                        if (unfavorableRate > 50) {
+                          riskFactors.push('High unfavorable case rate');
+                        } else if (unfavorableRate > 25) {
+                          riskFactors.push('Moderate unfavorable case rate');
+                        }
+                      }
+                      
+                      // Risk from mixed cases (20% weight)
+                      if (totalCases > 0) {
+                        const mixedRate = (mixedCases / totalCases) * 100;
+                        riskScore += (mixedRate * 0.2);
+                        
+                        if (mixedRate > 30) {
+                          riskFactors.push('Inconsistent case outcomes');
+                        }
+                      }
+                      
+                      // Risk from unresolved cases (20% weight)
+                      if (totalCases > 0) {
+                        const unresolvedRate = (unresolvedCases / totalCases) * 100;
+                        riskScore += (unresolvedRate * 0.2);
+                        
+                        if (unresolvedRate > 60) {
+                          riskFactors.push('High unresolved case rate');
+                        } else if (unresolvedRate > 30) {
+                          riskFactors.push('Moderate unresolved case rate');
+                        }
+                      }
+                      
+                      // Risk from total case volume (20% weight)
+                      if (totalCases > 10) {
+                        riskScore += 20;
+                        riskFactors.push('High case volume');
+                      } else if (totalCases > 5) {
+                        riskScore += 10;
+                        riskFactors.push('Moderate case volume');
+                      }
+                      
+                      // Financial risk factors from analytics
+                      if (analytics) {
+                        if (analytics.financial_risk_level === 'Critical') {
+                          riskScore += 30;
+                          riskFactors.push('Critical financial risk');
+                        } else if (analytics.financial_risk_level === 'High') {
+                          riskScore += 20;
+                          riskFactors.push('High financial risk');
+                        } else if (analytics.financial_risk_level === 'Medium') {
+                          riskScore += 10;
+                          riskFactors.push('Moderate financial risk');
+                        }
+                        
+                        if (analytics.total_monetary_amount > 1000000) {
+                          riskFactors.push('High monetary involvement');
+                        }
+                      }
+                      
+                      // Determine risk level
+                      if (riskScore >= 80) {
+                        riskLevel = 'Critical';
+                      } else if (riskScore >= 60) {
+                        riskLevel = 'High';
+                      } else if (riskScore >= 30) {
+                        riskLevel = 'Medium';
+                      } else {
+                        riskLevel = 'Low';
+                      }
+                    }
+                    
+                    return (
+                      <>
+                        <div className={`text-4xl font-bold mb-2 ${
+                          riskLevel === 'Critical' ? 'text-red-600' :
+                          riskLevel === 'High' ? 'text-orange-600' :
+                          riskLevel === 'Medium' ? 'text-yellow-600' :
+                          'text-green-600'
+                        }`}>
+                          {Math.round(riskScore)}%
+                        </div>
+                        <div className={`text-sm mb-4 ${
+                          riskLevel === 'Critical' ? 'text-red-600' :
+                          riskLevel === 'High' ? 'text-orange-600' :
+                          riskLevel === 'Medium' ? 'text-yellow-600' :
+                          'text-slate-600'
+                        }`}>
+                          {riskLevel} Financial Risk
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              riskLevel === 'Critical' ? 'bg-red-500' :
+                              riskLevel === 'High' ? 'bg-orange-500' :
+                              riskLevel === 'Medium' ? 'bg-yellow-500' :
+                              'bg-green-500'
+                            }`}
+                            style={{ width: `${Math.min(riskScore, 100)}%` }}
+                          ></div>
+                        </div>
+                        <p className="text-xs text-slate-500 mb-3">Based on legal history, case outcomes & financial factors</p>
+                        
+                        {/* Risk Assessment Summary */}
+                        <div className="text-left bg-slate-50 rounded-lg p-3 mb-3">
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Total Cases:</span>
+                              <span className="font-semibold">{caseStats?.total_cases || 0}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Unfavorable:</span>
+                              <span className="font-semibold text-red-600">{caseStats?.unfavorable_cases || 0}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Unresolved:</span>
+                              <span className="font-semibold text-orange-600">{caseStats?.unresolved_cases || 0}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Mixed:</span>
+                              <span className="font-semibold text-yellow-600">{caseStats?.mixed_cases || 0}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {riskFactors.length > 0 && (
+                          <div className="text-left">
+                            <p className="text-xs font-medium text-slate-700 mb-2">Key Risk Factors:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {riskFactors.slice(0, 4).map((factor, index) => (
+                                <span key={index} className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">
+                                  {factor}
+                                </span>
+                              ))}
+                              {riskFactors.length > 4 && (
+                                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                                  +{riskFactors.length - 4} more
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
-                <p className="text-xs text-slate-500">Based on legal history and case outcomes</p>
-              </div>
+              )}
             </div>
 
             {/* Quick Stats */}
@@ -551,25 +834,58 @@ const PersonProfile = () => {
               <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
                 <Clock className="h-5 w-5 text-blue-600" />
                 Quick Stats
+                {(caseStatsLoading || analyticsLoading) && <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />}
               </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Total Cases:</span>
-                  <span className="text-sm font-semibold text-slate-900">{personData?.total_cases || 0}</span>
+              {(caseStatsLoading || analyticsLoading) ? (
+                <div className="space-y-3">
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Resolved Cases:</span>
-                  <span className="text-sm font-semibold text-slate-900">{personData?.resolved_cases || 0}</span>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Total Cases:</span>
+                    <span className="text-sm font-semibold text-slate-900">{caseStats?.total_cases || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Resolved Cases:</span>
+                    <span className="text-sm font-semibold text-slate-900">{caseStats?.resolved_cases || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Unresolved Cases:</span>
+                    <span className="text-sm font-semibold text-slate-900">{caseStats?.unresolved_cases || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Favorable Cases:</span>
+                    <span className="text-sm font-semibold text-green-600">{caseStats?.favorable_cases || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Unfavorable Cases:</span>
+                    <span className="text-sm font-semibold text-red-600">{caseStats?.unfavorable_cases || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Mixed Cases:</span>
+                    <span className="text-sm font-semibold text-yellow-600">{caseStats?.mixed_cases || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Overall Outcome:</span>
+                    <span className={`text-sm font-semibold ${
+                      caseStats?.case_outcome === 'Favorable' ? 'text-green-600' :
+                      caseStats?.case_outcome === 'Unfavorable' ? 'text-red-600' :
+                      caseStats?.case_outcome === 'Mixed' ? 'text-yellow-600' :
+                      'text-gray-600'
+                    }`}>
+                      {caseStats?.case_outcome || 'N/A'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Pending Cases:</span>
-                  <span className="text-sm font-semibold text-slate-900">{personData?.pending_cases || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Favorable Outcomes:</span>
-                  <span className="text-sm font-semibold text-slate-900">{personData?.favorable_outcomes || 0}</span>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Verification Status */}
@@ -591,20 +907,278 @@ const PersonProfile = () => {
                     </div>
                   </div>
 
-            {/* Languages */}
+
+            {/* Affiliations */}
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
-                <Users className="h-5 w-5 text-blue-600" />
-                Languages
+                <Building2 className="h-5 w-5 text-green-600" />
+                Affiliations
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {(personData?.languages || []).map((language, index) => (
-                  <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                    {language}
-                  </span>
-                ))}
+              <div className="space-y-3">
+                <div className="text-center py-4">
+                  <p className="text-slate-500">N/A</p>
+                </div>
               </div>
             </div>
+
+            {/* Organizations */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <Building2 className="h-5 w-5 text-purple-600" />
+                Organizations
+              </h3>
+              <div className="space-y-3">
+                <div className="text-center py-4">
+                  <p className="text-slate-500">N/A</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Financial Risk Profile */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <DollarSign className="h-5 w-5 text-green-600" />
+                Financial Risk Profile
+                {(caseStatsLoading || analyticsLoading) && <RefreshCw className="h-4 w-4 animate-spin text-green-600" />}
+              </h3>
+              {(caseStatsLoading || analyticsLoading) ? (
+                <div className="space-y-4">
+                  <div className="animate-pulse">
+                    <div className="h-16 bg-gray-200 rounded"></div>
+                    <div className="h-16 bg-gray-200 rounded"></div>
+                    <div className="h-16 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {(() => {
+                    // Calculate financial risk indicators
+                    const totalCases = caseStats?.total_cases || 0;
+                    const unfavorableCases = caseStats?.unfavorable_cases || 0;
+                    const mixedCases = caseStats?.mixed_cases || 0;
+                    const unresolvedCases = caseStats?.unresolved_cases || 0;
+                    
+                    // Calculate risk indicators
+                    const unfavorableRate = totalCases > 0 ? (unfavorableCases / totalCases) * 100 : 0;
+                    const unresolvedRate = totalCases > 0 ? (unresolvedCases / totalCases) * 100 : 0;
+                    const mixedRate = totalCases > 0 ? (mixedCases / totalCases) * 100 : 0;
+                    
+                    // Determine creditworthiness
+                    let creditworthiness = 'Good';
+                    if (unfavorableRate > 50 || unresolvedRate > 60) {
+                      creditworthiness = 'Poor';
+                    } else if (unfavorableRate > 25 || unresolvedRate > 30 || mixedRate > 40) {
+                      creditworthiness = 'Fair';
+                    }
+                    
+                    return (
+                      <>
+                        <div className={`p-4 rounded-lg border-l-4 ${
+                          creditworthiness === 'Poor' ? 'bg-red-50 border-red-500' :
+                          creditworthiness === 'Fair' ? 'bg-yellow-50 border-yellow-500' :
+                          'bg-green-50 border-green-500'
+                        }`}>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <DollarSign className={`w-4 h-4 ${
+                              creditworthiness === 'Poor' ? 'text-red-600' :
+                              creditworthiness === 'Fair' ? 'text-yellow-600' :
+                              'text-green-600'
+                            }`} />
+                            <span className={`text-xs font-medium uppercase tracking-wide ${
+                              creditworthiness === 'Poor' ? 'text-red-800' :
+                              creditworthiness === 'Fair' ? 'text-yellow-800' :
+                              'text-green-800'
+                            }`}>Creditworthiness</span>
+                          </div>
+                          <p className={`text-lg font-bold ${
+                            creditworthiness === 'Poor' ? 'text-red-900' :
+                            creditworthiness === 'Fair' ? 'text-yellow-900' :
+                            'text-green-900'
+                          }`}>
+                            {creditworthiness}
+                          </p>
+                          <p className={`text-xs mt-1 ${
+                            creditworthiness === 'Poor' ? 'text-red-700' :
+                            creditworthiness === 'Fair' ? 'text-yellow-700' :
+                            'text-green-700'
+                          }`}>
+                            Based on legal history and case outcomes
+                          </p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-slate-50 p-3 rounded-lg">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-xs text-slate-600">Unfavorable Rate</span>
+                              <span className={`text-sm font-semibold ${
+                                unfavorableRate > 50 ? 'text-red-600' :
+                                unfavorableRate > 25 ? 'text-yellow-600' :
+                                'text-green-600'
+                              }`}>
+                                {unfavorableRate.toFixed(1)}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1">
+                              <div
+                                className={`h-1 rounded-full ${
+                                  unfavorableRate > 50 ? 'bg-red-500' :
+                                  unfavorableRate > 25 ? 'bg-yellow-500' :
+                                  'bg-green-500'
+                                }`}
+                                style={{ width: `${Math.min(unfavorableRate, 100)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-slate-50 p-3 rounded-lg">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-xs text-slate-600">Unresolved Rate</span>
+                              <span className={`text-sm font-semibold ${
+                                unresolvedRate > 60 ? 'text-red-600' :
+                                unresolvedRate > 30 ? 'text-yellow-600' :
+                                'text-green-600'
+                              }`}>
+                                {unresolvedRate.toFixed(1)}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1">
+                              <div
+                                className={`h-1 rounded-full ${
+                                  unresolvedRate > 60 ? 'bg-red-500' :
+                                  unresolvedRate > 30 ? 'bg-yellow-500' :
+                                  'bg-green-500'
+                                }`}
+                                style={{ width: `${Math.min(unresolvedRate, 100)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {analytics?.total_monetary_amount && analytics.total_monetary_amount > 0 && (
+                          <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <DollarSign className="w-4 h-4 text-blue-600" />
+                              <span className="text-xs font-medium text-blue-800 uppercase tracking-wide">Monetary Involvement</span>
+                            </div>
+                            <p className="text-lg font-bold text-blue-900">
+                              ${analytics.total_monetary_amount.toLocaleString()}
+                            </p>
+                            {analytics.average_case_value && analytics.average_case_value > 0 && (
+                              <p className="text-xs text-blue-700 mt-1">
+                                Avg per case: ${analytics.average_case_value.toLocaleString()}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        
+                        <div className="mt-3 p-3 bg-slate-50 rounded-lg">
+                          <p className="text-xs text-slate-600">
+                            <strong>Banking Recommendation:</strong> {
+                              creditworthiness === 'Poor' ? 'High risk - Enhanced due diligence required' :
+                              creditworthiness === 'Fair' ? 'Medium risk - Standard monitoring recommended' :
+                              'Low risk - Standard banking services suitable'
+                            }
+                          </p>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+
+            {/* Subject Matter */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <BookOpen className="h-5 w-5 text-blue-600" />
+                Subject Matter
+                {analyticsLoading && <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />}
+              </h3>
+              {analyticsLoading ? (
+                <div className="space-y-4">
+                  <div className="animate-pulse">
+                    <div className="h-16 bg-gray-200 rounded"></div>
+                    <div className="h-16 bg-gray-200 rounded"></div>
+                    <div className="h-16 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <BookOpen className="w-4 h-4 text-blue-600" />
+                      <span className="text-xs font-medium text-blue-800 uppercase tracking-wide">Primary Subject</span>
+                    </div>
+                    <p className="text-sm font-semibold text-blue-900">
+                      {analytics?.primary_subject_matter || 'N/A'}
+                    </p>
+                    {analytics?.subject_matter_categories && analytics.subject_matter_categories.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-xs text-blue-700 mb-1">Categories:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {analytics.subject_matter_categories.slice(0, 3).map((category, index) => (
+                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                              {category}
+                            </span>
+                          ))}
+                          {analytics.subject_matter_categories.length > 3 && (
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                              +{analytics.subject_matter_categories.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Scale className="w-4 h-4 text-orange-600" />
+                      <span className="text-xs font-medium text-orange-800 uppercase tracking-wide">Legal Issues</span>
+                    </div>
+                    {analytics?.legal_issues && analytics.legal_issues.length > 0 ? (
+                      <div className="space-y-1">
+                        {analytics.legal_issues.slice(0, 3).map((issue, index) => (
+                          <div key={index} className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
+                            {issue}
+                          </div>
+                        ))}
+                        {analytics.legal_issues.length > 3 && (
+                          <div className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                            +{analytics.legal_issues.length - 3} more issues
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-orange-900">N/A</p>
+                    )}
+                  </div>
+                  
+                  <div className="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Calculator className="w-4 h-4 text-teal-600" />
+                      <span className="text-xs font-medium text-teal-800 uppercase tracking-wide">Financial Terms</span>
+                    </div>
+                    {analytics?.financial_terms && analytics.financial_terms.length > 0 ? (
+                      <div className="space-y-1">
+                        {analytics.financial_terms.slice(0, 3).map((term, index) => (
+                          <div key={index} className="px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded">
+                            {term}
+                  </div>
+                ))}
+                        {analytics.financial_terms.length > 3 && (
+                          <div className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                            +{analytics.financial_terms.length - 3} more terms
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-teal-900">N/A</p>
+                    )}
+                  </div>
+                </div>
+              )}
+              </div>
           </div>
         </div>
       </div>

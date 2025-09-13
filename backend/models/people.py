@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, Float, JSON
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from database import Base
 
 class People(Base):
@@ -67,6 +68,12 @@ class People(Base):
     # Status
     status = Column(String(20), default="active", index=True)  # active, inactive, archived
     notes = Column(Text, nullable=True)
+    
+    # Relationship with case statistics
+    case_statistics = relationship("PersonCaseStatistics", back_populates="person", uselist=False)
+    
+    # Relationship with analytics
+    analytics = relationship("PersonAnalytics", back_populates="person", uselist=False)
     
     def __repr__(self):
         return f"<People(id={self.id}, name='{self.full_name}', risk_level='{self.risk_level}')>"

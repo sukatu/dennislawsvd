@@ -41,6 +41,15 @@ class PeopleBase(BaseModel):
     verification_notes: Optional[str] = None
     status: str = Field(default="active", max_length=20)
     notes: Optional[str] = None
+    
+    # Case Statistics (from person_case_statistics table)
+    total_cases: Optional[int] = Field(default=0, ge=0, description="Total number of cases")
+    resolved_cases: Optional[int] = Field(default=0, ge=0, description="Number of resolved cases")
+    unresolved_cases: Optional[int] = Field(default=0, ge=0, description="Number of unresolved cases")
+    favorable_cases: Optional[int] = Field(default=0, ge=0, description="Number of favorable cases")
+    unfavorable_cases: Optional[int] = Field(default=0, ge=0, description="Number of unfavorable cases")
+    mixed_cases: Optional[int] = Field(default=0, ge=0, description="Number of mixed outcome cases")
+    case_outcome: Optional[str] = Field(default="N/A", description="Overall case outcome")
 
     @field_validator('case_types', 'languages', 'previous_names', mode='before')
     @classmethod

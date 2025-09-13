@@ -88,7 +88,7 @@ const useGoogleAuth = () => {
   const handleGoogleSuccess = useCallback((userInfo) => {
     console.log('Google authentication successful:', userInfo);
     // You can add additional logic here, like sending user data to your backend
-    navigate('/people?authenticated=1');
+    navigate('/');
   }, [navigate]);
 
   // Handle Google Sign-In error

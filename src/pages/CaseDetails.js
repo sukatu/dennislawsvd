@@ -30,7 +30,17 @@ import {
   DollarSign,
   Percent,
   Calculator,
-  History
+  History,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Share2,
+  Maximize,
+  Minimize,
+  Facebook,
+  Twitter,
+  MessageCircle,
+  Check
 } from 'lucide-react';
 
 const CaseDetails = () => {
@@ -41,6 +51,13 @@ const CaseDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalClosing, setIsModalClosing] = useState(false);
+  const [modalSearchQuery, setModalSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     basicInfo: true,
     caseSummary: true,
@@ -108,6 +125,225 @@ const CaseDetails = () => {
       [section]: !prev[section]
     }));
   };
+
+  const closeModal = () => {
+    setIsModalClosing(true);
+    setTimeout(() => {
+      setIsModalOpen(false);
+      setIsModalClosing(false);
+      // Reset search when closing modal
+      setModalSearchQuery('');
+      setSearchResults([]);
+      setCurrentMatchIndex(0);
+    }, 300);
+  };
+
+  // Search functionality within modal
+  const searchInContent = (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setCurrentMatchIndex(0);
+      return;
+    }
+
+    setIsSearching(true);
+    const content = caseData?.summernote_content || caseData?.summernote || caseData?.summarnote || caseData?.metadata?.case_summary || caseData?.case_summary || '';
+    
+    // Remove HTML tags for searching
+    const textContent = content.replace(/<[^>]*>/g, '');
+    const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    const matches = [];
+    let match;
+
+    while ((match = regex.exec(textContent)) !== null) {
+      matches.push({
+        index: match.index,
+        text: match[0],
+        start: match.index,
+        end: match.index + match[0].length
+      });
+    }
+
+    setSearchResults(matches);
+    setCurrentMatchIndex(0);
+    setIsSearching(false);
+  };
+
+  const highlightSearchResults = (content, query) => {
+    if (!query.trim()) return content;
+    
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return content.replace(regex, '<mark class="bg-yellow-300 px-1 rounded">$1</mark>');
+  };
+
+  const goToNextMatch = () => {
+    if (searchResults.length > 0) {
+      const nextIndex = (currentMatchIndex + 1) % searchResults.length;
+      setCurrentMatchIndex(nextIndex);
+      scrollToMatch(nextIndex);
+    }
+  };
+
+  const goToPreviousMatch = () => {
+    if (searchResults.length > 0) {
+      const prevIndex = currentMatchIndex === 0 ? searchResults.length - 1 : currentMatchIndex - 1;
+      setCurrentMatchIndex(prevIndex);
+      scrollToMatch(prevIndex);
+    }
+  };
+
+  const scrollToMatch = (index) => {
+    const marks = document.querySelectorAll('.bg-yellow-300');
+    if (marks[index]) {
+      marks[index].scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+      // Add a temporary highlight effect
+      marks[index].classList.add('bg-yellow-400');
+      setTimeout(() => {
+        marks[index].classList.remove('bg-yellow-400');
+      }, 1000);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setModalSearchQuery(query);
+    searchInContent(query);
+  };
+
+  // Sharing and download functionality
+  const getCaseContent = () => {
+    return caseData?.summernote_content || caseData?.summernote || caseData?.summarnote || caseData?.metadata?.case_summary || caseData?.case_summary || '';
+  };
+
+  const getPlainTextContent = () => {
+    return getCaseContent().replace(/<[^>]*>/g, '');
+  };
+
+  const copyModalContent = async () => {
+    try {
+      await navigator.clipboard.writeText(getPlainTextContent());
+      // Show success feedback
+      const button = document.querySelector('[data-copy-button]');
+      if (button) {
+        const originalText = button.innerHTML;
+        button.innerHTML = '<Check className="w-4 h-4" /><span>Copied!</span>';
+        setTimeout(() => {
+          button.innerHTML = originalText;
+        }, 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  const shareToTwitter = () => {
+    const text = `Check out this case: ${caseData?.title || 'Case Details'}`;
+    const url = window.location.href;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(twitterUrl, '_blank', 'width=600,height=400');
+  };
+
+  const shareToFacebook = () => {
+    const url = window.location.href;
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    window.open(facebookUrl, '_blank', 'width=600,height=400');
+  };
+
+  const shareToWhatsApp = () => {
+    const text = `Check out this case: ${caseData?.title || 'Case Details'}`;
+    const url = window.location.href;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const downloadCase = () => {
+    const content = getPlainTextContent();
+    const title = caseData?.title || 'Case Details';
+    const filename = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
+  const getShareUrl = () => {
+    return window.location.href;
+  };
+
+  // Keyboard shortcuts for search navigation and actions
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isModalOpen) return;
+      
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'f':
+            e.preventDefault();
+            document.querySelector('input[placeholder*="Search within case content"]')?.focus();
+            break;
+          case 'g':
+            e.preventDefault();
+            if (e.shiftKey) {
+              goToPreviousMatch();
+            } else {
+              goToNextMatch();
+            }
+            break;
+          case 'c':
+            e.preventDefault();
+            copyModalContent();
+            break;
+          case 's':
+            e.preventDefault();
+            downloadCase();
+            break;
+          case 'Enter':
+            if (e.shiftKey) {
+              e.preventDefault();
+              toggleFullscreen();
+            }
+            break;
+        }
+      }
+      
+      // ESC key to close modal or exit fullscreen
+      if (e.key === 'Escape') {
+        if (isFullscreen) {
+          setIsFullscreen(false);
+        } else {
+          closeModal();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen, searchResults, currentMatchIndex, isFullscreen]);
+
+  // Close share menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showShareMenu && !event.target.closest('[data-share-menu]')) {
+        setShowShareMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showShareMenu]);
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -899,251 +1135,7 @@ const CaseDetails = () => {
             )}
           </div>
 
-          {/* Risk Assessment, Affiliations & Organizations */}
-          <div className="bg-white rounded-lg shadow-sm border">
-            <SectionHeader
-              title="Risk Assessment, Affiliations & Organizations"
-              icon={Shield}
-              isExpanded={expandedSections.riskAssessment}
-              onToggle={() => toggleSection('riskAssessment')}
-            />
-            {expandedSections.riskAssessment && (
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
-                  {/* Risk Assessment Grid */}
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Risk Assessment</h3>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <Shield className="w-4 h-4 text-red-600" />
-                          <span className="text-xs font-medium text-red-800 uppercase tracking-wide">Resolution Status</span>
-                        </div>
-                        <p className="text-sm font-semibold text-red-900">
-                          {caseData?.metadata?.resolution_status || 'Unknown'}
-                        </p>
-                      </div>
-                      
-                      <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <AlertTriangle className="w-4 h-4 text-orange-600" />
-                          <span className="text-xs font-medium text-orange-800 uppercase tracking-wide">Outcome</span>
-                        </div>
-                        <p className="text-sm font-semibold text-orange-900">
-                          {caseData?.metadata?.outcome || 'Unknown'}
-                        </p>
-                      </div>
-                      
-                      <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <Gavel className="w-4 h-4 text-yellow-600" />
-                          <span className="text-xs font-medium text-yellow-800 uppercase tracking-wide">Decision Type</span>
-                        </div>
-                        <p className="text-sm font-semibold text-yellow-900">
-                          {caseData?.metadata?.decision_type || 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
 
-
-                  {/* Insurance & Financial Grid */}
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Insurance & Financial</h3>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Shield className="w-4 h-4 text-purple-600" />
-                          <span className="text-xs font-medium text-purple-800 uppercase tracking-wide">Insurance Involved</span>
-                        </div>
-                        <div className="text-sm text-purple-900">
-                          {caseData?.metadata?.insurance_involved && formatArray(caseData.metadata.insurance_involved).length > 0 ? (
-                            <div className="space-y-1">
-                              {formatArray(caseData.metadata.insurance_involved).map((insurance, index) => (
-                                <div key={index} className="px-2 py-1 bg-purple-100 rounded text-xs">
-                                  {insurance}
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <span className="text-gray-500">No insurance involved</span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-500">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <Banknote className="w-4 h-4 text-gray-600" />
-                          <span className="text-xs font-medium text-gray-800 uppercase tracking-wide">Monetary Amount</span>
-                        </div>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {caseData?.metadata?.monetary_amount ? `$${caseData.metadata.monetary_amount.toLocaleString()}` : 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Financial Impact & Subject Matter */}
-          <div className="bg-white rounded-lg shadow-sm border">
-            <SectionHeader
-              title="Financial Impact & Subject Matter"
-              icon={TrendingUp}
-              isExpanded={expandedSections.financialImpact}
-              onToggle={() => toggleSection('financialImpact')}
-            />
-            {expandedSections.financialImpact && (
-              <div className="p-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  
-                  {/* Financial Impact Grid */}
-                  <div className="space-y-6">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Financial Impact</h3>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      {/* Monetary Amount */}
-                      <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <DollarSign className="w-5 h-5 text-green-600" />
-                          <span className="text-sm font-medium text-green-800 uppercase tracking-wide">Monetary Amount</span>
-                        </div>
-                        <p className="text-lg font-bold text-green-900">
-                          {caseData?.metadata?.monetary_amount ? `$${caseData.metadata.monetary_amount.toLocaleString()}` : 'N/A'}
-                        </p>
-                        {caseData?.metadata?.monetary_amount && (
-                          <p className="text-xs text-green-700 mt-1">
-                            {caseData.metadata.monetary_amount > 1000000 ? 'High Value Case' : 
-                             caseData.metadata.monetary_amount > 100000 ? 'Medium Value Case' : 'Low Value Case'}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Financial Risk Level */}
-                      <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <AlertTriangle className="w-5 h-5 text-red-600" />
-                          <span className="text-sm font-medium text-red-800 uppercase tracking-wide">Financial Risk Level</span>
-                        </div>
-                        <p className="text-lg font-bold text-red-900">
-                          {caseData?.metadata?.monetary_amount ? 
-                            (caseData.metadata.monetary_amount > 1000000 ? 'HIGH' : 
-                             caseData.metadata.monetary_amount > 100000 ? 'MEDIUM' : 'LOW') : 'UNKNOWN'}
-                        </p>
-                        <p className="text-xs text-red-700 mt-1">
-                          Based on monetary amount involved
-                        </p>
-                      </div>
-
-                      {/* Interest Rate (if applicable) */}
-                      <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Percent className="w-5 h-5 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-800 uppercase tracking-wide">Interest Rate</span>
-                        </div>
-                        <p className="text-lg font-bold text-blue-900">
-                          {caseData?.metadata?.interest_rate ? `${caseData.metadata.interest_rate}%` : 'N/A'}
-                        </p>
-                        <p className="text-xs text-blue-700 mt-1">
-                          Applicable interest rate for financial calculations
-                        </p>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* Subject Matter Grid */}
-                  <div className="space-y-6">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Subject Matter</h3>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      {/* Subject Matter */}
-                      <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <BookOpen className="w-5 h-5 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-800 uppercase tracking-wide">Subject Matter</span>
-                        </div>
-                        <p className="text-sm font-semibold text-blue-900">
-                          {caseData?.subject_matter || caseData?.metadata?.subject_matter || 'N/A'}
-                        </p>
-                      </div>
-
-
-                      {/* Legal Issues */}
-                      <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Scale className="w-5 h-5 text-orange-600" />
-                          <span className="text-sm font-medium text-orange-800 uppercase tracking-wide">Legal Issues</span>
-                        </div>
-                        <div className="text-sm text-orange-900">
-                          {caseData?.metadata?.legal_issues && formatArray(caseData.metadata.legal_issues).length > 0 ? (
-                            <div className="space-y-1">
-                              {formatArray(caseData.metadata.legal_issues).map((issue, index) => (
-                                <div key={index} className="px-2 py-1 bg-orange-100 rounded text-xs">
-                                  {issue}
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <span className="text-gray-500">No specific legal issues identified</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Financial Terms */}
-                      <div className="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Calculator className="w-5 h-5 text-teal-600" />
-                          <span className="text-sm font-medium text-teal-800 uppercase tracking-wide">Financial Terms</span>
-                        </div>
-                        <div className="text-sm text-teal-900">
-                          {caseData?.metadata?.financial_terms && formatArray(caseData.metadata.financial_terms).length > 0 ? (
-                            <div className="space-y-1">
-                              {formatArray(caseData.metadata.financial_terms).map((term, index) => (
-                                <div key={index} className="px-2 py-1 bg-teal-100 rounded text-xs">
-                                  {term}
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <span className="text-gray-500">No specific financial terms identified</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Board Resolution */}
-                      <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-500">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <FileText className="w-5 h-5 text-gray-600" />
-                          <span className="text-sm font-medium text-gray-800 uppercase tracking-wide">Board Resolution</span>
-                        </div>
-                        <p className="text-sm text-gray-900">
-                          {caseData?.board_resolution || caseData?.metadata?.board_resolution || 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Standalone Fields */}
           <div className="bg-white rounded-lg shadow-sm border">
@@ -1372,66 +1364,267 @@ const CaseDetails = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
-            onClick={() => setIsModalOpen(false)}
+            className={`fixed inset-0 bg-black transition-all duration-300 ease-out ${
+              isModalClosing ? 'bg-opacity-0' : 'bg-opacity-50'
+            }`}
+            onClick={closeModal}
           />
           
           {/* Modal */}
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] flex flex-col animate-in fade-in-0 zoom-in-95 duration-300">
+            <div 
+              className={`relative bg-white rounded-lg shadow-xl flex flex-col transform transition-all duration-300 ease-out ${
+                isFullscreen ? 'fixed inset-4 z-50 max-w-none w-auto h-auto' : 'max-w-6xl w-full max-h-[90vh]'
+              } ${
+                isModalClosing ? 'translate-y-4 scale-95 opacity-0' : 'translate-y-0 scale-100 opacity-100'
+              }`}
+              style={{
+                animation: isModalClosing ? 'none' : 'slideInUp 0.5s ease-out forwards, zoomIn 0.5s ease-out forwards'
+              }}
+            >
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-blue-600" />
+              <div 
+                className="p-6 border-b border-gray-200 transform transition-all duration-700 ease-out"
+                style={{
+                  animation: isModalClosing ? 'none' : 'slideInDown 0.7s ease-out 0.1s forwards',
+                  transform: isModalClosing ? 'translateY(-20px)' : 'translateY(0)',
+                  opacity: isModalClosing ? 0 : 1
+                }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center transform transition-all duration-500 ease-out"
+                         style={{
+                           animation: isModalClosing ? 'none' : 'bounceIn 0.6s ease-out 0.2s forwards',
+                           transform: isModalClosing ? 'scale(0)' : 'scale(1)',
+                           opacity: isModalClosing ? 0 : 1
+                         }}>
+                      <FileText className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="transform transition-all duration-500 ease-out"
+                         style={{
+                           animation: isModalClosing ? 'none' : 'slideInLeft 0.6s ease-out 0.3s forwards',
+                           transform: isModalClosing ? 'translateX(-20px)' : 'translateX(0)',
+                           opacity: isModalClosing ? 0 : 1
+                         }}>
+                      <h3 className="text-lg font-semibold text-gray-900">Full Case Content</h3>
+                      <p className="text-sm text-gray-500 break-words leading-tight">
+                        {caseData?.title || 'Case Details'}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Full Case Content</h3>
-                    <p className="text-sm text-gray-500 break-words leading-tight">
-                      {caseData?.title || 'Case Details'}
-                    </p>
+                  <div className="flex items-center space-x-2">
+                    {/* Action Buttons */}
+                    <div className="flex items-center space-x-1">
+                      <button
+                        onClick={copyModalContent}
+                        data-copy-button
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-300 ease-out transform hover:scale-110"
+                        title="Copy content"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      
+                      <button
+                        onClick={downloadCase}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-300 ease-out transform hover:scale-110"
+                        title="Download case"
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+                      
+                      <div className="relative" data-share-menu>
+                        <button
+                          onClick={() => setShowShareMenu(!showShareMenu)}
+                          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-300 ease-out transform hover:scale-110"
+                          title="Share case"
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </button>
+                        
+                        {/* Share Menu Dropdown */}
+                        {showShareMenu && (
+                          <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                            <button
+                              onClick={() => {
+                                shareToTwitter();
+                                setShowShareMenu(false);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                            >
+                              <Twitter className="w-4 h-4 text-blue-400" />
+                              <span>Share on Twitter</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                shareToFacebook();
+                                setShowShareMenu(false);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                            >
+                              <Facebook className="w-4 h-4 text-blue-600" />
+                              <span>Share on Facebook</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                shareToWhatsApp();
+                                setShowShareMenu(false);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                            >
+                              <MessageCircle className="w-4 h-4 text-green-500" />
+                              <span>Share on WhatsApp</span>
+                            </button>
+                            <div className="border-t border-gray-200 my-1"></div>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(getShareUrl());
+                                setShowShareMenu(false);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                            >
+                              <ExternalLink className="w-4 h-4 text-gray-500" />
+                              <span>Copy link</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <button
+                        onClick={toggleFullscreen}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-300 ease-out transform hover:scale-110"
+                        title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                      >
+                        {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    
+                    <button
+                      onClick={closeModal}
+                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-300 ease-out transform hover:scale-110"
+                      style={{
+                        animation: isModalClosing ? 'none' : 'fadeIn 0.5s ease-out 0.4s forwards',
+                        opacity: isModalClosing ? 0 : 1
+                      }}
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
                   </div>
                 </div>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                >
-                  <X className="w-6 h-6" />
-                </button>
+
+                {/* Search Bar */}
+                <div className="flex items-center space-x-3">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search within case content (e.g., 'Mahama', 'Writ of Summons')..."
+                      value={modalSearchQuery}
+                      onChange={handleSearchChange}
+                      className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    />
+                    {modalSearchQuery && (
+                      <button
+                        onClick={() => {
+                          setModalSearchQuery('');
+                          setSearchResults([]);
+                          setCurrentMatchIndex(0);
+                        }}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        title="Clear search"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  
+                  {searchResults.length > 0 && (
+                    <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
+                      <button
+                        onClick={goToPreviousMatch}
+                        className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded transition-colors"
+                        title="Previous match (Ctrl+Shift+G)"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <span className="text-sm text-blue-700 font-medium">
+                        {currentMatchIndex + 1} of {searchResults.length}
+                      </span>
+                      <button
+                        onClick={goToNextMatch}
+                        className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded transition-colors"
+                        title="Next match (Ctrl+G)"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  {isSearching && (
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      <span className="text-sm">Searching...</span>
+                    </div>
+                  )}
+                  
+                  {modalSearchQuery && searchResults.length === 0 && !isSearching && (
+                    <div className="flex items-center space-x-2 text-red-500">
+                      <X className="w-4 h-4" />
+                      <span className="text-sm">No matches found</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Modal Content */}
-              <div className="flex-1 overflow-y-auto p-6">
+              <div 
+                className="flex-1 overflow-y-auto p-6 transform transition-all duration-500 ease-out"
+                style={{
+                  animation: isModalClosing ? 'none' : 'fadeInUp 0.6s ease-out 0.2s forwards',
+                  transform: isModalClosing ? 'translateY(20px)' : 'translateY(0)',
+                  opacity: isModalClosing ? 0 : 1
+                }}
+              >
                 <div className="prose prose-lg max-w-none">
                   <div 
                     className="text-gray-900 leading-relaxed"
                     dangerouslySetInnerHTML={{
-                      __html: caseData?.summernote_content || caseData?.summernote || caseData?.summarnote || caseData?.metadata?.case_summary || caseData?.case_summary || 'No case content available'
+                      __html: highlightSearchResults(
+                        caseData?.summernote_content || caseData?.summernote || caseData?.summarnote || caseData?.metadata?.case_summary || caseData?.case_summary || 'No case content available',
+                        modalSearchQuery
+                      )
                     }}
                   />
                 </div>
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-                <div className="flex items-center space-x-2 text-sm text-gray-500">
-                  <Clock className="w-4 h-4" />
-                  <span>Last updated: {caseData?.updated_at ? formatDate(caseData.updated_at) : 'N/A'}</span>
+              <div 
+                className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50 transform transition-all duration-500 ease-out"
+                style={{
+                  animation: isModalClosing ? 'none' : 'slideInUp 0.6s ease-out 0.3s forwards',
+                  transform: isModalClosing ? 'translateY(20px)' : 'translateY(0)',
+                  opacity: isModalClosing ? 0 : 1
+                }}
+              >
+                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4" />
+                    <span>Last updated: {caseData?.updated_at ? formatDate(caseData.updated_at) : 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <Search className="w-4 h-4" />
+                    <span>Ctrl+F search • Ctrl+G next • Ctrl+C copy • Ctrl+S download • Shift+Enter fullscreen • ESC close</span>
+                  </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <button
-                    onClick={() => {
-                      const content = caseData?.summernote_content || caseData?.summernote || caseData?.summarnote || caseData?.metadata?.case_summary || caseData?.case_summary || '';
-                      navigator.clipboard.writeText(content.replace(/<[^>]*>/g, ''));
+                    onClick={closeModal}
+                    className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all duration-300 ease-out transform hover:scale-105 hover:shadow-lg"
+                    style={{
+                      animation: isModalClosing ? 'none' : 'fadeIn 0.5s ease-out 0.5s forwards',
+                      opacity: isModalClosing ? 0 : 1
                     }}
-                    className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-                  >
-                    <Copy className="w-4 h-4" />
-                    <span>Copy Text</span>
-                  </button>
-                  <button
-                    onClick={() => setIsModalOpen(false)}
-                    className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
                   >
                     <X className="w-4 h-4" />
                     <span>Close</span>
@@ -1442,6 +1635,84 @@ const CaseDetails = () => {
           </div>
         </div>
       )}
+
+      {/* Custom CSS for animations */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes slideInUp {
+          from { 
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+          }
+          to { 
+            transform: translateY(0) scale(1);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes slideInDown {
+          from { 
+            transform: translateY(-20px);
+            opacity: 0;
+          }
+          to { 
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes slideInLeft {
+          from { 
+            transform: translateX(-20px);
+            opacity: 0;
+          }
+          to { 
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes slideInUp {
+          from { 
+            transform: translateY(20px);
+            opacity: 0;
+          }
+          to { 
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes bounceIn {
+          0% { 
+            transform: scale(0);
+            opacity: 0;
+          }
+          50% { 
+            transform: scale(1.1);
+            opacity: 1;
+          }
+          100% { 
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes zoomIn {
+          from { 
+            transform: scale(0.95);
+            opacity: 0;
+          }
+          to { 
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 };

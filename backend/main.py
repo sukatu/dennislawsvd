@@ -17,6 +17,8 @@ from routes import legal_history
 from routes import case_search
 from routes import enhanced_search
 from routes import case_hearings
+from routes import person_case_statistics
+from routes import person_analytics
 from config import settings
 
 # Application lifespan
@@ -60,6 +62,8 @@ app.include_router(legal_history.router, prefix="/api/legal-history", tags=["leg
 app.include_router(case_search.router, prefix="/api/case-search", tags=["case_search"])
 app.include_router(enhanced_search.router, prefix="/api/enhanced-search", tags=["enhanced_search"])
 app.include_router(case_hearings.router, prefix="/api", tags=["case_hearings"])
+app.include_router(person_case_statistics.router, tags=["person_case_statistics"])
+app.include_router(person_analytics.router, prefix="/api", tags=["person_analytics"])
 
 # Root endpoint
 @app.get("/")

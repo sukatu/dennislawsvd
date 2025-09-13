@@ -69,8 +69,8 @@ const Login = () => {
         localStorage.setItem('accessToken', data.access_token);
         localStorage.setItem('userData', JSON.stringify(data.user));
         
-        // Redirect to dashboard or home
-        navigate('/people?authenticated=1');
+        // Redirect to homepage
+        navigate('/');
       } else {
         setError(data.detail || 'Invalid email or password');
       }

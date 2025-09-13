@@ -158,16 +158,32 @@ const PeopleResults = () => {
         return acc;
       }, []);
 
-      setResults(uniqueResults);
+      // Use the case statistics already provided by the backend API
+      const resultsWithCaseStats = uniqueResults.map(person => ({
+        ...person,
+        total_cases: person.total_cases || 0,
+        resolved_cases: person.resolved_cases || 0,
+        unresolved_cases: person.unresolved_cases || 0,
+        case_outcome: person.case_outcome || 'N/A'
+      }));
+
+      setResults(resultsWithCaseStats);
       setSearchStats(prev => ({
         ...prev,
-        totalResults: uniqueResults.length,
+        totalResults: resultsWithCaseStats.length,
         searchTime: (Date.now() - startTime) / 1000
       }));
 
     } catch (error) {
       console.error('Search error:', error);
-      setError('Failed to search. Please try again.');
+      setError('Failed to search. Using sample data for demonstration.');
+      // Use mock data as fallback
+      setResults(mockResults);
+      setSearchStats(prev => ({
+        ...prev,
+        totalResults: mockResults.length,
+        searchTime: (Date.now() - startTime) / 1000
+      }));
     } finally {
       setLoading(false);
       setCurrentSearching('');
@@ -179,47 +195,63 @@ const PeopleResults = () => {
   const mockResults = [
     {
       id: 1,
-      name: 'Albert Kweku Obeng',
-      dob: '7 March 1962 – 9 March 2004',
-      idNumber: 'KL1K-DXP',
-      riskLevel: 'Low',
-      riskScore: 25,
-      cases: 2,
-      caseTypes: ['Property Dispute', 'Family Law'],
-      location: 'Greater Accra'
+      full_name: 'Albert Kweku Obeng',
+      notes: 'Business Executive',
+      occupation: 'Businessman',
+      region: 'Greater Accra',
+      court: 'High Court',
+      languages: ['English', 'Twi'],
+      risk_level: 'Low',
+      risk_score: 25,
+      total_cases: 2,
+      resolved_cases: 2,
+      unresolved_cases: 0,
+      case_outcome: 'Favorable'
     },
     {
       id: 2,
-      name: 'Sarah Mensah',
-      dob: '15 June 1975',
-      idNumber: 'GH-123456789',
-      riskLevel: 'Medium',
-      riskScore: 65,
-      cases: 5,
-      caseTypes: ['Business Dispute', 'Contract Law'],
-      location: 'Ashanti'
+      full_name: 'Sarah Mensah',
+      notes: 'Legal Professional',
+      occupation: 'Lawyer',
+      region: 'Ashanti',
+      court: 'High Court',
+      languages: ['English', 'Twi'],
+      risk_level: 'Medium',
+      risk_score: 65,
+      total_cases: 5,
+      resolved_cases: 3,
+      unresolved_cases: 2,
+      case_outcome: 'Mixed'
     },
     {
       id: 3,
-      name: 'Kwame Asante',
-      dob: '22 September 1980',
-      idNumber: 'GH-987654321',
-      riskLevel: 'High',
-      riskScore: 85,
-      cases: 12,
-      caseTypes: ['Criminal', 'Fraud'],
-      location: 'Western'
+      full_name: 'Kwame Asante',
+      notes: 'Corporate Executive',
+      occupation: 'Businessman',
+      region: 'Western',
+      court: 'High Court',
+      languages: ['English', 'Twi'],
+      risk_level: 'High',
+      risk_score: 85,
+      total_cases: 12,
+      resolved_cases: 8,
+      unresolved_cases: 4,
+      case_outcome: 'Mixed'
     },
     {
       id: 4,
-      name: 'Ama Serwaa',
-      dob: '3 January 1990',
-      idNumber: 'GH-456789123',
-      riskLevel: 'Low',
-      riskScore: 15,
-      cases: 1,
-      caseTypes: ['Traffic Violation'],
-      location: 'Central'
+      full_name: 'Ama Serwaa',
+      notes: 'Government Official',
+      occupation: 'Civil Servant',
+      region: 'Central',
+      court: 'District Court',
+      languages: ['English', 'Fante'],
+      risk_level: 'Low',
+      risk_score: 15,
+      total_cases: 1,
+      resolved_cases: 1,
+      unresolved_cases: 0,
+      case_outcome: 'Favorable'
     }
   ];
 
@@ -393,7 +425,7 @@ const PeopleResults = () => {
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
                 <span>{currentSearching}</span>
-              </div>
+            </div>
             )}
             <div className="mt-2 text-xs text-slate-500">
               Searched {searchStats.courtsSearched} of {searchStats.totalCourts} courts • {searchStats.totalResults} results found
@@ -404,14 +436,14 @@ const PeopleResults = () => {
 
       {/* Error State */}
       {error && (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="rounded-lg bg-red-50 border border-red-200 p-4">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-600" />
               <span className="text-red-800">{error}</span>
             </div>
           </div>
-        </div>
+                </div>
       )}
 
       {/* Alphabet Navigation */}
@@ -434,9 +466,9 @@ const PeopleResults = () => {
                 </button>
               ))}
             </div>
-          </div>
-        </div>
-      )}
+                </div>
+              </div>
+            )}
 
       {/* Results */}
       {!loading && !error && (
@@ -460,9 +492,9 @@ const PeopleResults = () => {
                       {letter}
                       <span className="text-sm font-normal text-slate-500">
                         ({groupedResults[letter].length} {groupedResults[letter].length === 1 ? 'person' : 'people'})
-                      </span>
+                          </span>
                     </h2>
-                  </div>
+                        </div>
                   
                   {/* People in this section */}
                   <div className="space-y-3 pl-4">
@@ -477,109 +509,124 @@ const PeopleResults = () => {
                             <div className="flex-shrink-0">
                               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                                 <Users className="h-6 w-6 text-blue-600" />
-                              </div>
-                            </div>
+                    </div>
+                  </div>
                             <div className="flex-1">
                               <h3 className="text-lg font-semibold text-slate-900 mb-1">
                                 {person.full_name}
                               </h3>
-                              <p className="text-slate-600 text-sm mb-2">
-                                {person.notes || 'Name extracted from case titles.'}
-                                {person.occupation && ` ${person.occupation}`}
-                                {person.languages && person.languages.length > 0 && ` with ${person.languages.length} language${person.languages.length > 1 ? 's' : ''}`}
-                              </p>
-                              <div className="flex items-center gap-4 text-sm text-slate-500">
-                                <div className="flex items-center gap-1">
-                                  <Clock className="h-4 w-4" />
-                                  <span>Just now</span>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                  <span className="text-slate-600">Total Cases:</span>
+                                  <span className="font-semibold text-slate-900">{person.total_cases || 0}</span>
                                 </div>
-                                {person.region && (
-                                  <div className="flex items-center gap-1">
-                                    <MapPin className="h-4 w-4" />
-                                    <span>{getRegionName(person.region)}</span>
-                                  </div>
-                                )}
-                                {person.court && (
-                                  <div className="flex items-center gap-1">
-                                    <Scale className="h-4 w-4" />
-                                    <span>{person.court}</span>
-                                  </div>
-                                )}
-                              </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                  <span className="text-slate-600">Resolved:</span>
+                                  <span className="font-semibold text-green-600">{person.resolved_cases || 0}</span>
+              </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                  <span className="text-slate-600">Unresolved:</span>
+                                  <span className="font-semibold text-red-600">{person.unresolved_cases || 0}</span>
+                        </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                  <span className="text-slate-600">Outcome:</span>
+                                  <span className="font-semibold text-purple-600">{person.case_outcome || 'N/A'}</span>
+                        </div>
+                      </div>
                             </div>
                           </div>
                           <div className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
                             <Eye className="h-4 w-4" />
                             Click to view details
-                          </div>
+                        </div>
                         </div>
                       </div>
                     ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
-        </div>
-      )}
+              </div>
+            )}
 
-      {/* Pagination */}
+            {/* Pagination */}
       {!loading && !error && displayTotalPages > 1 && (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-slate-600">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm text-slate-600">
               Showing {startIndex + 1} to {endIndex} of {results.length} results
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+                </div>
+            
+            <div className="flex items-center gap-1 overflow-x-auto max-w-full">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  >
                 <ChevronLeft className="h-4 w-4" />
-              </button>
-              
-              {Array.from({ length: Math.min(5, displayTotalPages) }, (_, i) => {
-                const page = i + 1;
-                return (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`px-3 py-2 text-sm font-medium rounded-lg ${
-                      currentPage === page
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    {page}
                   </button>
-                );
-              })}
-              
-              {displayTotalPages > 5 && (
-                <>
-                  <span className="text-slate-400">...</span>
+                  
+              <div className="flex items-center gap-1 min-w-0">
+                {/* Show first page */}
+                {currentPage > 3 && (
+                  <>
+                    <button
+                      onClick={() => handlePageChange(1)}
+                      className="px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100"
+                    >
+                      1
+                    </button>
+                    {currentPage > 4 && <span className="px-2 text-slate-400">...</span>}
+                  </>
+                )}
+                
+                {/* Show pages around current page */}
+                {Array.from({ length: displayTotalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    return page >= Math.max(1, currentPage - 2) && 
+                           page <= Math.min(displayTotalPages, currentPage + 2);
+                  })
+                  .map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                      className={`px-3 py-2 text-sm font-medium rounded-lg whitespace-nowrap ${
+                        currentPage === page
+                          ? 'bg-blue-600 text-white'
+                          : 'text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                
+                {/* Show last page */}
+                {currentPage < displayTotalPages - 2 && (
+                  <>
+                    {currentPage < displayTotalPages - 3 && <span className="px-2 text-slate-400">...</span>}
+                    <button
+                      onClick={() => handlePageChange(displayTotalPages)}
+                      className="px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100"
+                    >
+                      {displayTotalPages}
+                    </button>
+                  </>
+                )}
+                  </div>
+                  
                   <button
-                    onClick={() => handlePageChange(displayTotalPages)}
-                    className={`px-3 py-2 text-sm font-medium rounded-lg ${
-                      currentPage === displayTotalPages
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    {displayTotalPages}
-                  </button>
-                </>
-              )}
-              
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
+                    onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === displayTotalPages}
-                className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+                className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  >
                 <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+                  </button>
+                </div>
           </div>
         </div>
       )}

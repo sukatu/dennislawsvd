@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi import status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func, desc, asc
 from database import get_db
 from models.people import People
 from models.user import User
+from models.person_case_statistics import PersonCaseStatistics
 from schemas.people import (
     PeopleCreate, 
     PeopleUpdate, 
@@ -51,8 +51,11 @@ async def search_people(
 ):
     """Search for people with various filters"""
     try:
-        # Build query
-        query_obj = db.query(People)
+        # Build query with case statistics join
+        query_obj = db.query(People).outerjoin(
+            PersonCaseStatistics, 
+            People.id == PersonCaseStatistics.person_id
+        )
         
         # Apply filters
         filters = []
@@ -139,12 +142,32 @@ async def search_people(
         has_next = page < total_pages
         has_prev = page > 1
         
-        # Update search count for each person
+        # Update search count for each person and add case statistics
         for person in people:
             if person.search_count is None:
                 person.search_count = 0
             person.search_count += 1
             person.last_searched = func.now()
+            
+            # Add case statistics if available
+            if hasattr(person, 'case_statistics') and person.case_statistics:
+                stats = person.case_statistics
+                person.total_cases = stats.total_cases
+                person.resolved_cases = stats.resolved_cases
+                person.unresolved_cases = stats.unresolved_cases
+                person.favorable_cases = stats.favorable_cases
+                person.unfavorable_cases = stats.unfavorable_cases
+                person.mixed_cases = stats.mixed_cases
+                person.case_outcome = stats.case_outcome
+            else:
+                # Default values if no statistics available
+                person.total_cases = 0
+                person.resolved_cases = 0
+                person.unresolved_cases = 0
+                person.favorable_cases = 0
+                person.unfavorable_cases = 0
+                person.mixed_cases = 0
+                person.case_outcome = "N/A"
         
         db.commit()
         

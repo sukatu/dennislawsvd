@@ -9,6 +9,7 @@ const People = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
+  const [allPeople, setAllPeople] = useState([]); // For alphabet grouping
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('name');
   const [filterBy, setFilterBy] = useState({
@@ -25,12 +26,15 @@ const People = () => {
   const [totalResults, setTotalResults] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedLetter, setSelectedLetter] = useState(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingStatus, setLoadingStatus] = useState('');
+  const [isLoadingAllPeople, setIsLoadingAllPeople] = useState(false);
 
   // Advanced search form data
   const [advancedFormData, setAdvancedFormData] = useState({
     firstName: '',
     lastName: '',
-    dateOfBirth: '',
     idNumber: '',
     phone: '',
     email: '',
@@ -48,7 +52,6 @@ const People = () => {
     {
       id: 1,
       name: 'Albert Kweku Obeng',
-      dob: '7 March 1962 – 9 March 2004',
       idNumber: 'KL1K-DXP',
       riskLevel: 'Low',
       riskScore: 25,
@@ -60,7 +63,6 @@ const People = () => {
     {
       id: 2,
       name: 'Sarah Mensah',
-      dob: '15 June 1975',
       idNumber: 'GH-123456789',
       riskLevel: 'Medium',
       riskScore: 65,
@@ -72,7 +74,6 @@ const People = () => {
     {
       id: 3,
       name: 'Kwame Asante',
-      dob: '22 September 1980',
       idNumber: 'GH-987654321',
       riskLevel: 'High',
       riskScore: 85,
@@ -84,7 +85,6 @@ const People = () => {
     {
       id: 4,
       name: 'Ama Serwaa',
-      dob: '3 January 1990',
       idNumber: 'GH-456789123',
       riskLevel: 'Low',
       riskScore: 30,
@@ -96,7 +96,6 @@ const People = () => {
     {
       id: 5,
       name: 'John Osei',
-      dob: '12 August 1978',
       idNumber: 'GH-789123456',
       riskLevel: 'Medium',
       riskScore: 55,
@@ -108,7 +107,6 @@ const People = () => {
     {
       id: 6,
       name: 'Grace Adjei',
-      dob: '25 November 1985',
       idNumber: 'GH-321654987',
       riskLevel: 'High',
       riskScore: 90,
@@ -120,7 +118,6 @@ const People = () => {
     {
       id: 7,
       name: 'Michael Boateng',
-      dob: '8 April 1972',
       idNumber: 'GH-654987321',
       riskLevel: 'Low',
       riskScore: 20,
@@ -132,7 +129,6 @@ const People = () => {
     {
       id: 8,
       name: 'Patience Owusu',
-      dob: '17 July 1988',
       idNumber: 'GH-147258369',
       riskLevel: 'Medium',
       riskScore: 60,
@@ -144,7 +140,6 @@ const People = () => {
     {
       id: 9,
       name: 'Samuel Kofi',
-      dob: '29 December 1983',
       idNumber: 'GH-963852741',
       riskLevel: 'High',
       riskScore: 80,
@@ -156,7 +151,6 @@ const People = () => {
     {
       id: 10,
       name: 'Comfort Asante',
-      dob: '14 March 1992',
       idNumber: 'GH-852741963',
       riskLevel: 'Low',
       riskScore: 35,
@@ -168,7 +162,6 @@ const People = () => {
     {
       id: 11,
       name: 'Daniel Nkrumah',
-      dob: '6 October 1976',
       idNumber: 'GH-741852963',
       riskLevel: 'Medium',
       riskScore: 70,
@@ -180,7 +173,6 @@ const People = () => {
     {
       id: 12,
       name: 'Esther Ofori',
-      dob: '21 May 1987',
       idNumber: 'GH-159753486',
       riskLevel: 'High',
       riskScore: 95,
@@ -201,35 +193,163 @@ const People = () => {
     }
   }, [searchParams]);
 
+  // Load all people for alphabet grouping
+  const loadAllPeopleForAlphabet = async () => {
+    try {
+      console.log('Loading all people for alphabet grouping...');
+      setIsLoadingAllPeople(true);
+      setLoadingProgress(0);
+      setLoadingStatus('Connecting to database...');
+      
+      const token = localStorage.getItem('accessToken');
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // First, get the total count
+      console.log('Getting total count...');
+      setLoadingStatus('Getting total count...');
+      setLoadingProgress(5);
+      
+      const countResponse = await fetch(`http://localhost:8000/api/people/search?page=1&limit=1`, { headers });
+      if (!countResponse.ok) {
+        throw new Error(`Count API failed: ${countResponse.status}`);
+      }
+      const countData = await countResponse.json();
+      const totalPeople = countData.total || 0;
+      console.log('Total people in database:', totalPeople);
+
+      // Load all people in batches
+      const allPeopleData = [];
+      const batchSize = 100; // Load 100 at a time
+      const totalPages = Math.ceil(totalPeople / batchSize);
+      
+      console.log(`Loading ${totalPeople} people in ${totalPages} batches of ${batchSize}...`);
+      setLoadingStatus(`Loading ${totalPeople} people in ${totalPages} batches...`);
+      setLoadingProgress(10);
+      
+      for (let page = 1; page <= totalPages; page++) {
+        console.log(`Loading batch ${page}/${totalPages}...`);
+        setLoadingStatus(`Loading batch ${page} of ${totalPages}...`);
+        
+        const response = await fetch(`http://localhost:8000/api/people/search?page=${page}&limit=${batchSize}`, { headers });
+        
+        if (response.ok) {
+          const data = await response.json();
+          allPeopleData.push(...(data.people || []));
+          console.log(`Batch ${page} loaded: ${data.people?.length || 0} people`);
+          
+          // Update progress
+          const progress = 10 + ((page / totalPages) * 80); // 10% to 90%
+          setLoadingProgress(Math.round(progress));
+        } else {
+          console.error(`Batch ${page} failed:`, response.status, response.statusText);
+        }
+      }
+
+      console.log(`Total people loaded: ${allPeopleData.length}`);
+      setLoadingStatus('Processing data...');
+      setLoadingProgress(90);
+      
+      const transformedResults = allPeopleData.map(person => ({
+        id: person.id,
+        name: person.full_name || `${person.first_name} ${person.last_name}`,
+        idNumber: person.id_number || 'N/A',
+        riskLevel: person.risk_level || 'Low',
+        riskScore: person.risk_score || 0,
+        cases: person.case_count || 0,
+        caseTypes: person.case_types || [],
+        location: person.region || 'N/A'
+      }));
+
+      console.log('Transformed results sample:', transformedResults.slice(0, 3));
+      setAllPeople(transformedResults);
+      setLoadingStatus('Complete!');
+      setLoadingProgress(100);
+      console.log('All people set successfully');
+      
+      // Hide loading after a short delay
+      setTimeout(() => {
+        setIsLoadingAllPeople(false);
+        setLoadingProgress(0);
+        setLoadingStatus('');
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error loading all people for alphabet:', error);
+      setLoadingStatus('Error loading data, using fallback...');
+      setLoadingProgress(0);
+      
+      // Fallback to sample data if API fails
+      console.log('Using fallback sample data due to error...');
+      const sampleData = [
+        { id: 1, name: 'AARON KWESI KAITOO', idNumber: 'N/A', riskLevel: 'Low', riskScore: 0, cases: 0, caseTypes: [], location: 'UER' },
+        { id: 2, name: 'AARON MFARFO', idNumber: 'N/A', riskLevel: 'Low', riskScore: 0, cases: 0, caseTypes: [], location: 'WR' },
+        { id: 3, name: 'AARON MORNY GODWIN', idNumber: 'N/A', riskLevel: 'Low', riskScore: 0, cases: 0, caseTypes: [], location: 'GAR' },
+        { id: 4, name: 'BENJAMIN ADJEI', idNumber: 'N/A', riskLevel: 'Medium', riskScore: 50, cases: 2, caseTypes: ['Civil'], location: 'ASR' },
+        { id: 5, name: 'CHARLES OWUSU', idNumber: 'N/A', riskLevel: 'High', riskScore: 80, cases: 5, caseTypes: ['Criminal'], location: 'GAR' },
+        { id: 6, name: 'DAVID MENSAH', idNumber: 'N/A', riskLevel: 'Low', riskScore: 20, cases: 1, caseTypes: ['Civil'], location: 'WR' },
+        { id: 7, name: 'EMMANUEL ASANTE', idNumber: 'N/A', riskLevel: 'Medium', riskScore: 60, cases: 3, caseTypes: ['Commercial'], location: 'ER' },
+        { id: 8, name: 'FRANCIS GYASI', idNumber: 'N/A', riskLevel: 'Low', riskScore: 30, cases: 1, caseTypes: ['Civil'], location: 'VR' },
+        { id: 9, name: 'GEORGE APPIAH', idNumber: 'N/A', riskLevel: 'High', riskScore: 90, cases: 7, caseTypes: ['Criminal', 'Fraud'], location: 'GAR' },
+        { id: 10, name: 'HENRY BOATENG', idNumber: 'N/A', riskLevel: 'Medium', riskScore: 55, cases: 2, caseTypes: ['Civil'], location: 'ASR' }
+      ];
+      setAllPeople(sampleData);
+      console.log('Fallback sample data set due to error');
+      
+      setTimeout(() => {
+        setIsLoadingAllPeople(false);
+        setLoadingProgress(0);
+        setLoadingStatus('');
+      }, 2000);
+    }
+  };
+
+  // Load all people for alphabet grouping on component mount
+  useEffect(() => {
+    console.log('Component mounted, loading all people...');
+    loadAllPeopleForAlphabet();
+  }, []);
+
   // Handle search when search query changes
   useEffect(() => {
     if (searchQuery.trim()) {
       handleSearch();
-    } else {
+      } else {
       // If no search query, reload all people
       const loadAllPeople = async () => {
         try {
+          console.log('Loading people for current page...');
           const token = localStorage.getItem('accessToken');
-          if (!token) return;
+          
+          const headers = {
+            'Content-Type': 'application/json'
+          };
+          
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
 
           setIsLoading(true);
+          console.log('Making API call for paginated people...');
           const response = await fetch(`http://localhost:8000/api/people/search?page=${currentPage}&limit=${itemsPerPage}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
+            headers
           });
 
+          console.log('Paginated API response status:', response.status);
           if (response.ok) {
             const data = await response.json();
+            console.log('Paginated API response data:', data);
+            console.log('Number of people received:', data.people?.length || 0);
+            
             const transformedResults = (data.people || []).map(person => ({
               id: person.id,
               name: person.full_name || `${person.first_name} ${person.last_name}`,
-              dob: person.date_of_birth ? new Date(person.date_of_birth).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              }) : 'N/A',
               idNumber: person.id_number || 'N/A',
               riskLevel: person.risk_level || 'Low',
               riskScore: person.risk_score || 0,
@@ -238,9 +358,13 @@ const People = () => {
               location: person.region || 'N/A'
             }));
 
+            console.log('Transformed paginated results:', transformedResults.slice(0, 3));
             setFilteredResults(transformedResults);
             setTotalResults(data.total || 0);
             setTotalPages(data.total_pages || 0);
+            console.log('Paginated people set successfully');
+          } else {
+            console.error('Paginated API response not ok:', response.status, response.statusText);
           }
         } catch (error) {
           console.error('Error loading people:', error);
@@ -252,14 +376,122 @@ const People = () => {
     }
   }, [searchQuery, currentPage, itemsPerPage]);
 
-  // Pagination - using server-side pagination
+  // Group results alphabetically
+  const groupResultsAlphabetically = (peopleList) => {
+    // Sort alphabetically by name
+    const sortedResults = [...peopleList].sort((a, b) => {
+      const nameA = (a.name || '').toLowerCase();
+      const nameB = (b.name || '').toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+
+    // Group by first letter
+    const grouped = {};
+    sortedResults.forEach(person => {
+      const firstLetter = (person.name || 'Unknown').charAt(0).toUpperCase();
+      if (!grouped[firstLetter]) {
+        grouped[firstLetter] = [];
+      }
+      grouped[firstLetter].push(person);
+    });
+
+    return grouped;
+  };
+
+  // Get alphabetically grouped results for the full dataset
+  // For alphabet grouping, we need all people, not just the current page
+  console.log('All people for grouping:', allPeople.length);
+  const groupedResults = groupResultsAlphabetically(allPeople);
+  console.log('Grouped results:', Object.keys(groupedResults).map(letter => `${letter}: ${groupedResults[letter]?.length || 0}`));
+  
+  // Create all alphabet sections A-Z
+  const allAlphabetSections = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+  
+  // Filter results based on selected letter
+  const filteredGroupedResults = selectedLetter 
+    ? { [selectedLetter]: groupedResults[selectedLetter] || [] }
+    : groupedResults;
+  
+  const alphabetSections = selectedLetter 
+    ? [selectedLetter] 
+    : allAlphabetSections.filter(letter => groupedResults[letter] && groupedResults[letter].length > 0);
+
+  // Pagination - using server-side pagination for normal view, client-side for letter filtering
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, totalResults);
-  const currentResults = filteredResults; // Results are already paginated from server
+  const currentResults = selectedLetter 
+    ? filteredResults.slice(startIndex, endIndex) // Client-side pagination for letter filtering
+    : filteredResults; // Server-side pagination for normal view
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLetterClick = (letter) => {
+    if (selectedLetter === letter) {
+      // If clicking the same letter, clear the filter
+      setSelectedLetter(null);
+    } else {
+      // Filter to show only people with names starting with this letter
+      setSelectedLetter(letter);
+      
+      // Filter allPeople to show only people starting with this letter
+      const filteredByLetter = allPeople.filter(person => {
+        const name = (person.name || '').toLowerCase();
+        return name.startsWith(letter.toLowerCase());
+      });
+      
+      setFilteredResults(filteredByLetter);
+      setTotalResults(filteredByLetter.length);
+      setTotalPages(Math.ceil(filteredByLetter.length / itemsPerPage));
+    }
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const clearLetterFilter = async () => {
+    setSelectedLetter(null);
+    setCurrentPage(1);
+    
+    // Reload all people for the current page
+    try {
+      const token = localStorage.getItem('accessToken');
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      setIsLoading(true);
+      const response = await fetch(`http://localhost:8000/api/people/search?page=1&limit=${itemsPerPage}`, {
+        headers
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const transformedResults = (data.people || []).map(person => ({
+          id: person.id,
+          name: person.full_name || `${person.first_name} ${person.last_name}`,
+          idNumber: person.id_number || 'N/A',
+          riskLevel: person.risk_level || 'Low',
+          riskScore: person.risk_score || 0,
+          cases: person.case_count || 0,
+          caseTypes: person.case_types || [],
+          location: person.region || 'N/A'
+        }));
+
+        setFilteredResults(transformedResults);
+        setTotalResults(data.total || 0);
+        setTotalPages(data.total_pages || 0);
+      }
+    } catch (error) {
+      console.error('Error loading people:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Reset to first page when filters change
@@ -351,11 +583,6 @@ const People = () => {
         const transformedResults = (data.people || []).map(person => ({
           id: person.id,
           name: person.full_name || `${person.first_name} ${person.last_name}`,
-          dob: person.date_of_birth ? new Date(person.date_of_birth).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          }) : 'N/A',
           idNumber: person.id_number || 'N/A',
           riskLevel: person.risk_level || 'Low',
           riskScore: person.risk_score || 0,
@@ -417,11 +644,6 @@ const People = () => {
           const transformedResults = (data.people || []).map(person => ({
             id: person.id,
             name: person.full_name || `${person.first_name} ${person.last_name}`,
-            dob: person.date_of_birth ? new Date(person.date_of_birth).toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            }) : 'N/A',
             idNumber: person.id_number || 'N/A',
             riskLevel: person.risk_level || 'Low',
             riskScore: person.risk_score || 0,
@@ -512,6 +734,33 @@ const People = () => {
           <p className="text-slate-600">Search, filter, and manage people in the legal database</p>
         </div>
 
+        {/* Loading Progress Bar */}
+        {isLoadingAllPeople && (
+          <div className="mb-8 bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">Loading People Database</h3>
+              <span className="text-sm text-slate-600">{loadingProgress}%</span>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-slate-200 rounded-full h-3 mb-4">
+              <div 
+                className="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${loadingProgress}%` }}
+              ></div>
+            </div>
+            
+            {/* Status Text */}
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-slate-600">{loadingStatus}</p>
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <span className="text-xs text-slate-500">Please wait...</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Tab Navigation */}
         <div className="mb-8">
           <div className="border-b border-slate-200">
@@ -565,44 +814,44 @@ const People = () => {
             )}
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
               <form onSubmit={handleSearch} className="space-y-4">
+              <div className="relative">
                 <div className="relative">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-                    <input
-                      type="text"
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <input
+                    type="text"
                       placeholder={isAuthenticated ? "Search for people, banks, or insurance companies..." : "Please login to search..."}
-                      value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        setShowSuggestions(e.target.value.length > 0);
-                      }}
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setShowSuggestions(e.target.value.length > 0);
+                    }}
                       disabled={!isAuthenticated}
                       className={`w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 ${!isAuthenticated ? 'bg-slate-100 cursor-not-allowed' : ''}`}
-                    />
-                  </div>
-                  
-              {/* Search Suggestions */}
-              {showSuggestions && searchQuery && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  />
+                </div>
+                
+                {/* Search Suggestions */}
+                {showSuggestions && searchQuery && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {isLoadingSuggestions ? (
                     <div className="px-4 py-2 text-slate-500 text-sm">Loading suggestions...</div>
                   ) : suggestions.length > 0 ? (
                     suggestions.map((suggestion, index) => (
-                      <button
-                        key={index}
+                        <button
+                          key={index}
                         type="button"
-                        onClick={() => handleSuggestionClick(suggestion)}
-                        className="w-full px-4 py-2 text-left hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
-                      >
-                        {suggestion}
-                      </button>
+                          onClick={() => handleSuggestionClick(suggestion)}
+                          className="w-full px-4 py-2 text-left hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
+                        >
+                          {suggestion}
+                        </button>
                     ))
                   ) : (
                     <div className="px-4 py-2 text-slate-500 text-sm">No suggestions found</div>
                   )}
-                </div>
-              )}
-                </div>
+                  </div>
+                )}
+              </div>
                 <div className="flex justify-end">
                   <button
                     type="submit"
@@ -650,16 +899,6 @@ const People = () => {
                       type="text"
                       name="idNumber"
                       value={advancedFormData.idNumber}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Date of Birth</label>
-                    <input
-                      type="date"
-                      name="dateOfBirth"
-                      value={advancedFormData.dateOfBirth}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                     />
@@ -885,17 +1124,201 @@ const People = () => {
             )}
           </div>
 
+          {/* Alphabet Navigation */}
+          {!isLoading && (
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+              <div className="flex flex-wrap gap-2 justify-center">
+                {allAlphabetSections.map((letter) => {
+                  const hasPeople = groupedResults[letter] && groupedResults[letter].length > 0;
+                  const isSelected = selectedLetter === letter;
+                  
+                  return (
+                    <button
+                      key={letter}
+                      onClick={() => handleLetterClick(letter)}
+                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors border ${
+                        isSelected
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : hasPeople
+                          ? 'text-slate-600 hover:text-blue-600 hover:bg-blue-50 border-slate-200 hover:border-blue-300'
+                          : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100 border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      {letter}
+                      {hasPeople && (
+                        <span className="ml-1 text-xs">
+                          ({groupedResults[letter].length})
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+                
+                {selectedLetter && (
+                  <button
+                    onClick={clearLetterFilter}
+                    className="px-3 py-2 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-slate-200 hover:border-red-300"
+                  >
+                    Clear Filter
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Filter Indicator */}
+          {selectedLetter && (
+            <div className="px-6 py-3 bg-blue-50 border-b border-blue-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-blue-800">
+                    Showing people whose names start with "{selectedLetter}"
+                  </span>
+                  <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                    {filteredGroupedResults[selectedLetter]?.length || 0} people
+                  </span>
+                </div>
+                <button
+                  onClick={clearLetterFilter}
+                  className="text-sm text-blue-600 hover:text-blue-800 underline"
+                >
+                  Show all people
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Results Grid/List */}
           <div className="p-6">
-            {currentResults.length === 0 ? (
+            {filteredResults.length === 0 && !selectedLetter ? (
               <div className="text-center py-12">
                 <User className="h-12 w-12 text-slate-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-slate-900 mb-2">No people found</h3>
                 <p className="text-slate-500">Try adjusting your search criteria or filters</p>
               </div>
-            ) : (
+            ) : selectedLetter ? (
+              // Show filtered results for selected letter
+              <div className="space-y-8">
+                <div id={`section-${selectedLetter}`} className="space-y-4">
+                  {/* Section Header */}
+                  <div className="sticky top-0 bg-slate-50 border-b border-slate-200 py-3 px-4 rounded-t-lg">
+                    <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+                      <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                        {selectedLetter}
+                      </span>
+                      {selectedLetter}
+                      <span className="text-sm font-normal text-slate-500">
+                        ({currentResults.length} {currentResults.length === 1 ? 'person' : 'people'})
+                      </span>
+                    </h2>
+                  </div>
+                  
+                  {/* People in this section */}
+                  {currentResults.length > 0 ? (
               <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
                 {currentResults.map((person) => (
+                  <div
+                    key={person.id}
+                    className={`bg-white border border-slate-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer ${
+                      viewMode === 'list' ? 'flex items-center p-4' : 'p-6'
+                    }`}
+                    onClick={() => navigate(`/person-profile/${person.id}?source=search`)}
+                  >
+                    {viewMode === 'grid' ? (
+                      <>
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center">
+                              <User className="h-6 w-6 text-slate-600" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-slate-900">{person.name}</h3>
+                            </div>
+                          </div>
+                                <div className="text-right">
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    person.riskLevel === 'High' ? 'bg-red-100 text-red-800' :
+                                    person.riskLevel === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-green-100 text-green-800'
+                                  }`}>
+                            {person.riskLevel} Risk
+                          </span>
+                        </div>
+                              </div>
+                              
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                                  <span className="text-slate-500">Cases:</span>
+                                  <span className="font-medium">{person.cases}</span>
+                          </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-slate-500">Location:</span>
+                                  <span className="font-medium">{person.location}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-slate-500">Risk Score:</span>
+                                  <span className="font-medium">{person.riskScore}</span>
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-4">
+                                <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center">
+                                  <User className="h-5 w-5 text-slate-600" />
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="font-semibold text-slate-900">{person.name}</h3>
+                                  <p className="text-sm text-slate-500">{person.location}</p>
+                                </div>
+                                <div className="flex items-center gap-4 text-sm">
+                                  <span className="text-slate-500">{person.cases} cases</span>
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    person.riskLevel === 'High' ? 'bg-red-100 text-red-800' :
+                                    person.riskLevel === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-green-100 text-green-800'
+                                  }`}>
+                                    {person.riskLevel} Risk
+                                  </span>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-slate-500">
+                      <p>No people found starting with "{selectedLetter}"</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              // Show all people grouped by alphabet
+              <div className="space-y-8">
+                {alphabetSections.map((letter) => {
+                  const peopleInSection = filteredGroupedResults[letter] || [];
+                  
+                  return (
+                    <div key={letter} id={`section-${letter}`} className="space-y-4">
+                      {/* Section Header */}
+                      <div className="sticky top-0 bg-slate-50 border-b border-slate-200 py-3 px-4 rounded-t-lg">
+                        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+                          <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                            {letter}
+                          </span>
+                          {letter}
+                          <span className="text-sm font-normal text-slate-500">
+                            ({peopleInSection.length} {peopleInSection.length === 1 ? 'person' : 'people'})
+                          </span>
+                        </h2>
+                      </div>
+                      
+                      {/* People in this section */}
+                      {peopleInSection.length > 0 ? (
+                        <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+                          {peopleInSection.map((person) => (
                   <div
                     key={person.id}
                     className={`bg-white border border-slate-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer ${
@@ -921,10 +1344,6 @@ const People = () => {
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-slate-500">Date of Birth:</span>
-                            <span className="text-slate-900">{person.dob}</span>
-                          </div>
-                          <div className="flex justify-between text-sm">
                             <span className="text-slate-500">Cases:</span>
                             <span className="text-slate-900">{person.cases}</span>
                           </div>
@@ -949,10 +1368,6 @@ const People = () => {
                             <p className="text-sm text-slate-500">ID: {person.idNumber}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-slate-500">Date of Birth</p>
-                            <p className="text-slate-900">{person.dob}</p>
-                          </div>
-                          <div>
                             <p className="text-sm text-slate-500">Cases</p>
                             <p className="text-slate-900">{person.cases}</p>
                           </div>
@@ -974,31 +1389,61 @@ const People = () => {
                     )}
                   </div>
                 ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-slate-500">
+                          <p>No people found starting with "{letter}"</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-between">
+              <div className="mt-8">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-sm text-slate-500">
-                  Showing {startIndex + 1} to {endIndex} of {totalResults} results
+                    Showing {startIndex + 1} to {endIndex} of {totalResults} results
                 </div>
-                <div className="flex items-center gap-2">
+                  
+                  <div className="flex items-center gap-1 overflow-x-auto max-w-full">
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="flex items-center gap-1 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-1 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    Previous
+                      <span className="hidden sm:inline">Previous</span>
                   </button>
                   
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <div className="flex items-center gap-1 min-w-0">
+                      {/* Show first page */}
+                      {currentPage > 3 && (
+                        <>
+                          <button
+                            onClick={() => handlePageChange(1)}
+                            className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg"
+                          >
+                            1
+                          </button>
+                          {currentPage > 4 && <span className="px-2 text-slate-400">...</span>}
+                        </>
+                      )}
+                      
+                      {/* Show pages around current page */}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter(page => {
+                          return page >= Math.max(1, currentPage - 2) && 
+                                 page <= Math.min(totalPages, currentPage + 2);
+                        })
+                        .map((page) => (
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`px-3 py-2 text-sm rounded-lg ${
+                            className={`px-3 py-2 text-sm rounded-lg whitespace-nowrap ${
                           page === currentPage
                             ? 'bg-sky-600 text-white'
                             : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -1007,16 +1452,30 @@ const People = () => {
                         {page}
                       </button>
                     ))}
+                      
+                      {/* Show last page */}
+                      {currentPage < totalPages - 2 && (
+                        <>
+                          {currentPage < totalPages - 3 && <span className="px-2 text-slate-400">...</span>}
+                          <button
+                            onClick={() => handlePageChange(totalPages)}
+                            className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg"
+                          >
+                            {totalPages}
+                          </button>
+                        </>
+                      )}
                   </div>
                   
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="flex items-center gap-1 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-1 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                   >
-                    Next
+                      <span className="hidden sm:inline">Next</span>
                     <ChevronRight className="h-4 w-4" />
                   </button>
+                  </div>
                 </div>
               </div>
             )}
