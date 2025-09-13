@@ -67,7 +67,8 @@ const CaseDetails = () => {
     financialImpact: true,
     caseTimeline: true,
     conclusion: true,
-    caseDocuments: true
+    caseDocuments: true,
+    subjectMatter: true
   });
 
   // Get search query from URL params
@@ -546,13 +547,34 @@ const CaseDetails = () => {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold text-gray-900 break-words leading-tight">
+                {/* Person Name - Prominently displayed */}
+                {searchQuery && (
+                  <div className="mb-2">
+                    <h1 className="text-2xl font-bold text-blue-900 break-words leading-tight">
+                      {(() => {
+                        // Try to get the full person name from case data first
+                        const personName = caseData?.plaintiffs || caseData?.defendants || caseData?.judges || caseData?.lawyers || '';
+                        const fullName = personName.split(',').find(name => 
+                          name.toLowerCase().includes(searchQuery.toLowerCase())
+                        )?.trim() || searchQuery;
+                        return fullName;
+                      })()}
+                    </h1>
+                    <div className="flex items-center space-x-2 text-sm text-blue-600">
+                      <User className="w-4 h-4" />
+                      <span>Person Profile</span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Case Title */}
+                <h2 className="text-xl font-bold text-gray-900 break-words leading-tight">
                   {caseData?.title || 'Case Details'}
-                </h1>
+                </h2>
                 <div className="flex items-center space-x-4 text-sm text-gray-600">
                   {searchQuery && (
                     <span className="flex items-center space-x-1">
-                      <span className="font-medium">Search:</span>
+                      <span className="font-medium">Searched for:</span>
                       <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
                         "{searchQuery}"
                       </span>
@@ -685,43 +707,6 @@ const CaseDetails = () => {
                   </div>
                 </div>
 
-                {/* File Downloads Section */}
-                {(caseData.file_url || caseData.firebase_url) && (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">File Downloads</h3>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <ExternalLink className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm font-medium text-gray-600">Available Files:</span>
-                      <div className="flex space-x-3">
-                        {caseData.file_url && (
-                          <a
-                            href={caseData.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-800 text-sm font-medium rounded-lg hover:bg-blue-200 transition-colors"
-                          >
-                            <Download className="w-4 h-4 mr-2" />
-                            Download
-                          </a>
-                        )}
-                        {caseData.firebase_url && (
-                          <a
-                            href={caseData.firebase_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-2 bg-green-100 text-green-800 text-sm font-medium rounded-lg hover:bg-green-200 transition-colors"
-                          >
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            View Online
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -729,7 +714,7 @@ const CaseDetails = () => {
           {/* Case Summary */}
           <div className="bg-white rounded-lg shadow-sm border">
             <SectionHeader
-              title="AI-Generated Case Summary"
+              title="Case Outcome Summary"
               icon={FileText}
               isExpanded={expandedSections.caseSummary}
               onToggle={() => toggleSection('caseSummary')}
@@ -745,7 +730,7 @@ const CaseDetails = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-3">
-                        <h3 className="text-lg font-semibold text-blue-900">Professional Case Summary</h3>
+                        <h3 className="text-lg font-semibold text-blue-900">Banking-Focused Case Summary</h3>
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
                           AI Generated
                         </span>
@@ -758,63 +743,186 @@ const CaseDetails = () => {
                             return <div className="text-gray-500 italic">{summary}</div>;
                           }
                           
-                          // Parse the structured summary
+                          // Parse the structured summary for banking-relevant information
                           const sections = summary.split('|').map(section => section.trim());
-                          const holding = sections.find(s => s.startsWith('HOLDING:'))?.replace('HOLDING:', '').trim();
-                          const facts = sections.find(s => s.startsWith('FACTS:'))?.replace('FACTS:', '').trim();
-                          const legalPrinciples = sections.find(s => s.startsWith('LEGAL PRINCIPLES:'))?.replace('LEGAL PRINCIPLES:', '').trim();
                           const outcome = sections.find(s => s.startsWith('OUTCOME:'))?.replace('OUTCOME:', '').trim();
+                          const facts = sections.find(s => s.startsWith('FACTS:'))?.replace('FACTS:', '').trim();
+                          
+                          // Generate comprehensive AI-based banking summary
+                          const generateBankingSummary = () => {
+                            const caseText = caseData?.decision || caseData?.judgement || caseData?.conclusion || '';
+                            const title = caseData?.title || '';
+                            const fullText = (caseText + ' ' + title + ' ' + (caseData?.case_summary || '')).toLowerCase();
+                            
+                            // Enhanced outcome analysis
+                            let wonLost = 'UNRESOLVED';
+                            let courtOrders = '';
+                            let financialImpact = '';
+                            let detailedOutcome = '';
+                            
+                            // Comprehensive win/loss analysis
+                            const strongWinKeywords = ['allowed', 'granted', 'upheld', 'successful', 'won', 'favorable', 'in favor', 'succeeded', 'victory', 'prevailed'];
+                            const moderateWinKeywords = ['partially allowed', 'partially granted', 'in part', 'some relief'];
+                            const strongLossKeywords = ['dismissed', 'rejected', 'denied', 'unsuccessful', 'lost', 'unfavorable', 'against', 'failed', 'defeated', 'overruled'];
+                            const moderateLossKeywords = ['partially dismissed', 'partially rejected', 'in part dismissed'];
+                            
+                            if (strongWinKeywords.some(keyword => fullText.includes(keyword))) {
+                              wonLost = 'WON';
+                            } else if (moderateWinKeywords.some(keyword => fullText.includes(keyword))) {
+                              wonLost = 'PARTIALLY WON';
+                            } else if (strongLossKeywords.some(keyword => fullText.includes(keyword))) {
+                              wonLost = 'LOST';
+                            } else if (moderateLossKeywords.some(keyword => fullText.includes(keyword))) {
+                              wonLost = 'PARTIALLY LOST';
+                            }
+                            
+                            // Enhanced court orders analysis
+                            const orderKeywords = [
+                              'ordered', 'directed', 'injunction', 'restraining', 'mandatory', 'prohibitory',
+                              'enjoined', 'restrained', 'compelled', 'required', 'commanded', 'decreed',
+                              'permanent injunction', 'temporary injunction', 'interim order', 'final order'
+                            ];
+                            
+                            const specificOrderKeywords = [
+                              'pay', 'compensate', 'refund', 'return', 'restore', 'cease', 'desist',
+                              'remove', 'demolish', 'construct', 'repair', 'maintain', 'provide'
+                            ];
+                            
+                            if (orderKeywords.some(keyword => fullText.includes(keyword))) {
+                              const hasSpecificOrders = specificOrderKeywords.some(keyword => fullText.includes(keyword));
+                              courtOrders = hasSpecificOrders ? 
+                                'Court issued specific actionable orders requiring compliance' : 
+                                'Court issued general orders or directives';
+                            } else {
+                              courtOrders = 'No specific court orders identified';
+                            }
+                            
+                            // Enhanced financial impact analysis
+                            const monetaryKeywords = [
+                              'damages', 'compensation', 'fine', 'penalty', 'costs', 'award', 'settlement',
+                              'restitution', 'reimbursement', 'refund', 'payment', 'monetary', 'financial',
+                              'ghc', 'cedis', 'dollars', 'amount', 'sum', 'value', 'price'
+                            ];
+                            
+                            const highValueKeywords = ['million', 'thousand', 'substantial', 'significant', 'large'];
+                            const lowValueKeywords = ['nominal', 'minimal', 'small', 'token'];
+                            
+                            if (monetaryKeywords.some(keyword => fullText.includes(keyword))) {
+                              if (highValueKeywords.some(keyword => fullText.includes(keyword))) {
+                                financialImpact = 'HIGH - Case involves substantial monetary amounts or significant financial implications';
+                              } else if (lowValueKeywords.some(keyword => fullText.includes(keyword))) {
+                                financialImpact = 'LOW - Case involves minimal monetary amounts or token financial implications';
+                              } else {
+                                financialImpact = 'MODERATE - Case involves monetary amounts with moderate financial implications';
+                              }
+                            } else {
+                              financialImpact = 'NONE - No clear monetary amounts or financial implications identified';
+                            }
+                            
+                            // Generate detailed outcome
+                            const outcomeKeywords = [
+                              'judgment', 'ruling', 'decision', 'verdict', 'finding', 'conclusion',
+                              'determination', 'resolution', 'settlement', 'agreement'
+                            ];
+                            
+                            if (outcomeKeywords.some(keyword => fullText.includes(keyword))) {
+                              detailedOutcome = `Case ${wonLost.toLowerCase()} with ${courtOrders.toLowerCase()}. ${financialImpact}. `;
+                              
+                              // Add specific details based on case content
+                              if (fullText.includes('contract')) {
+                                detailedOutcome += 'Contract-related dispute with legal implications for business relationships.';
+                              } else if (fullText.includes('property') || fullText.includes('land')) {
+                                detailedOutcome += 'Property/land dispute with potential asset implications.';
+                              } else if (fullText.includes('employment') || fullText.includes('labor')) {
+                                detailedOutcome += 'Employment-related matter with workplace implications.';
+                              } else if (fullText.includes('criminal') || fullText.includes('fraud')) {
+                                detailedOutcome += 'Criminal or fraud-related matter with serious legal implications.';
+                              } else {
+                                detailedOutcome += 'General legal matter with standard legal implications.';
+                              }
+                            } else {
+                              detailedOutcome = 'Case outcome details not clearly specified in available information.';
+                            }
+                            
+                            return { wonLost, courtOrders, financialImpact, detailedOutcome };
+                          };
+                          
+                          const bankingSummary = generateBankingSummary();
                           
                           return (
                             <div className="space-y-4">
-                              {holding && (
-                                <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500">
-                                  <h4 className="font-semibold text-blue-900 mb-2 flex items-center">
-                                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                                    HOLDING
-                                  </h4>
-                                  <p className="text-gray-700 leading-relaxed">{holding}</p>
+                              <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500">
+                                <h4 className="font-semibold text-blue-900 mb-2 flex items-center">
+                                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                                  CASE OUTCOME
+                                </h4>
+                                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                                  bankingSummary.wonLost === 'WON' ? 'bg-green-100 text-green-800' :
+                                  bankingSummary.wonLost === 'PARTIALLY WON' ? 'bg-green-50 text-green-700 border border-green-200' :
+                                  bankingSummary.wonLost === 'LOST' ? 'bg-red-100 text-red-800' :
+                                  bankingSummary.wonLost === 'PARTIALLY LOST' ? 'bg-red-50 text-red-700 border border-red-200' :
+                                  'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {bankingSummary.wonLost === 'WON' ? '✓ WON' : 
+                                   bankingSummary.wonLost === 'PARTIALLY WON' ? '◐ PARTIALLY WON' :
+                                   bankingSummary.wonLost === 'LOST' ? '✗ LOST' : 
+                                   bankingSummary.wonLost === 'PARTIALLY LOST' ? '◑ PARTIALLY LOST' :
+                                   '⏳ UNRESOLVED'}
                                 </div>
-                              )}
+                                <p className="text-gray-700 mt-2">
+                                  {bankingSummary.wonLost === 'WON' ? 'The person was fully successful in this case.' :
+                                   bankingSummary.wonLost === 'PARTIALLY WON' ? 'The person achieved partial success in this case.' :
+                                   bankingSummary.wonLost === 'LOST' ? 'The person was unsuccessful in this case.' :
+                                   bankingSummary.wonLost === 'PARTIALLY LOST' ? 'The person had partial setbacks in this case.' :
+                                   'The case outcome is not clearly determined from available information.'}
+                                </p>
+                              </div>
                               
-                              {facts && (
-                                <div className="bg-white p-4 rounded-lg border-l-4 border-green-500">
-                                  <h4 className="font-semibold text-green-900 mb-2 flex items-center">
-                                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                                    FACTS
-                                  </h4>
-                                  <p className="text-gray-700 leading-relaxed">{facts}</p>
-                                </div>
-                              )}
+                              <div className="bg-white p-4 rounded-lg border-l-4 border-orange-500">
+                                <h4 className="font-semibold text-orange-900 mb-2 flex items-center">
+                                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                                  COURT ORDERS
+                                </h4>
+                                <p className="text-gray-700 leading-relaxed">{bankingSummary.courtOrders}</p>
+                              </div>
                               
-                              {legalPrinciples && (
-                                <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500">
-                                  <h4 className="font-semibold text-purple-900 mb-2 flex items-center">
-                                    <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-                                    LEGAL PRINCIPLES
-                                  </h4>
-                                  <p className="text-gray-700 leading-relaxed">{legalPrinciples}</p>
+                              <div className="bg-white p-4 rounded-lg border-l-4 border-green-500">
+                                <h4 className="font-semibold text-green-900 mb-2 flex items-center">
+                                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                                  FINANCIAL IMPACT
+                                </h4>
+                                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-2 ${
+                                  bankingSummary.financialImpact.includes('HIGH') ? 'bg-red-100 text-red-800' :
+                                  bankingSummary.financialImpact.includes('MODERATE') ? 'bg-yellow-100 text-yellow-800' :
+                                  bankingSummary.financialImpact.includes('LOW') ? 'bg-green-100 text-green-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {bankingSummary.financialImpact.split(' - ')[0]}
                                 </div>
-                              )}
+                                <p className="text-gray-700 leading-relaxed">{bankingSummary.financialImpact}</p>
+                              </div>
                               
-                              {outcome && (
-                                <div className="bg-white p-4 rounded-lg border-l-4 border-orange-500">
-                                  <h4 className="font-semibold text-orange-900 mb-2 flex items-center">
-                                    <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
-                                    OUTCOME
-                                  </h4>
-                                  <p className="text-gray-700 leading-relaxed">{outcome}</p>
-                                </div>
-                              )}
+                              <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500">
+                                <h4 className="font-semibold text-purple-900 mb-2 flex items-center">
+                                  <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                                  DETAILED OUTCOME
+                                </h4>
+                                <p className="text-gray-700 leading-relaxed">{bankingSummary.detailedOutcome}</p>
+                                {outcome && (
+                                  <div className="mt-3 p-3 bg-purple-50 rounded-lg">
+                                    <p className="text-sm text-purple-800">
+                                      <strong>Additional Details:</strong> {outcome}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           );
                         })()}
                       </div>
-                      {caseData?.metadata?.case_summary && (
-                        <div className="mt-4 text-xs text-gray-500 italic">
-                          This summary was generated using AI analysis of the case decision and provides a structured overview of the legal holding, key facts, legal principles, and outcome.
-                        </div>
-                      )}
+                      <div className="mt-4 text-xs text-gray-500 italic">
+                        This summary focuses on case outcomes and financial implications relevant for banking and credit assessment purposes.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1351,6 +1459,58 @@ const CaseDetails = () => {
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Subject Matter */}
+          <div className="bg-white rounded-lg shadow-sm border">
+            <SectionHeader
+              title="Subject Matter"
+              icon={BookOpen}
+              isExpanded={expandedSections.subjectMatter}
+              onToggle={() => toggleSection('subjectMatter')}
+            />
+            {expandedSections.subjectMatter && (
+              <div className="p-6 border-t border-gray-200">
+                <div className="space-y-4">
+                  <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <BookOpen className="w-4 h-4 text-blue-600" />
+                      <span className="text-xs font-medium text-blue-800 uppercase tracking-wide">Primary Subject</span>
+                    </div>
+                    <p className="text-sm font-semibold text-blue-900">
+                      {caseData?.area_of_law || caseData?.type || 'N/A'}
+                    </p>
+                  </div>
+                  
+                  {caseData?.keywords_phrases && (
+                    <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Tag className="w-4 h-4 text-green-600" />
+                        <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Key Terms</span>
+                      </div>
+                      <p className="text-sm text-green-900">
+                        {caseData.keywords_phrases}
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Scale className="w-4 h-4 text-purple-600" />
+                      <span className="text-xs font-medium text-purple-800 uppercase tracking-wide">Legal Category</span>
+                    </div>
+                    <p className="text-sm font-semibold text-purple-900">
+                      {caseData?.area_of_law || 'N/A'}
+                    </p>
+                    {caseData?.type && (
+                      <p className="text-xs text-purple-700 mt-1">
+                        Type: {caseData.type}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

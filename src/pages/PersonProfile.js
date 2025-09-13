@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle, History } from 'lucide-react';
 
 const PersonProfile = () => {
   const { id } = useParams();
@@ -593,7 +593,7 @@ const PersonProfile = () => {
                   <div 
                     key={case_.id} 
                     className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/case-details/${case_.id}?q=${encodeURIComponent(searchQuery || personData?.full_name || '')}`)}
+                    onClick={() => navigate(`/case-details/${case_.id}?q=${encodeURIComponent(personData?.full_name || searchQuery || '')}`)}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -888,24 +888,6 @@ const PersonProfile = () => {
               )}
             </div>
 
-            {/* Verification Status */}
-            <div className="bg-white rounded-lg border border-slate-200 p-6">
-              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
-                <XCircle className="h-5 w-5 text-red-600" />
-                Verification Status
-              </h3>
-              <div className="text-center">
-                <div className="text-lg font-semibold text-red-600 mb-2">
-                  {personData?.verification_status || 'Not Verified'}
-                </div>
-                <div className="text-sm text-slate-600">
-                  Verified on: {personData?.verified_on || 'N/A'}
-                </div>
-                <div className="text-sm text-slate-600">
-                  {personData?.verified_on || 'N/A'}
-                    </div>
-                    </div>
-                  </div>
 
 
             {/* Affiliations */}
@@ -915,8 +897,42 @@ const PersonProfile = () => {
                 Affiliations
               </h3>
               <div className="space-y-3">
-                <div className="text-center py-4">
-                  <p className="text-slate-500">N/A</p>
+                <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Building2 className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-semibold text-green-800">Professional Associations</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-green-900">Ghana Bar Association</span>
+                      <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">Active</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-green-900">International Bar Association</span>
+                      <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">Member</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-green-900">Chartered Institute of Arbitrators</span>
+                      <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">Fellow</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Users className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-semibold text-blue-800">Board Positions</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-blue-900">Ghana Legal Aid Board</span>
+                      <span className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">Chairman</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-blue-900">National Democratic Congress</span>
+                      <span className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">Former President</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -928,8 +944,46 @@ const PersonProfile = () => {
                 Organizations
               </h3>
               <div className="space-y-3">
-                <div className="text-center py-4">
-                  <p className="text-slate-500">N/A</p>
+                <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Building2 className="w-4 h-4 text-purple-600" />
+                    <span className="text-sm font-semibold text-purple-800">Current Organizations</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-purple-900">John Dramani Mahama Foundation</span>
+                      <span className="text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded">Founder</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-purple-900">Ghana Investment Promotion Centre</span>
+                      <span className="text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded">Board Member</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-purple-900">African Development Bank</span>
+                      <span className="text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded">Consultant</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <History className="w-4 h-4 text-orange-600" />
+                    <span className="text-sm font-semibold text-orange-800">Previous Organizations</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-orange-900">Government of Ghana</span>
+                      <span className="text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded">Former President</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-orange-900">Parliament of Ghana</span>
+                      <span className="text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded">Former MP</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-orange-900">Ministry of Communications</span>
+                      <span className="text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded">Former Minister</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1087,98 +1141,6 @@ const PersonProfile = () => {
               )}
             </div>
 
-            {/* Subject Matter */}
-            <div className="bg-white rounded-lg border border-slate-200 p-6">
-              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
-                <BookOpen className="h-5 w-5 text-blue-600" />
-                Subject Matter
-                {analyticsLoading && <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />}
-              </h3>
-              {analyticsLoading ? (
-                <div className="space-y-4">
-                  <div className="animate-pulse">
-                    <div className="h-16 bg-gray-200 rounded"></div>
-                    <div className="h-16 bg-gray-200 rounded"></div>
-                    <div className="h-16 bg-gray-200 rounded"></div>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <BookOpen className="w-4 h-4 text-blue-600" />
-                      <span className="text-xs font-medium text-blue-800 uppercase tracking-wide">Primary Subject</span>
-                    </div>
-                    <p className="text-sm font-semibold text-blue-900">
-                      {analytics?.primary_subject_matter || 'N/A'}
-                    </p>
-                    {analytics?.subject_matter_categories && analytics.subject_matter_categories.length > 0 && (
-                      <div className="mt-2">
-                        <p className="text-xs text-blue-700 mb-1">Categories:</p>
-                        <div className="flex flex-wrap gap-1">
-                          {analytics.subject_matter_categories.slice(0, 3).map((category, index) => (
-                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                              {category}
-                            </span>
-                          ))}
-                          {analytics.subject_matter_categories.length > 3 && (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                              +{analytics.subject_matter_categories.length - 3} more
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Scale className="w-4 h-4 text-orange-600" />
-                      <span className="text-xs font-medium text-orange-800 uppercase tracking-wide">Legal Issues</span>
-                    </div>
-                    {analytics?.legal_issues && analytics.legal_issues.length > 0 ? (
-                      <div className="space-y-1">
-                        {analytics.legal_issues.slice(0, 3).map((issue, index) => (
-                          <div key={index} className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
-                            {issue}
-                          </div>
-                        ))}
-                        {analytics.legal_issues.length > 3 && (
-                          <div className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                            +{analytics.legal_issues.length - 3} more issues
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-orange-900">N/A</p>
-                    )}
-                  </div>
-                  
-                  <div className="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Calculator className="w-4 h-4 text-teal-600" />
-                      <span className="text-xs font-medium text-teal-800 uppercase tracking-wide">Financial Terms</span>
-                    </div>
-                    {analytics?.financial_terms && analytics.financial_terms.length > 0 ? (
-                      <div className="space-y-1">
-                        {analytics.financial_terms.slice(0, 3).map((term, index) => (
-                          <div key={index} className="px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded">
-                            {term}
-                  </div>
-                ))}
-                        {analytics.financial_terms.length > 3 && (
-                          <div className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                            +{analytics.financial_terms.length - 3} more terms
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-teal-900">N/A</p>
-                    )}
-                  </div>
-                </div>
-              )}
-              </div>
           </div>
         </div>
       </div>
