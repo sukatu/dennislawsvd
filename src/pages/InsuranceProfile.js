@@ -23,6 +23,7 @@ import {
   AlertTriangle,
   Building2
 } from 'lucide-react';
+import RequestDetailsModal from '../components/RequestDetailsModal';
 
 const InsuranceProfile = () => {
   const { id } = useParams();
@@ -38,6 +39,9 @@ const InsuranceProfile = () => {
     cases: true,
     analytics: true
   });
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [selectedCase, setSelectedCase] = useState(null);
+  const [showProfileRequestModal, setShowProfileRequestModal] = useState(false);
 
   const searchQuery = new URLSearchParams(location.search).get('q') || '';
 
@@ -129,6 +133,17 @@ const InsuranceProfile = () => {
       <span className="text-sm text-gray-900">{value || 'N/A'}</span>
     </div>
   );
+
+  // Handle request details modal
+  const handleRequestDetails = (caseItem) => {
+    setSelectedCase(caseItem);
+    setShowRequestModal(true);
+  };
+
+  // Handle profile request modal
+  const handleProfileRequest = () => {
+    setShowProfileRequestModal(true);
+  };
 
   const ArrayDisplay = ({ label, items, icon: Icon }) => (
     <div className="py-2">
@@ -236,6 +251,14 @@ const InsuranceProfile = () => {
                   Insurance Company
                 </p>
               </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleProfileRequest}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Request Profile Information
+              </button>
             </div>
           </div>
         </div>
@@ -475,6 +498,25 @@ const InsuranceProfile = () => {
           </div>
         </div>
       </div>
+
+      {/* Request Details Modal */}
+      <RequestDetailsModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+        caseData={selectedCase}
+        entityType="Insurance"
+        entityName={insuranceData?.name}
+      />
+
+      {/* Profile Request Modal */}
+      <RequestDetailsModal
+        isOpen={showProfileRequestModal}
+        onClose={() => setShowProfileRequestModal(false)}
+        caseData={null}
+        entityType="Insurance"
+        entityName={insuranceData?.name}
+        isProfileRequest={true}
+      />
     </div>
   );
 };

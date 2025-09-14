@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle, History, Download, MapPin, Globe } from 'lucide-react';
+import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle, History, MapPin, Globe } from 'lucide-react';
+import RequestDetailsModal from '../components/RequestDetailsModal';
 
 const BankDetail = () => {
   const { id } = useParams();
@@ -22,6 +23,9 @@ const BankDetail = () => {
   const [caseSortOrder, setCaseSortOrder] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [casesPerPage] = useState(10);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [selectedCase, setSelectedCase] = useState(null);
+  const [showProfileRequestModal, setShowProfileRequestModal] = useState(false);
 
   // Bank logo mapping
   const bankLogoMap = {
@@ -369,6 +373,17 @@ const BankDetail = () => {
     return filtered;
   };
 
+  // Handle request details modal
+  const handleRequestDetails = (caseItem) => {
+    setSelectedCase(caseItem);
+    setShowRequestModal(true);
+  };
+
+  // Handle profile request modal
+  const handleProfileRequest = () => {
+    setShowProfileRequestModal(true);
+  };
+
   // Update filtered cases when search query, sort options, or related cases change
   useEffect(() => {
     const filtered = filterAndSortCases(relatedCases, caseSearchQuery, caseSortBy, caseSortOrder);
@@ -477,13 +492,14 @@ const BankDetail = () => {
                 <div>
                   <h1 className="text-lg font-semibold text-slate-900">{bankData.name}</h1>
                   <p className="text-sm text-slate-500">{bankData.status}</p>
-        </div>
       </div>
             </div>
             <div className="flex items-center gap-3">
-              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
-                <Download className="h-4 w-4" />
-                Export
+              <button
+                onClick={handleProfileRequest}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Request Profile Information
               </button>
             </div>
           </div>
@@ -560,22 +576,198 @@ const BankDetail = () => {
                     
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <div className="flex items-center space-x-2 mb-1">
-                        <Globe className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Website</span>
-                      </div>
+                      <Globe className="w-4 h-4 text-gray-600" />
+                      <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Website</span>
+                </div>
                     <a href={bankData.website} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-blue-600 hover:text-blue-800">
                       {bankData.website}
                     </a>
+                </div>
+                </div>
+                </div>
+                </div>
+
+            {/* Previous Names */}
+            {bankData.previousNames && bankData.previousNames.length > 0 && (
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                  <History className="h-5 w-5 text-purple-600" />
+                    Previous Names
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {bankData.previousNames.map((name, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                    >
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Affiliations */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <Building2 className="h-5 w-5 text-green-600" />
+                Affiliations
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <Building2 className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">Ghana Association of Bankers</p>
+                        <p className="text-xs text-slate-600">Member since 2010</p>
+                          </div>
+                      </div>
+                    <span className="text-xs text-green-600 font-medium">Active</span>
                     </div>
-                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Shield className="w-4 h-4 text-blue-600" />
+              </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">Bank of Ghana</p>
+                        <p className="text-xs text-slate-600">Licensed Commercial Bank</p>
                       </div>
                     </div>
+                    <span className="text-xs text-blue-600 font-medium">Licensed</span>
+                  </div>
+                    </div>
+                    
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                        <Star className="w-4 h-4 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">Ghana Stock Exchange</p>
+                        <p className="text-xs text-slate-600">Listed Company</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-amber-600 font-medium">Listed</span>
+                    </div>
+                    
+                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                        <Users className="w-4 h-4 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">International Banking Association</p>
+                        <p className="text-xs text-slate-600">Member since 2015</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-purple-600 font-medium">Member</span>
+                  </div>
+                </div>
+                    </div>
+                  </div>
+                  
+            {/* Financial Risk Profile */}
+            {analytics && (
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                  Financial Risk Profile
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <div className="relative w-32 h-32 mx-auto mb-4">
+                        <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                          <circle
+                            cx="50"
+                            cy="50"
+                            r="40"
+                            stroke="#e5e7eb"
+                            strokeWidth="8"
+                            fill="none"
+                          />
+                          <circle
+                            cx="50"
+                            cy="50"
+                            r="40"
+                            stroke={analytics.risk_score <= 30 ? '#10b981' : analytics.risk_score <= 70 ? '#f59e0b' : '#ef4444'}
+                            strokeWidth="8"
+                            fill="none"
+                            strokeDasharray={`${(analytics.risk_score / 100) * 251.2} 251.2`}
+                            className="transition-all duration-1000 ease-out"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className={`text-3xl font-bold ${getRiskScoreColor(analytics.risk_score)}`}>
+                            {analytics.risk_score}
+                          </span>
+                      </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className={`text-xl font-semibold ${getRiskScoreColor(analytics.risk_score)}`}>
+                          {analytics.risk_level} Risk
+                        </p>
+                        <p className="text-sm text-slate-600">Financial Risk Score</p>
+                      </div>
+                    </div>
+                    </div>
+                    
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-700 mb-3">Risk Assessment Details</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-600">Credit Risk:</span>
+                          <span className="font-semibold text-slate-900">{analytics.credit_risk || 'N/A'}</span>
+                      </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-600">Market Risk:</span>
+                          <span className="font-semibold text-slate-900">{analytics.market_risk || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-600">Operational Risk:</span>
+                          <span className="font-semibold text-slate-900">{analytics.operational_risk || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-600">Liquidity Risk:</span>
+                          <span className="font-semibold text-slate-900">{analytics.liquidity_risk || 'N/A'}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {analytics.risk_factors && analytics.risk_factors.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium text-slate-700 mb-2">Key Risk Factors</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {analytics.risk_factors.slice(0, 6).map((factor, index) => (
+                            <span key={index} className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">
+                              {factor}
+                            </span>
+                          ))}
+                          {analytics.risk_factors.length > 6 && (
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                              +{analytics.risk_factors.length - 6} more
+                            </span>
+                          )}
+                      </div>
+                      </div>
+                    )}
+                    </div>
+                  </div>
+                </div>
+              )}
                     
             {/* Tabs */}
             <div className="bg-white rounded-lg border border-slate-200">
               <div className="border-b border-slate-200">
                 <nav className="flex space-x-8 px-6" aria-label="Tabs">
-                  {['manager', 'board', 'secretaries', 'cases'].map((tab) => (
+                  {['manager', 'board', 'secretaries', 'auditors', 'capital', 'shareholders'].map((tab) => (
                 <button
                       key={tab}
                       className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
@@ -585,7 +777,11 @@ const BankDetail = () => {
                       }`}
                       onClick={() => setActiveTab(tab)}
                     >
-                      {tab}
+                      {tab === 'board' ? 'Board of Directors' : 
+                       tab === 'secretaries' ? 'Secretaries' :
+                       tab === 'auditors' ? 'Auditors' :
+                       tab === 'capital' ? 'Capital Details' :
+                       tab === 'shareholders' ? 'Shareholders' : tab}
                 </button>
                   ))}
                 </nav>
@@ -621,7 +817,7 @@ const BankDetail = () => {
               )}
                       
                 {activeTab === 'board' && (
-                <div>
+                      <div>
                     <h3 className="text-lg font-semibold text-slate-900 mb-4">Board of Directors</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {managementData.map((member) => (
@@ -644,8 +840,8 @@ const BankDetail = () => {
                     </div>
                   </div>
                         ))}
-                </div>
-                    
+                      </div>
+                      
                     {/* Board Committees */}
                     <div className="mt-8">
                       <h4 className="text-lg font-semibold text-slate-900 mb-4">Board Committees</h4>
@@ -708,7 +904,7 @@ const BankDetail = () => {
                               <span className="text-green-600 font-semibold text-xs">
                                 {secretary.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
                               </span>
-              </div>
+                </div>
                             <div className="flex-1">
                               <h4 className="font-semibold text-gray-900 mb-1">{secretary.name}</h4>
                               <p className="text-sm font-medium text-green-600 mb-2">{secretary.position}</p>
@@ -716,13 +912,13 @@ const BankDetail = () => {
                                 <p><span className="font-medium">Experience:</span> {secretary.experience}</p>
                                 <p><span className="font-medium">Background:</span> {secretary.background}</p>
                                 <p><span className="font-medium">Qualifications:</span> {secretary.qualifications}</p>
-                              </div>
-                            </div>
+                      </div>
+                    </div>
               </div>
                               </div>
                   ))}
-                            </div>
-                            
+                    </div>
+                    
                     {/* Secretary Responsibilities */}
                     <div className="mt-6 bg-green-50 rounded-lg p-6">
                       <h5 className="text-lg font-semibold text-gray-900 mb-4">Secretarial Functions</h5>
@@ -748,48 +944,460 @@ const BankDetail = () => {
                     </div>
                   )}
 
-                {activeTab === 'cases' && (
+                {activeTab === 'auditors' && (
+                <div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-4">External Auditors</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {[
+                        { 
+                          name: 'PricewaterhouseCoopers', 
+                          position: 'Principal Auditor', 
+                          experience: '15 years with the bank',
+                          background: 'Big 4 accounting firm with extensive banking experience',
+                          qualifications: 'Chartered Accountant, ICAG',
+                          tenure: '2015 - Present',
+                          firm: 'PwC Ghana',
+                          license: 'ICAG-001234'
+                        },
+                        { 
+                          name: 'Ernst & Young', 
+                          position: 'Secondary Auditor', 
+                          experience: '8 years with the bank',
+                          background: 'International accounting firm specializing in financial services',
+                          qualifications: 'Chartered Accountant, ICAG',
+                          tenure: '2018 - Present',
+                          firm: 'EY Ghana',
+                          license: 'ICAG-005678'
+                        },
+                        { 
+                          name: 'KPMG', 
+                          position: 'Tax Advisory Auditor', 
+                          experience: '5 years with the bank',
+                          background: 'Specialized in tax compliance and advisory services',
+                          qualifications: 'Chartered Accountant, ICAG, CTA',
+                          tenure: '2020 - Present',
+                          firm: 'KPMG Ghana',
+                          license: 'ICAG-009876'
+                        }
+                      ].map((auditor, index) => (
+                        <div key={index} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                              <span className="text-green-600 font-semibold text-xs">
+                                {auditor.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                              </span>
+                </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 mb-1">{auditor.name}</h4>
+                              <p className="text-sm font-medium text-green-600 mb-2">{auditor.position}</p>
+                              <div className="space-y-1 text-xs text-gray-600">
+                                <p><span className="font-medium">Experience:</span> {auditor.experience}</p>
+                                <p><span className="font-medium">Background:</span> {auditor.background}</p>
+                                <p><span className="font-medium">Qualifications:</span> {auditor.qualifications}</p>
+                                <p><span className="font-medium">Tenure:</span> {auditor.tenure}</p>
+                                <p><span className="font-medium">Firm:</span> {auditor.firm}</p>
+                                <p><span className="font-medium">License:</span> {auditor.license}</p>
+                        </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      </div>
+                      
+                    {/* Audit Scope & Responsibilities */}
+                    <div className="mt-6 bg-green-50 rounded-lg p-6">
+                      <h5 className="text-lg font-semibold text-gray-900 mb-4">Audit Scope & Responsibilities</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg p-4">
+                          <h6 className="font-medium text-gray-900 mb-2">Financial Audit</h6>
+                          <p className="text-sm text-gray-600">Annual financial statement audit, internal control assessment, and regulatory compliance verification</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <h6 className="font-medium text-gray-900 mb-2">Risk Assessment</h6>
+                          <p className="text-sm text-gray-600">Evaluation of risk management frameworks, operational risk assessment, and compliance monitoring</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <h6 className="font-medium text-gray-900 mb-2">Regulatory Reporting</h6>
+                          <p className="text-sm text-gray-600">Preparation of regulatory reports, Bank of Ghana compliance verification, and statutory filings</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <h6 className="font-medium text-gray-900 mb-2">Tax Compliance</h6>
+                          <p className="text-sm text-gray-600">Tax return preparation, tax planning advisory, and GRA compliance verification</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Recent Audit Reports */}
+                    <div className="mt-6">
+                      <h5 className="text-lg font-semibold text-gray-900 mb-4">Recent Audit Reports</h5>
+                      <div className="space-y-3">
+                        <div className="bg-white border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                <div>
+                              <h6 className="font-medium text-gray-900">Annual Audit Report 2023</h6>
+                              <p className="text-sm text-gray-600">Financial Year 2023 - Complete Audit</p>
+                </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                                Clean Opinion
+                              </span>
+                              <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Report
+                              </button>
+                        </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h6 className="font-medium text-gray-900">Interim Review Q3 2024</h6>
+                              <p className="text-sm text-gray-600">Third Quarter 2024 - Interim Review</p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                                Satisfactory
+                              </span>
+                              <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Report
+                              </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                        <div className="bg-white border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                <div>
+                              <h6 className="font-medium text-gray-900">Compliance Audit 2024</h6>
+                              <p className="text-sm text-gray-600">Regulatory Compliance Assessment</p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full font-medium">
+                                Minor Issues
+                          </span>
+                              <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Report
+                              </button>
+                </div>
+              </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              )}
+
+                {activeTab === 'capital' && (
                   <div>
-                    {/* Header */}
+                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Capital Structure & Details</h3>
+                    
+                    {/* Capital Overview */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                      <div className="bg-blue-50 rounded-lg p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span className="text-blue-600 font-semibold text-sm">AC</span>
+                          </div>
+                          <span className="text-sm font-medium text-blue-800">Authorized Capital</span>
+                        </div>
+                        <p className="text-2xl font-bold text-blue-900">GH₵ 2.5B</p>
+                        <p className="text-xs text-blue-700">2,500,000,000 shares</p>
+                </div>
+
+                      <div className="bg-green-50 rounded-lg p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <span className="text-green-600 font-semibold text-sm">IC</span>
+                      </div>
+                          <span className="text-sm font-medium text-green-800">Issued Capital</span>
+                        </div>
+                        <p className="text-2xl font-bold text-green-900">GH₵ 1.8B</p>
+                        <p className="text-xs text-green-700">1,800,000,000 shares</p>
+              </div>
+
+                      <div className="bg-purple-50 rounded-lg p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                            <span className="text-purple-600 font-semibold text-sm">PC</span>
+                      </div>
+                          <span className="text-sm font-medium text-purple-800">Paid-up Capital</span>
+                    </div>
+                        <p className="text-2xl font-bold text-purple-900">GH₵ 1.2B</p>
+                        <p className="text-xs text-purple-700">1,200,000,000 shares</p>
+                  </div>
+                  
+                      <div className="bg-amber-50 rounded-lg p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                            <span className="text-amber-600 font-semibold text-sm">RC</span>
+                          </div>
+                          <span className="text-sm font-medium text-amber-800">Reserve Capital</span>
+                        </div>
+                        <p className="text-2xl font-bold text-amber-900">GH₵ 600M</p>
+                        <p className="text-xs text-amber-700">600,000,000 shares</p>
+                      </div>
+                    </div>
+
+                    {/* Share Details */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                      <div className="bg-white border border-slate-200 rounded-lg p-6">
+                        <h4 className="text-lg font-semibold text-slate-900 mb-4">Share Class Details</h4>
+                  <div className="space-y-4">
+                          <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-sm font-medium text-slate-600">Ordinary Shares</span>
+                            <span className="text-sm font-semibold text-slate-900">1,200,000,000</span>
+                      </div>
+                          <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-sm font-medium text-slate-600">Preference Shares</span>
+                            <span className="text-sm font-semibold text-slate-900">300,000,000</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-sm font-medium text-slate-600">Treasury Shares</span>
+                            <span className="text-sm font-semibold text-slate-900">50,000,000</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2">
+                            <span className="text-sm font-medium text-slate-600">Unissued Shares</span>
+                            <span className="text-sm font-semibold text-slate-900">950,000,000</span>
+                          </div>
+                        </div>
+                    </div>
+                    
+                      <div className="bg-white border border-slate-200 rounded-lg p-6">
+                        <h4 className="text-lg font-semibold text-slate-900 mb-4">Financial Ratios</h4>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-sm font-medium text-slate-600">Capital Adequacy Ratio</span>
+                            <span className="text-sm font-semibold text-green-600">18.5%</span>
+                      </div>
+                          <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-sm font-medium text-slate-600">Tier 1 Capital Ratio</span>
+                            <span className="text-sm font-semibold text-green-600">15.2%</span>
+                    </div>
+                          <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-sm font-medium text-slate-600">Leverage Ratio</span>
+                            <span className="text-sm font-semibold text-blue-600">8.3%</span>
+                  </div>
+                          <div className="flex justify-between items-center py-2">
+                            <span className="text-sm font-medium text-slate-600">Return on Equity</span>
+                            <span className="text-sm font-semibold text-purple-600">12.8%</span>
+                </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Capital History */}
+                    <div className="bg-white border border-slate-200 rounded-lg p-6">
+                      <h4 className="text-lg font-semibold text-slate-900 mb-4">Capital History & Changes</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-slate-900">Capital Increase</p>
+                            <p className="text-sm text-slate-600">March 2023 - Rights Issue</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-green-600">+GH₵ 200M</p>
+                            <p className="text-xs text-slate-500">200M new shares</p>
+                          </div>
+              </div>
+              
+                        <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-slate-900">Bonus Issue</p>
+                            <p className="text-sm text-slate-600">September 2022 - 1:5 Bonus</p>
+                        </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-blue-600">+GH₵ 150M</p>
+                            <p className="text-xs text-slate-500">150M bonus shares</p>
+                              </div>
+                            </div>
+                        
+                        <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-slate-900">Share Buyback</p>
+                            <p className="text-sm text-slate-600">December 2021 - Treasury Shares</p>
+              </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-purple-600">-GH₵ 50M</p>
+                            <p className="text-xs text-slate-500">50M treasury shares</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'shareholders' && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Major Shareholders</h3>
+                    
+                    {/* Shareholder Overview */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div className="bg-blue-50 rounded-lg p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span className="text-blue-600 font-semibold text-sm">TS</span>
+                              </div>
+                          <span className="text-sm font-medium text-blue-800">Total Shares</span>
+                        </div>
+                        <p className="text-2xl font-bold text-blue-900">1.8B</p>
+                        <p className="text-xs text-blue-700">Outstanding shares</p>
+                            </div>
+                            
+                      <div className="bg-green-50 rounded-lg p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <span className="text-green-600 font-semibold text-sm">FS</span>
+                              </div>
+                          <span className="text-sm font-medium text-green-800">Free Float</span>
+                              </div>
+                        <p className="text-2xl font-bold text-green-900">65%</p>
+                        <p className="text-xs text-green-700">Publicly traded</p>
+                      </div>
+                      
+                      <div className="bg-purple-50 rounded-lg p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                            <span className="text-purple-600 font-semibold text-sm">IS</span>
+                          </div>
+                          <span className="text-sm font-medium text-purple-800">Institutional</span>
+                        </div>
+                        <p className="text-2xl font-bold text-purple-900">35%</p>
+                        <p className="text-xs text-purple-700">Institutional holdings</p>
+                            </div>
+                          </div>
+                          
+                    {/* Major Shareholders List */}
+                    <div className="space-y-4 mb-6">
+                      <h4 className="text-lg font-semibold text-slate-900">Top 10 Shareholders</h4>
+                      <div className="space-y-3">
+                        {[
+                          { name: 'Ghana Government', percentage: 25.5, shares: '459M', type: 'Government', change: '+2.1%' },
+                          { name: 'Pension Fund Trustees', percentage: 18.2, shares: '328M', type: 'Institutional', change: '+0.8%' },
+                          { name: 'International Finance Corp', percentage: 12.8, shares: '230M', type: 'International', change: '0.0%' },
+                          { name: 'Ecobank Transnational', percentage: 8.5, shares: '153M', type: 'Corporate', change: '-1.2%' },
+                          { name: 'Stanbic Investment', percentage: 6.2, shares: '112M', type: 'Institutional', change: '+0.5%' },
+                          { name: 'Goldman Sachs', percentage: 4.8, shares: '86M', type: 'International', change: '+0.3%' },
+                          { name: 'BlackRock Inc', percentage: 3.9, shares: '70M', type: 'International', change: '+0.7%' },
+                          { name: 'Vanguard Group', percentage: 2.8, shares: '50M', type: 'International', change: '+0.2%' },
+                          { name: 'Fidelity Investments', percentage: 2.1, shares: '38M', type: 'International', change: '-0.1%' },
+                          { name: 'Other Shareholders', percentage: 15.2, shares: '274M', type: 'Retail', change: '-2.3%' }
+                        ].map((shareholder, index) => (
+                          <div key={index} className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
+                                  <span className="text-slate-600 font-semibold text-sm">
+                                    {shareholder.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                                  </span>
+                            </div>
+                                <div>
+                                  <h5 className="font-semibold text-slate-900">{shareholder.name}</h5>
+                                  <p className="text-sm text-slate-600">{shareholder.type} • {shareholder.shares} shares</p>
+                          </div>
+                        </div>
+                              <div className="text-right">
+                                <p className="text-lg font-bold text-slate-900">{shareholder.percentage}%</p>
+                                <p className={`text-sm font-medium ${shareholder.change.startsWith('+') ? 'text-green-600' : shareholder.change.startsWith('-') ? 'text-red-600' : 'text-slate-600'}`}>
+                                  {shareholder.change}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="mt-3">
+                              <div className="w-full bg-slate-200 rounded-full h-2">
+                                <div 
+                                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                  style={{ width: `${shareholder.percentage}%` }}
+                                ></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                      </div>
+                    </div>
+
+                    {/* Shareholder Categories */}
+                    <div className="bg-white border border-slate-200 rounded-lg p-6">
+                      <h4 className="text-lg font-semibold text-slate-900 mb-4">Shareholder Categories</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span className="text-blue-600 font-bold text-lg">25.5%</span>
+                    </div>
+                          <p className="font-medium text-slate-900">Government</p>
+                          <p className="text-sm text-slate-600">459M shares</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span className="text-green-600 font-bold text-lg">35.0%</span>
+                          </div>
+                          <p className="font-medium text-slate-900">Institutional</p>
+                          <p className="text-sm text-slate-600">630M shares</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span className="text-purple-600 font-bold text-lg">25.0%</span>
+                          </div>
+                          <p className="font-medium text-slate-900">International</p>
+                          <p className="text-sm text-slate-600">450M shares</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span className="text-amber-600 font-bold text-lg">14.5%</span>
+                          </div>
+                          <p className="font-medium text-slate-900">Retail</p>
+                          <p className="text-sm text-slate-600">261M shares</p>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              )}
+
+              </div>
+            </div>
+
+            {/* Related Cases */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                        <Scale className="h-5 w-5 text-blue-600" />
-                        Related Cases ({relatedCases.length})
-                      </h3>
-                      <button className="text-slate-400 hover:text-slate-600">
-                        <RefreshCw className="h-5 w-5" />
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <Scale className="h-5 w-5 text-blue-600" />
+                  Related Cases ({filteredCases.length} of {relatedCases.length})
+                </h2>
+                <button className="text-slate-400 hover:text-slate-600">
+                  <RefreshCw className="h-5 w-5" />
                 </button>
               </div>
               
-                    {/* Search and Filter Bar */}
-                    <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                      <div className="flex-1 relative">
+                  {/* Search and Filter Controls */}
+              <div className="mb-6 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                        <div className="relative">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                           <input
                             type="text"
                             placeholder="Search cases..."
                             value={caseSearchQuery}
                             onChange={(e) => setCaseSearchQuery(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
-                      <div className="flex gap-2">
+                  </div>
+                  <div className="flex gap-2">
                 <select
                             value={caseSortBy}
                             onChange={(e) => setCaseSortBy(e.target.value)}
-                          className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           >
                             <option value="date">Sort by Date</option>
                             <option value="title">Sort by Title</option>
-                          <option value="court">Sort by Court</option>
+                      <option value="court">Sort by Court</option>
                 </select>
                 <select
                             value={caseSortOrder}
                             onChange={(e) => setCaseSortOrder(e.target.value)}
-                          className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           >
-                          <option value="desc">Descending</option>
-                          <option value="asc">Ascending</option>
+                      <option value="desc">Descending</option>
+                      <option value="asc">Ascending</option>
                 </select>
                           <button
                             onClick={() => {
@@ -797,63 +1405,70 @@ const BankDetail = () => {
                               setCaseSortBy('date');
                               setCaseSortOrder('desc');
                             }}
-                          className="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+                      className="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
                           >
-                          Clear
+                      Clear
                           </button>
                         </div>
                     </div>
+              </div>
 
-                    {/* Cases List */}
+              {/* Cases List */}
                   {casesLoading ? (
                     <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                        <p className="mt-2 text-slate-600">Loading cases...</p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="mt-2 text-slate-600">Loading cases...</p>
                     </div>
                   ) : filteredCases.length > 0 ? (
               <div className="space-y-4">
-                        {filteredCases.map((caseItem) => (
-                          <div key={caseItem.id} className="bg-slate-50 rounded-lg p-4 hover:shadow-md transition-shadow">
-                            <div className="flex items-start justify-between">
+                  {filteredCases.map((caseItem) => (
+                    <div key={caseItem.id} className="bg-slate-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between">
                       <div className="flex-1">
-                                <h4 className="font-semibold text-slate-900 mb-2">{caseItem.title}</h4>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-slate-600 mb-3">
-                                  <div>
-                                    <span className="font-medium">Suit Number:</span> {caseItem.suit_reference_number}
+                          <h4 className="font-semibold text-slate-900 mb-2">{caseItem.title}</h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-slate-600 mb-3">
+                            <div>
+                              <span className="font-medium">Suit Number:</span> {caseItem.suit_reference_number}
                       </div>
                       <div>
                               <span className="font-medium">Court:</span> {caseItem.court_type || 'N/A'}
                       </div>
                       <div>
-                                    <span className="font-medium">Date:</span> {caseItem.date ? new Date(caseItem.date).toLocaleDateString('en-US', { 
-                                      year: 'numeric', 
-                                      month: 'long', 
-                                      day: 'numeric' 
-                                    }) : 'N/A'}
+                              <span className="font-medium">Date:</span> {caseItem.date ? new Date(caseItem.date).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                              }) : 'N/A'}
                       </div>
                       <div>
-                                    <span className="font-medium">Nature:</span> {caseItem.area_of_law || 'N/A'}
+                              <span className="font-medium">Nature:</span> {caseItem.area_of_law || 'N/A'}
                       </div>
                       </div>
-                                {caseItem.ai_case_outcome && (
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm text-slate-600">Outcome:</span>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                      caseItem.ai_case_outcome === 'WON' ? 'bg-emerald-100 text-emerald-800' :
-                                      caseItem.ai_case_outcome === 'LOST' ? 'bg-red-100 text-red-800' :
-                                      'bg-amber-100 text-amber-800'
-                                    }`}>
-                                      {caseItem.ai_case_outcome}
-                                    </span>
+                          {caseItem.ai_case_outcome && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-slate-600">Outcome:</span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                caseItem.ai_case_outcome === 'WON' ? 'bg-emerald-100 text-emerald-800' :
+                                caseItem.ai_case_outcome === 'LOST' ? 'bg-red-100 text-red-800' :
+                                'bg-amber-100 text-amber-800'
+                              }`}>
+                                {caseItem.ai_case_outcome}
+                              </span>
                     </div>
-                                )}
-                              </div>
-                              <div className="ml-4">
+                          )}
+                        </div>
+                        <div className="ml-4 flex gap-2">
                         <button 
-                                  onClick={() => navigate(`/case-details/${caseItem.id}`)}
-                                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                                >
-                                  View Case
+                          onClick={() => handleRequestDetails(caseItem)}
+                            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                        >
+                          Request Details
+                        </button>
+                        <button 
+                            onClick={() => navigate(`/case-details/${caseItem.id}`)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        >
+                            View Case
                         </button>
                       </div>
                     </div>
@@ -863,17 +1478,14 @@ const BankDetail = () => {
                   ) : (
                     <div className="text-center py-8">
                       <Scale className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                        <p className="text-slate-500">No related cases found for this bank.</p>
-                        {caseSearchQuery && (
-                          <p className="text-sm text-slate-400 mt-2">Try adjusting your search criteria.</p>
-                        )}
+                  <p className="text-slate-500">No related cases found for this bank.</p>
+                  {caseSearchQuery && (
+                    <p className="text-sm text-slate-400 mt-2">Try adjusting your search criteria.</p>
+                  )}
                     </div>
                   )}
-                  </div>
-                )}
-              </div>
-                        </div>
-                        </div>
+            </div>
+          </div>
 
           {/* Right Sidebar */}
           <div className="lg:col-span-1 space-y-6">
@@ -1027,9 +1639,28 @@ const BankDetail = () => {
               )}
       </div>
 
+      {/* Request Details Modal */}
+      <RequestDetailsModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+        caseData={selectedCase}
+        entityType="Bank"
+        entityName={bankData?.name}
+      />
+
+      {/* Profile Request Modal */}
+      <RequestDetailsModal
+        isOpen={showProfileRequestModal}
+        onClose={() => setShowProfileRequestModal(false)}
+        caseData={null}
+        entityType="Bank"
+        entityName={bankData?.name}
+        isProfileRequest={true}
+              />
             </div>
-              </div>
             </div>
+          </div>
+        </div>
     </div>
   );
 };

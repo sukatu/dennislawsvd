@@ -20,6 +20,7 @@ from routes import case_hearings
 from routes import person_case_statistics
 from routes import person_analytics
 from routes import banking_summary
+from routes import request_details
 from config import settings
 
 # Application lifespan
@@ -66,6 +67,7 @@ app.include_router(case_hearings.router, prefix="/api", tags=["case_hearings"])
 app.include_router(person_case_statistics.router, tags=["person_case_statistics"])
 app.include_router(person_analytics.router, prefix="/api", tags=["person_analytics"])
 app.include_router(banking_summary.router, tags=["banking_summary"])
+app.include_router(request_details.router, tags=["request_details"])
 
 # Root endpoint
 @app.get("/")

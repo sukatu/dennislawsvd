@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle, History } from 'lucide-react';
+import RequestDetailsModal from '../components/RequestDetailsModal';
 
 const PersonProfile = () => {
   const { id } = useParams();
@@ -22,6 +23,9 @@ const PersonProfile = () => {
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const [caseStats, setCaseStats] = useState(null);
   const [caseStatsLoading, setCaseStatsLoading] = useState(true);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [selectedCase, setSelectedCase] = useState(null);
+  const [showProfileRequestModal, setShowProfileRequestModal] = useState(false);
 
   // Court name mapping function
   const getCourtFullName = (courtCode) => {
@@ -380,6 +384,18 @@ const PersonProfile = () => {
     setCurrentPage(1);
   }, [relatedCases, caseSearchQuery, caseSortBy, caseSortOrder]);
 
+  // Handle request details modal
+  const handleRequestDetails = (caseItem, event) => {
+    event.stopPropagation(); // Prevent event bubbling to parent div
+    setSelectedCase(caseItem);
+    setShowRequestModal(true);
+  };
+
+  // Handle profile request modal
+  const handleProfileRequest = () => {
+    setShowProfileRequestModal(true);
+  };
+
   // Pagination
   const totalPages = Math.ceil(filteredCases.length / casesPerPage);
   const startIndex = (currentPage - 1) * casesPerPage;
@@ -465,6 +481,12 @@ const PersonProfile = () => {
               <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                 <Star className="h-4 w-4" />
                 Watchlist
+              </button>
+              <button
+                onClick={handleProfileRequest}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Request Profile Information
               </button>
             </div>
           </div>
@@ -615,8 +637,22 @@ const PersonProfile = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="ml-4 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-                        View Case
+                      <div className="ml-4 flex gap-2">
+                        <button 
+                          onClick={(e) => handleRequestDetails(case_, e)}
+                          className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                        >
+                          Request Details
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/case-details/${case_.id}`);
+                          }}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        >
+                          View Case
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -1146,6 +1182,25 @@ const PersonProfile = () => {
           </div>
         </div>
       </div>
+
+      {/* Request Details Modal */}
+      <RequestDetailsModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+        caseData={selectedCase}
+        entityType="Person"
+        entityName={personData?.name}
+      />
+
+      {/* Profile Request Modal */}
+      <RequestDetailsModal
+        isOpen={showProfileRequestModal}
+        onClose={() => setShowProfileRequestModal(false)}
+        caseData={null}
+        entityType="Person"
+        entityName={personData?.full_name}
+        isProfileRequest={true}
+      />
     </div>
   );
 };

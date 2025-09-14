@@ -12,3 +12,4 @@ from .companies import Companies
 from .insurance import Insurance
 from .legal_history import LegalHistory
 from .user import User
+from .request_details import RequestDetails
