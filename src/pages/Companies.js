@@ -1,62 +1,93 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Building2, MapPin, Phone, Mail, Globe, Filter, ChevronDown, Eye, Star, Users, TrendingUp, FileText } from 'lucide-react';
+import { Building2, Search, AlertTriangle, ChevronLeft, ChevronRight, ArrowLeft, Phone, Mail } from 'lucide-react';
 
 const Companies = () => {
   const navigate = useNavigate();
-  const [companies, setCompanies] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const searchRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage] = useState(9);
+  const [companiesData, setCompaniesData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [totalResults, setTotalResults] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-  
-  // Filters
-  const [filters, setFilters] = useState({
-    city: '',
-    region: '',
-    company_type: '',
-    industry: '',
-    is_active: true
-  });
 
-  // Load companies
-  const loadCompanies = async (page = 1, search = '', filterParams = {}) => {
-    setLoading(true);
-    setError(null);
-    
+  // Load companies data from API
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('accessToken');
+      setIsAuthenticated(!!token);
+      return !!token;
+    };
+
+    if (checkAuth()) {
+      loadCompaniesData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [currentPage, itemsPerPage, searchTerm, filterStatus]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadCompaniesData = async () => {
     try {
       const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.error('No authentication token found');
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
       const params = new URLSearchParams({
-        page: page,
-        limit: 20,
-        ...(search && { query: search }),
-        ...filterParams
+        page: currentPage.toString(),
+        limit: itemsPerPage.toString()
       });
-      
+
+      if (searchTerm) {
+        params.append('name', searchTerm);
+      }
+
       const response = await fetch(`http://localhost:8000/api/companies/search?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (response.ok) {
         const data = await response.json();
-        setCompanies(data.results || []);
-        setTotalPages(data.total_pages || 1);
+        console.log('Companies data loaded:', data);
+        
+        const transformedCompanies = (data.results || []).map(company => ({
+          id: company.id,
+          name: company.name,
+          shortName: company.short_name,
+          industry: company.industry,
+          phone: company.phone || 'N/A',
+          email: company.email || 'N/A',
+          address: company.address || 'N/A',
+          website: company.website || 'N/A',
+          established: company.established_date ? new Date(company.established_date).getFullYear().toString() : 'N/A',
+          companyType: company.company_type || 'N/A',
+          totalCases: 0, // This would come from a separate cases API
+          activeCases: 0,
+          resolvedCases: 0,
+          riskLevel: 'Low', // This would be calculated based on cases
+          riskScore: 0,
+          lastActivity: company.updated_at ? new Date(company.updated_at).toISOString().split('T')[0] : 'N/A',
+          cases: [] // This would come from a separate cases API
+        }));
+
+        setCompaniesData(transformedCompanies);
         setTotalResults(data.total || 0);
-        setCurrentPage(data.page || 1);
       } else {
-        const errorData = await response.json();
-        setError(errorData.detail || 'Failed to load companies');
+        console.error('Failed to load companies data:', response.status);
       }
-    } catch (err) {
-      setError('Network error. Please try again.');
+    } catch (error) {
+      console.error('Error loading companies data:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -64,74 +95,57 @@ const Companies = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    loadCompanies(1, searchQuery, filters);
+    loadCompaniesData();
   };
 
-  // Handle filter change
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+  // Handle company click
+  const handleCompanyClick = (company) => {
+    navigate(`/company-profile/${company.id}?name=${encodeURIComponent(company.name)}`);
   };
 
-  // Apply filters
-  const applyFilters = () => {
-    setCurrentPage(1);
-    loadCompanies(1, searchQuery, filters);
-  };
+  // Filter and sort companies
+  const filteredCompanies = companiesData.filter(company => {
+    if (filterStatus === 'all') return true;
+    return company.riskLevel === filterStatus;
+  });
 
-  // Clear filters
-  const clearFilters = () => {
-    setFilters({
-      city: '',
-      region: '',
-      company_type: '',
-      industry: '',
-      is_active: true
-    });
-    setSearchQuery('');
-    setCurrentPage(1);
-    loadCompanies(1, '', {});
-  };
+  // Pagination
+  const totalPagesCount = Math.ceil(totalResults / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
 
-  // Load companies on component mount
-  useEffect(() => {
-    loadCompanies();
-  }, []);
+  // Early return for loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-sky-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Loading companies...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const formatCurrency = (amount) => {
-    if (!amount || amount === 0) return 'N/A';
-    return new Intl.NumberFormat('en-GH', {
-      style: 'currency',
-      currency: 'GHS',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
-
-  const formatRegion = (regionCode) => {
-    if (!regionCode) return 'N/A';
-
-    const regionMappings = {
-      'GAR': 'Greater Accra Region',
-      'ASR': 'Ashanti Region',
-      'UWR': 'Upper West Region',
-      'UER': 'Upper East Region',
-      'NR': 'Northern Region',
-      'BR': 'Brong-Ahafo Region',
-      'VR': 'Volta Region',
-      'ER': 'Eastern Region',
-      'CR': 'Central Region',
-      'WR': 'Western Region',
-      'WNR': 'Western North Region',
-      'AHA': 'Ahafo Region',
-      'BON': 'Bono Region',
-      'BON_E': 'Bono East Region',
-      'OTI': 'Oti Region',
-      'SAV': 'Savannah Region',
-      'NEA': 'North East Region'
-    };
-
-    return regionMappings[regionCode.toUpperCase()] || regionCode;
-  };
+  // Authentication check
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-600 mb-4">
+            <AlertTriangle className="h-16 w-16 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold">Authentication Required</h2>
+            <p className="text-gray-600 mt-2">Please log in to view companies data</p>
+          </div>
+          <button
+            onClick={() => navigate('/login')}
+            className="bg-sky-600 text-white px-6 py-2 rounded-lg hover:bg-sky-700 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -140,301 +154,150 @@ const Companies = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Companies Database</h1>
-              <p className="text-gray-600 mt-2">
-                {totalResults > 0 ? `${totalResults} companies found` : 'No companies found'}
+              <h1 className="text-3xl font-bold text-gray-900">Companies</h1>
+              <p className="text-gray-600 mt-1">
+                {totalResults} companies found
               </p>
             </div>
-            
             <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={() => navigate('/')}
+              className="flex items-center text-gray-600 hover:text-gray-900"
             >
-              <Filter className="w-4 h-4" />
-              <span>Filters</span>
-              <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              <ArrowLeft className="h-5 w-5 mr-1" />
+              Back to Home
             </button>
           </div>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="Search companies by name, industry, or activities..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search companies..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                ref={searchRef}
               />
             </div>
+            <div className="flex gap-2">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+              >
+                <option value="all">All Risk Levels</option>
+                <option value="Low">Low Risk</option>
+                <option value="Medium">Medium Risk</option>
+                <option value="High">High Risk</option>
+              </select>
+              <button
+                type="submit"
+                className="px-6 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors flex items-center"
+              >
+                <Search className="h-4 w-4 mr-2" />
+                Search
+              </button>
+            </div>
           </form>
-
-          {/* Filters */}
-          {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                <input
-                  type="text"
-                  value={filters.city}
-                  onChange={(e) => handleFilterChange('city', e.target.value)}
-                  placeholder="e.g., Accra"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Region</label>
-                <select
-                  value={filters.region}
-                  onChange={(e) => handleFilterChange('region', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">All Regions</option>
-                  <option value="GAR">Greater Accra Region</option>
-                  <option value="ASR">Ashanti Region</option>
-                  <option value="UWR">Upper West Region</option>
-                  <option value="UER">Upper East Region</option>
-                  <option value="NR">Northern Region</option>
-                  <option value="BR">Brong-Ahafo Region</option>
-                  <option value="VR">Volta Region</option>
-                  <option value="ER">Eastern Region</option>
-                  <option value="CR">Central Region</option>
-                  <option value="WR">Western Region</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Company Type</label>
-                <select
-                  value={filters.company_type}
-                  onChange={(e) => handleFilterChange('company_type', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">All Types</option>
-                  <option value="Limited">Limited</option>
-                  <option value="Partnership">Partnership</option>
-                  <option value="Sole Proprietorship">Sole Proprietorship</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-                <input
-                  type="text"
-                  value={filters.industry}
-                  onChange={(e) => handleFilterChange('industry', e.target.value)}
-                  placeholder="e.g., Technology"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              
-              <div className="flex items-end space-x-2">
-                <button
-                  onClick={applyFilters}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Apply
-                </button>
-                <button
-                  onClick={clearFilters}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Results */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600">Loading companies...</span>
-          </div>
-        ) : error ? (
-          <div className="text-center py-12">
-            <div className="text-red-600">{error}</div>
-          </div>
-        ) : companies.length === 0 ? (
-          <div className="text-center py-12">
-            <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">No companies found</p>
-            <p className="text-sm text-gray-500 mt-2">Try adjusting your search terms or filters</p>
-          </div>
-        ) : (
-          <>
-            {/* Companies Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {companies.map((company) => (
-                <div key={company.id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{company.name}</h3>
-                        {company.short_name && (
-                          <p className="text-sm text-gray-600 mb-2">{company.short_name}</p>
-                        )}
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                          <Building2 className="w-4 h-4" />
-                          <span>{company.industry || 'N/A'}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        {company.rating && (
-                          <div className="flex items-center">
-                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="text-sm text-gray-600 ml-1">{company.rating}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Company Details */}
-                    <div className="space-y-2 mb-4">
-                      {company.city && (
-                        <div className="flex items-center text-sm text-gray-600">
-                          <MapPin className="w-4 h-4 mr-2" />
-                          <span>{company.city}, {formatRegion(company.region)}</span>
-                        </div>
-                      )}
-                      
-                      {company.phone && (
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Phone className="w-4 h-4 mr-2" />
-                          <span>{company.phone}</span>
-                        </div>
-                      )}
-                      
-                      {company.email && (
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Mail className="w-4 h-4 mr-2" />
-                          <span>{company.email}</span>
-                        </div>
-                      )}
-                      
-                      {company.website && (
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Globe className="w-4 h-4 mr-2" />
-                          <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
-                            {company.website}
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Company Stats */}
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      {company.employee_count > 0 && (
-                        <div className="text-center">
-                          <div className="flex items-center justify-center mb-1">
-                            <Users className="w-4 h-4 text-blue-600 mr-1" />
-                            <span className="text-sm font-medium text-gray-900">{company.employee_count}</span>
-                          </div>
-                          <p className="text-xs text-gray-600">Employees</p>
-                        </div>
-                      )}
-                      
-                      {company.annual_revenue > 0 && (
-                        <div className="text-center">
-                          <div className="flex items-center justify-center mb-1">
-                            <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                            <span className="text-sm font-medium text-gray-900">
-                              {formatCurrency(company.annual_revenue)}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-600">Annual Revenue</p>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Company Description */}
-                    {company.description && (
-                      <p className="text-sm text-gray-700 mb-4 line-clamp-3">
-                        {company.description}
-                      </p>
-                    )}
-                    
-                    {/* Business Activities */}
-                    {company.business_activities && company.business_activities.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Business Activities</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {company.business_activities.slice(0, 3).map((activity, index) => (
-                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                              {activity}
-                            </span>
-                          ))}
-                          {company.business_activities.length > 3 && (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                              +{company.business_activities.length - 3} more
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Action Buttons */}
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => navigate(`/company-details/${company.id}?name=${encodeURIComponent(company.name)}`)}
-                        className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
-                      >
-                        <Eye className="w-4 h-4" />
-                        <span>Quick View</span>
-                      </button>
-                      <button
-                        onClick={() => navigate(`/company-profile/${company.id}`)}
-                        className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                      >
-                        <FileText className="w-4 h-4" />
-                        <span>Full Profile</span>
-                      </button>
-                    </div>
+      {/* Companies Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCompanies.map((company) => (
+            <div
+              key={company.id}
+              onClick={() => handleCompanyClick(company)}
+              className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow cursor-pointer"
+            >
+              <div className="p-6">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-lg bg-sky-100 flex items-center justify-center mr-4">
+                    <Building2 className="h-6 w-6 text-sky-600" />
                   </div>
+                <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900">{company.name}</h3>
+                    <p className="text-sm text-gray-600">{company.established}</p>
                 </div>
-              ))}
-            </div>
-            
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between mt-8">
-                <div className="text-sm text-gray-600">
-                  Showing {((currentPage - 1) * 20) + 1} to {Math.min(currentPage * 20, totalResults)} of {totalResults} companies
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => loadCompanies(currentPage - 1, searchQuery, filters)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Previous
-                  </button>
-                  <span className="px-3 py-2 text-sm text-gray-600">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    onClick={() => loadCompanies(currentPage + 1, searchQuery, filters)}
-                    disabled={currentPage >= totalPages}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Next
-                  </button>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    company.riskLevel === 'Low' ? 'bg-green-100 text-green-800' :
+                    company.riskLevel === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {company.riskLevel} Risk
                 </div>
               </div>
-            )}
-          </>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Building2 className="h-4 w-4 mr-2" />
+                    {company.industry}
+                </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Phone className="h-4 w-4 mr-2" />
+                    {company.phone}
+                </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Mail className="h-4 w-4 mr-2" />
+                    {company.email}
+                </div>
+              </div>
+
+                <div className="border-t pt-4">
+                  <div className="flex justify-between items-center text-sm text-gray-600">
+                    <span>Total Cases: {company.totalCases}</span>
+                    <span>Last Activity: {company.lastActivity}</span>
+                    </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* No Results */}
+        {filteredCompanies.length === 0 && !isLoading && (
+          <div className="text-center py-12">
+            <Building2 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No companies found</h3>
+            <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+          </div>
         )}
-      </div>
+
+        {/* Pagination */}
+        {totalPagesCount > 1 && (
+          <div className="mt-8 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Showing {startIndex + 1} to {Math.min(endIndex, totalResults)} of {totalResults} companies
+            </div>
+            <div className="flex items-center space-x-2">
+                <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                <ChevronLeft className="h-4 w-4" />
+                </button>
+                
+              <span className="px-4 py-2 text-sm font-medium text-gray-700">
+                Page {currentPage} of {totalPagesCount}
+              </span>
+                
+                <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPagesCount))}
+                disabled={currentPage === totalPagesCount}
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="h-4 w-4" />
+                </button>
+            </div>
+          </div>
+        )}
+        </div>
     </div>
   );
 };

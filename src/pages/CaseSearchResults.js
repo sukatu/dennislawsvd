@@ -233,7 +233,9 @@ const CaseSearchResults = () => {
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <button
-                          onClick={() => navigate(`/case-details/${case_item.id}?q=${encodeURIComponent(query)}`)}
+                          onClick={() => navigate(`/case-details/${case_item.id}?q=${encodeURIComponent(query)}`, {
+                            state: { originalPersonCases: results }
+                          })}
                           className="text-left"
                         >
                           <h3 className="text-lg font-semibold text-blue-600 hover:text-blue-800 mb-2 transition-colors">

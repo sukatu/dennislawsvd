@@ -479,6 +479,14 @@ async def get_case_details(
         "summernote_content": metadata.summernote_content if metadata else None,
         "conclusion": case.conclusion,
         
+        # AI Banking Summary Fields
+        "ai_case_outcome": case.ai_case_outcome,
+        "ai_court_orders": case.ai_court_orders,
+        "ai_financial_impact": case.ai_financial_impact,
+        "ai_detailed_outcome": case.ai_detailed_outcome,
+        "ai_summary_generated_at": case.ai_summary_generated_at,
+        "ai_summary_version": case.ai_summary_version,
+        
         # Citation data
         "citing_cases": {
             "count": citation_count,
@@ -520,3 +528,96 @@ async def get_case_details(
     }
     
     return case_details
+
+@router.get("/{case_id}/related-cases")
+async def get_related_cases(
+    case_id: int,
+    limit: int = Query(10, ge=1, le=50, description="Maximum related cases"),
+    db: Session = Depends(get_db)
+):
+    """Get cases related to the people involved in the current case"""
+    
+    # Get the current case
+    current_case = db.query(ReportedCases).filter(ReportedCases.id == case_id).first()
+    if not current_case:
+        raise HTTPException(status_code=404, detail="Case not found")
+    
+    # Extract people from current case
+    people_to_search = []
+    
+    # Add protagonist and antagonist
+    if current_case.protagonist:
+        people_to_search.append(current_case.protagonist.strip())
+    if current_case.antagonist:
+        people_to_search.append(current_case.antagonist.strip())
+    
+    # Add lawyers
+    if current_case.lawyers:
+        lawyers = [lawyer.strip() for lawyer in current_case.lawyers.split(',') if lawyer.strip()]
+        people_to_search.extend(lawyers)
+    
+    # Add presiding judge
+    if current_case.presiding_judge:
+        if isinstance(current_case.presiding_judge, list):
+            people_to_search.extend([judge.strip() for judge in current_case.presiding_judge if judge.strip()])
+        else:
+            people_to_search.append(current_case.presiding_judge.strip())
+    
+    # Add judgement by
+    if current_case.judgement_by and current_case.judgement_by != '-':
+        people_to_search.append(current_case.judgement_by.strip())
+    
+    # Remove duplicates and empty strings
+    people_to_search = list(set([person for person in people_to_search if person and person != '-']))
+    
+    if not people_to_search:
+        return {
+            "related_cases": [],
+            "total": 0,
+            "search_people": []
+        }
+    
+    # Search for cases involving these people
+    related_cases = []
+    
+    for person in people_to_search:
+        # Search in title, protagonist, antagonist, lawyers, presiding_judge, judgement_by
+        person_cases = db.query(ReportedCases).filter(
+            or_(
+                func.lower(ReportedCases.title).like(f"%{person.lower()}%"),
+                func.lower(ReportedCases.protagonist).like(f"%{person.lower()}%"),
+                func.lower(ReportedCases.antagonist).like(f"%{person.lower()}%"),
+                func.lower(ReportedCases.lawyers).like(f"%{person.lower()}%"),
+                func.lower(ReportedCases.presiding_judge).like(f"%{person.lower()}%"),
+                func.lower(ReportedCases.judgement_by).like(f"%{person.lower()}%")
+            ),
+            ReportedCases.id != case_id  # Exclude current case
+        ).limit(limit).all()
+        
+        for case in person_cases:
+            # Avoid duplicates
+            if not any(rc['id'] == case.id for rc in related_cases):
+                related_cases.append({
+                    "id": case.id,
+                    "title": case.title,
+                    "suit_reference_number": case.suit_reference_number,
+                    "date": case.date,
+                    "court_type": case.court_type,
+                    "area_of_law": case.area_of_law,
+                    "protagonist": case.protagonist,
+                    "antagonist": case.antagonist,
+                    "presiding_judge": case.presiding_judge,
+                    "ai_case_outcome": case.ai_case_outcome,
+                    "ai_financial_impact": case.ai_financial_impact,
+                    "matched_person": person
+                })
+    
+    # Sort by date (most recent first) and limit results
+    related_cases.sort(key=lambda x: x['date'] or '', reverse=True)
+    related_cases = related_cases[:limit]
+    
+    return {
+        "related_cases": related_cases,
+        "total": len(related_cases),
+        "search_people": people_to_search
+    }

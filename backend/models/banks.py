@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Float, JSON
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from database import Base
 
 class Banks(Base):
@@ -68,3 +69,7 @@ class Banks(Base):
     description = Column(Text, nullable=True)
     notes = Column(Text, nullable=True)
     status = Column(String(20), default="ACTIVE")  # ACTIVE, INACTIVE, SUSPENDED
+    
+    # Relationships
+    analytics = relationship("BankAnalytics", back_populates="bank", uselist=False)
+    case_statistics = relationship("BankCaseStatistics", back_populates="bank", uselist=False)

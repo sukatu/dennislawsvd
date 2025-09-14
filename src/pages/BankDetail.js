@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Building2, Calendar, MapPin, Phone, Mail, TrendingUp, AlertTriangle, CheckCircle, Clock, User, Scale, Eye, EyeOff, Globe, CreditCard, Smartphone, CreditCard as Atm, DollarSign, Star, Shield, Award, ExternalLink, Download, XCircle, Users, Briefcase, GraduationCap, FileText, Search, Filter, ArrowUpDown } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle, History, Download, MapPin, Globe } from 'lucide-react';
 
 const BankDetail = () => {
-  const [searchParams] = useSearchParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [bankData, setBankData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedSections, setExpandedSections] = useState({
-    basicInfo: true,
-    contactInfo: true,
-    services: true,
-    financialInfo: true,
-    management: true,
-    cases: true,
-    previousNames: true
-  });
+  const [analytics, setAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
+  const [caseStats, setCaseStats] = useState(null);
+  const [caseStatsLoading, setCaseStatsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('manager');
+  const [managementData, setManagementData] = useState([]);
+  const [relatedCases, setRelatedCases] = useState([]);
+  const [casesLoading, setCasesLoading] = useState(false);
+  const [filteredCases, setFilteredCases] = useState([]);
+  const [caseSearchQuery, setCaseSearchQuery] = useState('');
+  const [caseSortBy, setCaseSortBy] = useState('date');
+  const [caseSortOrder, setCaseSortOrder] = useState('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [casesPerPage] = useState(10);
 
   // Bank logo mapping
   const bankLogoMap = {
@@ -48,281 +53,33 @@ const BankDetail = () => {
     'UMB Bank': '/banks/umb.jpeg',
     'Universal Merchant Bank': '/banks/universal merchant bank.jpeg',
     'Zenith Bank': '/banks/zenith.jpeg',
-    'ABII National Bank': '/banks/abii national.jpeg'
   };
-  // Management data - would come from API in real implementation
-  const [managementData, setManagementData] = useState([]);
-  const [relatedCases, setRelatedCases] = useState([]);
-  const [filteredCases, setFilteredCases] = useState([]);
-  const [casesLoading, setCasesLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [casesPerPage] = useState(10);
-  const [totalCases, setTotalCases] = useState(0); // eslint-disable-line no-unused-vars
-  const [caseSearchQuery, setCaseSearchQuery] = useState('');
-  const [caseSortBy, setCaseSortBy] = useState('date'); // date, title, suit_number
-  const [caseSortOrder, setCaseSortOrder] = useState('desc'); // asc, desc
-  const [showRequestModal, setShowRequestModal] = useState(false);
-  const [selectedCase, setSelectedCase] = useState(null);
-  const [requestType, setRequestType] = useState('case_details');
-  const [requestMessage, setRequestMessage] = useState('');
 
   // Load bank data
   useEffect(() => {
-    const bankId = searchParams.get('id');
-    const bankName = searchParams.get('name');
+    console.log('URL Parameters - Bank ID:', id);
     
-    console.log('URL Parameters - Bank ID:', bankId, 'Bank Name:', bankName);
-    
-    if (bankId || bankName) {
-      setCurrentPage(1); // Reset pagination when bank changes
-      loadBankData(bankId, bankName);
-      loadManagementData(bankId, bankName);
-      loadRelatedCases(bankId, bankName);
+    if (id) {
+      loadBankData(id);
+      loadManagementData(id);
+      loadRelatedCases(id);
+      loadBankAnalytics(id);
+      loadBankCaseStats(id);
     }
-  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id]);
 
-  // eslint-disable-next-line no-unused-vars
-  const getSampleCasesForBank = (bankName) => {
-    if (!bankName) {
-      console.log('No bank name provided');
-      return [];
-    }
-    
-    const bankNameLower = bankName.toLowerCase();
-    console.log('Checking bank name:', bankNameLower);
-    
-    if (bankNameLower.includes('access bank') || bankNameLower.includes('access') || bankNameLower.includes('access bank ghana')) {
-      console.log('Matched Access Bank');
-      return [
-        {
-          id: 2006,
-          title: "ACCESS BANK GHANA LIMITED vs. MRS. LUCKY AFI ALLOTEY T/A & ANO.",
-          suit_reference_number: "SUIT NO.: BFS/284/12",
-          date: "2017-11-24",
-          status: "Resolved",
-          court_type: "High Court",
-          presiding_judge: "Justice Smith",
-          protagonist: "ACCESS BANK GHANA LIMITED",
-          antagonist: "MRS. LUCKY AFI ALLOTEY T/A & ANO.",
-          case_summary: "A commercial dispute involving loan recovery and debt collection between Access Bank Ghana Limited and the defendants."
-        },
-        {
-          id: 2028,
-          title: "ECOBANK NIGERIA PLC vs. HISS HANDS HOUSING AGENCY AND ACCESS BANK (GHANA) LIMITED",
-          suit_reference_number: "CIVIL APPEAL NO. J4/49/2016",
-          date: "2017-12-06",
-          status: "Active",
-          court_type: "Commercial Court",
-          presiding_judge: "Justice Johnson",
-          protagonist: "ECOBANK NIGERIA PLC",
-          antagonist: "HISS HANDS HOUSING AGENCY AND ACCESS BANK (GHANA) LIMITED",
-          case_summary: "A complex commercial litigation involving multiple parties including Access Bank Ghana Limited as a defendant."
-        },
-        {
-          id: 3846,
-          title: "ACCESS BANK LTD vs. MARKET DIRECT AND OTHERS",
-          suit_reference_number: "SUIT NO. CM/0048/16",
-          date: "2018-05-21",
-          status: "Resolved",
-          court_type: "High Court",
-          presiding_judge: "Justice Brown",
-          protagonist: "ACCESS BANK LTD",
-          antagonist: "MARKET DIRECT AND OTHERS",
-          case_summary: "A commercial dispute involving breach of contract and financial obligations between Access Bank and Market Direct."
-        },
-        {
-          id: 3847,
-          title: "ACCESS BANK GH LTD vs. MARKET DIRECT AND OTHERS",
-          suit_reference_number: "SUIT NO. CM/0048/16",
-          date: "2018-04-21",
-          status: "Resolved",
-          court_type: "High Court",
-          presiding_judge: "Justice Brown",
-          protagonist: "ACCESS BANK GH LTD",
-          antagonist: "MARKET DIRECT AND OTHERS",
-          case_summary: "A commercial dispute involving breach of contract and financial obligations between Access Bank Ghana and Market Direct."
-        },
-        {
-          id: 4173,
-          title: "MARIANE QUANSAH vs. ACCESS BANK",
-          suit_reference_number: "SUIT NO. INDL/63/12",
-          date: "2017-01-24",
-          status: "Resolved",
-          court_type: "High Court",
-          presiding_judge: "Justice Wilson",
-          protagonist: "MARIANE QUANSAH",
-          antagonist: "ACCESS BANK",
-          case_summary: "A consumer dispute involving Mariane Quansah and Access Bank regarding banking services."
-        },
-        {
-          id: 4656,
-          title: "KOBBY BREW vs. ACCESS BANK GHANA LIMITED, AFS IRIC CONSULT, PETER ANNAN AND RAYMOND KOTEY",
-          suit_reference_number: "SUIT NO. BFS/08/2012",
-          date: "2016-11-04",
-          status: "Resolved",
-          court_type: "High Court",
-          presiding_judge: "Justice Davis",
-          protagonist: "KOBBY BREW",
-          antagonist: "ACCESS BANK GHANA LIMITED, AFS IRIC CONSULT, PETER ANNAN AND RAYMOND KOTEY",
-          case_summary: "A complex commercial dispute involving multiple defendants including Access Bank Ghana Limited."
-        },
-        {
-          id: 6634,
-          title: "CORNELIUS OGBU vs. ACCESS BANK (GH) LTD",
-          suit_reference_number: "CIVIL APPEAL SUIT NO: H1/16/15",
-          date: "2015-02-18",
-          status: "Resolved",
-          court_type: "Appeal Court",
-          presiding_judge: "Justice Thompson",
-          protagonist: "CORNELIUS OGBU",
-          antagonist: "ACCESS BANK (GH) LTD",
-          case_summary: "A civil appeal case involving Cornelius Ogbu and Access Bank Ghana Limited."
-        }
-      ];
-    } else if (bankNameLower.includes('ghana commercial bank') || bankNameLower.includes('gcb') || bankNameLower.includes('commercial')) {
-      console.log('Matched Ghana Commercial Bank');
-      return [
-        {
-          id: 83,
-          title: "GHANA COMMERCIAL BANK Vs. EASTERN ALLOYS COMPANY LIMITED, WORLD PRAYER CENTRE, DELA AKPEY",
-          suit_reference_number: "Suit No. 83",
-          date: "2018-07-04",
-          status: "Resolved",
-          court_type: "High Court",
-          presiding_judge: "Justice Wilson",
-          protagonist: "GHANA COMMERCIAL BANK",
-          antagonist: "EASTERN ALLOYS COMPANY LIMITED, WORLD PRAYER CENTRE, DELA AKPEY",
-          case_summary: "A commercial dispute involving loan recovery and debt collection by Ghana Commercial Bank."
-        }
-      ];
-    } else if (bankNameLower.includes('ecobank') || bankNameLower.includes('eco')) {
-      console.log('Matched Ecobank');
-      return [
-        {
-          id: 2028,
-          title: "ECOBANK NIGERIA PLC vs. HISS HANDS HOUSING AGENCY AND ACCESS BANK (GHANA) LIMITED",
-          suit_reference_number: "Suit No. 2028",
-          date: "2017-12-06",
-          status: "Active",
-          court_type: "Commercial Court",
-          presiding_judge: "Justice Johnson",
-          protagonist: "ECOBANK NIGERIA PLC",
-          antagonist: "HISS HANDS HOUSING AGENCY AND ACCESS BANK (GHANA) LIMITED",
-          case_summary: "A complex commercial litigation involving multiple parties including Ecobank Nigeria PLC."
-        }
-      ];
-    } else if (bankNameLower.includes('bank')) {
-      console.log('Matched generic bank');
-      // Return some generic bank cases for any bank
-      return [
-        {
-          id: 2006,
-          title: `${bankName.toUpperCase()} vs. COMMERCIAL DISPUTE PARTY`,
-          suit_reference_number: "Suit No. 2006",
-          date: "2017-11-24",
-          status: "Resolved",
-          court_type: "High Court",
-          presiding_judge: "Justice Smith",
-          protagonist: bankName.toUpperCase(),
-          antagonist: "COMMERCIAL DISPUTE PARTY",
-          case_summary: `A commercial dispute involving ${bankName} and the defendant party.`
-        },
-        {
-          id: 2028,
-          title: `${bankName.toUpperCase()} vs. FINANCIAL SERVICES LITIGATION`,
-          suit_reference_number: "Suit No. 2028",
-          date: "2017-12-06",
-          status: "Active",
-          court_type: "Commercial Court",
-          presiding_judge: "Justice Johnson",
-          protagonist: bankName.toUpperCase(),
-          antagonist: "FINANCIAL SERVICES LITIGATION",
-          case_summary: `A financial services litigation case involving ${bankName}.`
-        }
-      ];
-    }
-    
-    console.log('No bank match found');
-    return [];
-  };
-
-  const loadManagementData = async (bankId, bankName) => {
-    // Sample management data - in real implementation, this would come from an API
-    const sampleManagement = [
-      {
-        id: 1,
-        name: "Dr. Ernest Kwamina Yedu Addison",
-        position: "Governor",
-        tenure: "2017 - Present",
-        qualifications: "PhD Economics, University of Manchester",
-        experience: "25+ years in banking and finance",
-        profileId: 1,
-        email: "governor@bog.gov.gh",
-        phone: "+233 302 666 902",
-        bio: "Experienced economist with extensive background in monetary policy and banking supervision."
-      },
-      {
-        id: 2,
-        name: "Mrs. Elsie Addo Awadzi",
-        position: "First Deputy Governor",
-        tenure: "2017 - Present", 
-        qualifications: "LLM International Law, Harvard University",
-        experience: "20+ years in legal and regulatory affairs",
-        profileId: 2,
-        email: "first.deputy@bog.gov.gh",
-        phone: "+233 302 666 903",
-        bio: "Legal expert specializing in financial regulation and international banking law."
-      },
-      {
-        id: 3,
-        name: "Dr. Maxwell Opoku-Afari",
-        position: "Second Deputy Governor",
-        tenure: "2019 - Present",
-        qualifications: "PhD Economics, University of Ghana",
-        experience: "18+ years in economic research and policy",
-        profileId: 3,
-        email: "second.deputy@bog.gov.gh", 
-        phone: "+233 302 666 904",
-        bio: "Renowned economist with expertise in macroeconomic policy and financial stability."
-      },
-      {
-        id: 4,
-        name: "Mr. Johnson Asiama",
-        position: "Chief Executive Officer",
-        tenure: "2020 - Present",
-        qualifications: "MBA Finance, London Business School",
-        experience: "22+ years in commercial banking",
-        profileId: 4,
-        email: "ceo@bank.com",
-        phone: "+233 302 123 456",
-        bio: "Seasoned banking executive with extensive experience in retail and corporate banking."
-      }
-    ];
-    
-    setManagementData(sampleManagement);
-  };
-
-  const loadRelatedCases = async (bankId, bankName) => {
+  const loadBankData = async (bankId) => {
     try {
-      setCasesLoading(true);
-      console.log('Loading related cases for bank:', bankName);
-      console.log('Bank ID:', bankId);
+      setIsLoading(true);
+      setError(null);
       
-      // For testing, create a token with user ID 1
-      let token = localStorage.getItem('accessToken');
-      if (!token) {
-        // Create a test token with user ID 1
-        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzU3NjAzNzU4fQ.r0VQhhM6QMwTm8Ej8a2ENvdI6DzK06o62fUV4AbxxHM';
-        console.log('Using test token for API access');
-      }
+      console.log('loadBankData called with:', { bankId });
 
-                    // Simple title search - search for cases containing the bank name
-                    const url = `http://localhost:8000/api/case-search/search?query=${encodeURIComponent(bankName)}&page=${currentPage}&limit=${casesPerPage}`;
-      console.log('API URL:', url);
+      const url = `http://localhost:8000/api/banks/${bankId}`;
+      console.log('Using bank ID URL:', url);
       
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -331,98 +88,10 @@ const BankDetail = () => {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('API Response:', data);
-        
-        if (data.results && data.results.length > 0) {
-          console.log(`Found ${data.results.length} cases with "${bankName}" in title`);
-          setRelatedCases(data.results);
-          setTotalCases(data.total || data.results.length);
-        } else {
-          console.log('No cases found in API response');
-          setRelatedCases([]);
-          setTotalCases(0);
-        }
-      } else {
-        console.error('Failed to fetch related cases:', response.status);
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        setRelatedCases([]);
-        setTotalCases(0);
-      }
-    } catch (error) {
-      console.error('Error loading related cases:', error);
-      setRelatedCases([]);
-      setTotalCases(0);
-    } finally {
-      setCasesLoading(false);
-    }
-  };
-
-  const handleRequestDetails = (caseItem) => {
-    setSelectedCase(caseItem);
-    setShowRequestModal(true);
-    setRequestMessage('');
-  };
-
-  const handleSubmitRequest = () => {
-    // In a real application, this would send the request to a backend API
-    const requestData = {
-      type: requestType,
-      caseId: selectedCase.id,
-      caseNumber: selectedCase.suit_reference_number,
-      bankName: bankData.name,
-      message: requestMessage,
-      timestamp: new Date().toISOString()
-    };
-
-    console.log('Request submitted:', requestData);
-    
-    // Show success message
-    alert(`Request submitted successfully!\n\nRequest Type: ${requestType === 'case_details' ? 'Case Details' : requestType === 'full_report' ? 'Full Report' : 'Legal Documents'}\nCase: ${selectedCase.suit_reference_number}\nBank: ${bankData.name}`);
-    
-    // Close modal and reset
-    setShowRequestModal(false);
-    setSelectedCase(null);
-    setRequestMessage('');
-  };
-
-  const loadBankData = async (bankId, bankName) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        console.error('No authentication token found');
-        setError('Authentication required');
-        return;
-      }
-
-      let url;
-      if (bankId) {
-        url = `http://localhost:8000/api/banks/${bankId}`;
-      } else if (bankName) {
-        // Search for bank by name
-        url = `http://localhost:8000/api/banks/search?name=${encodeURIComponent(bankName)}&limit=1`;
-      }
-
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        let data;
-        if (bankId) {
-          data = await response.json();
-        } else {
-          const searchResult = await response.json();
-          data = searchResult.banks && searchResult.banks.length > 0 ? searchResult.banks[0] : null;
-        }
+        console.log('Bank data from ID:', data);
 
         if (data) {
+          console.log('Raw bank data received:', data);
           // Transform API data to match expected format
           const transformedData = {
             id: data.id,
@@ -461,9 +130,7 @@ const BankDetail = () => {
             hasAtmServices: data.has_atm_services || false,
             hasForeignExchange: data.has_foreign_exchange || false,
             services: data.services || [],
-            description: data.description || 'No description available',
-            notes: data.notes || 'No notes available',
-            isActive: data.is_active || false,
+            previousNames: data.previous_names || [],
             isVerified: data.is_verified || false,
             verificationDate: data.verification_date ? new Date(data.verification_date).toLocaleDateString('en-US', { 
               year: 'numeric', 
@@ -501,7 +168,9 @@ const BankDetail = () => {
             branches: [],
             cases: []
           };
+          console.log('Transformed bank data:', transformedData);
           setBankData(transformedData);
+          console.log('Bank data set successfully');
         } else {
           console.error('No bank data found');
           setError('Bank not found');
@@ -518,48 +187,142 @@ const BankDetail = () => {
     }
   };
 
+  // Load bank analytics
+  const loadBankAnalytics = async (bankId) => {
+    try {
+      setAnalyticsLoading(true);
+      const response = await fetch(`http://localhost:8000/api/banks/${bankId}/analytics`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Bank analytics loaded:', data);
+        setAnalytics(data);
+      } else {
+        console.error('Failed to load bank analytics:', response.status);
+        setAnalytics(null);
+      }
+    } catch (error) {
+      console.error('Error loading bank analytics:', error);
+      setAnalytics(null);
+    } finally {
+      setAnalyticsLoading(false);
+    }
   };
 
-  const formatRegion = (regionCode) => {
-    if (!regionCode) return 'N/A';
-    
-    const regionMappings = {
-      'GAR': 'Greater Accra Region',
-      'ASR': 'Ashanti Region', 
-      'UWR': 'Upper West Region',
-      'UER': 'Upper East Region',
-      'NR': 'Northern Region',
-      'BR': 'Brong-Ahafo Region',
-      'VR': 'Volta Region',
-      'ER': 'Eastern Region',
-      'CR': 'Central Region',
-      'WR': 'Western Region',
-      'WNR': 'Western North Region',
-      'AHA': 'Ahafo Region',
-      'BON': 'Bono Region',
-      'BON_E': 'Bono East Region',
-      'OTI': 'Oti Region',
-      'SAV': 'Savannah Region',
-      'NEA': 'North East Region'
-    };
-    
-    return regionMappings[regionCode.toUpperCase()] || regionCode;
+  // Load bank case statistics
+  const loadBankCaseStats = async (bankId) => {
+    try {
+      setCaseStatsLoading(true);
+      const response = await fetch(`http://localhost:8000/api/banks/${bankId}/case-statistics`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Bank case stats loaded:', data);
+        setCaseStats(data);
+      } else {
+        console.error('Failed to load bank case stats:', response.status);
+        setCaseStats(null);
+      }
+    } catch (error) {
+      console.error('Error loading bank case stats:', error);
+      setCaseStats(null);
+    } finally {
+      setCaseStatsLoading(false);
+    }
   };
 
-  const formatCurrency = (amount) => {
-    if (!amount || amount === 0) return 'N/A';
-    return new Intl.NumberFormat('en-GH', {
-      style: 'currency',
-      currency: 'GHS',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
+  // Load management data
+  const loadManagementData = async (bankId) => {
+    // Sample management data - in real implementation, this would come from an API
+    const sampleManagement = [
+      {
+        id: 1,
+        name: "Dr. Ernest Kwamina Yedu Addison",
+        position: "Governor",
+        tenure: "2017 - Present",
+        qualifications: "PhD Economics, University of Manchester",
+        experience: "25+ years in banking and finance",
+        profileId: 1,
+        email: "governor@bog.gov.gh",
+        phone: "+233 302 666 902",
+        bio: "Experienced economist with extensive background in monetary policy and banking supervision."
+      },
+      {
+        id: 2,
+        name: "Mrs. Elsie Addo Awadzi",
+        position: "First Deputy Governor",
+        tenure: "2017 - Present", 
+        qualifications: "LLM International Law, Harvard University",
+        experience: "20+ years in legal and regulatory affairs",
+        profileId: 2,
+        email: "first.deputy@bog.gov.gh",
+        phone: "+233 302 666 903",
+        bio: "Legal expert with extensive experience in financial regulation and international law."
+      },
+      {
+        id: 3,
+        name: "Dr. Maxwell Opoku-Afari",
+        position: "Second Deputy Governor",
+        tenure: "2019 - Present",
+        qualifications: "PhD Economics, University of Ghana",
+        experience: "18+ years in economic research and policy",
+        profileId: 3,
+        email: "second.deputy@bog.gov.gh",
+        phone: "+233 302 666 904",
+        bio: "Economic policy expert with strong background in research and analysis."
+      }
+    ];
+    
+    setManagementData(sampleManagement);
+  };
+
+  // Load related cases
+  const loadRelatedCases = async (bankId) => {
+    try {
+      setCasesLoading(true);
+      console.log('Loading related cases for bank ID:', bankId);
+
+      const url = `http://localhost:8000/api/banks/${bankId}/related-cases?limit=10`;
+      console.log('API URL:', url);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Related cases loaded:', data);
+        
+        if (data.related_cases && data.related_cases.length > 0) {
+          setRelatedCases(data.related_cases);
+        } else {
+          console.log('No cases found in API response');
+          setRelatedCases([]);
+        }
+      } else {
+        console.error('Failed to fetch related cases:', response.status);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        setRelatedCases([]);
+      }
+    } catch (error) {
+      console.error('Error loading related cases:', error);
+      setRelatedCases([]);
+    } finally {
+      setCasesLoading(false);
+    }
   };
 
   // Filter and sort cases
@@ -567,13 +330,12 @@ const BankDetail = () => {
     let filtered = cases;
 
     // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = cases.filter(caseItem => 
-        caseItem.title.toLowerCase().includes(query) ||
-        caseItem.suit_reference_number?.toLowerCase().includes(query) ||
-        caseItem.court_type?.toLowerCase().includes(query) ||
-        caseItem.presiding_judge?.toLowerCase().includes(query)
+    if (searchQuery) {
+      filtered = filtered.filter(caseItem =>
+        caseItem.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        caseItem.suit_reference_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        caseItem.court_type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        caseItem.area_of_law?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -583,12 +345,12 @@ const BankDetail = () => {
       
       switch (sortBy) {
         case 'title':
-          aValue = a.title.toLowerCase();
-          bValue = b.title.toLowerCase();
+          aValue = a.title || '';
+          bValue = b.title || '';
           break;
-        case 'suit_number':
-          aValue = a.suit_reference_number || '';
-          bValue = b.suit_reference_number || '';
+        case 'court':
+          aValue = a.court_type || '';
+          bValue = b.court_type || '';
           break;
         case 'date':
         default:
@@ -598,9 +360,9 @@ const BankDetail = () => {
       }
 
       if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       } else {
-        return aValue < bValue ? 1 : -1;
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
       }
     });
 
@@ -613,6 +375,31 @@ const BankDetail = () => {
     setFilteredCases(filtered);
     setCurrentPage(1); // Reset to first page when filtering
   }, [relatedCases, caseSearchQuery, caseSortBy, caseSortOrder]);
+
+  const getRiskColor = (level) => {
+    switch (level) {
+      case 'Low':
+        return 'bg-emerald-50 text-emerald-600 ring-emerald-200';
+      case 'Medium':
+        return 'bg-amber-50 text-amber-600 ring-amber-200';
+      case 'High':
+        return 'bg-red-50 text-red-600 ring-red-200';
+      default:
+        return 'bg-slate-50 text-slate-600 ring-slate-200';
+    }
+  };
+
+  const getRiskScoreColor = (score) => {
+    if (score <= 30) return 'text-emerald-600';
+    if (score <= 70) return 'text-amber-600';
+    return 'text-red-600';
+  };
+
+  const getProgressBarColor = (score) => {
+    if (score <= 30) return 'bg-emerald-500';
+    if (score <= 70) return 'bg-amber-500';
+    return 'bg-red-500';
+  };
 
   if (isLoading) {
   return (
@@ -663,32 +450,6 @@ const BankDetail = () => {
     );
   }
 
-  const getRiskColor = (level) => {
-    switch (level) {
-      case 'Low':
-        return 'bg-emerald-50 text-emerald-600 ring-emerald-200';
-      case 'Medium':
-        return 'bg-amber-50 text-amber-600 ring-amber-200';
-      case 'High':
-        return 'bg-red-50 text-red-600 ring-red-200';
-      default:
-        return 'bg-slate-50 text-slate-600 ring-slate-200';
-    }
-  };
-
-  const getRiskScoreColor = (score) => {
-    if (score <= 30) return 'text-emerald-600';
-    if (score <= 70) return 'text-amber-600';
-    return 'text-red-600';
-  };
-
-  const getProgressBarColor = (score) => {
-    if (score <= 30) return 'bg-emerald-500';
-    if (score <= 70) return 'bg-amber-500';
-    return 'bg-red-500';
-  };
-
-
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Fixed Header */}
@@ -703,65 +464,49 @@ const BankDetail = () => {
                 <ArrowLeft className="h-5 w-5" />
                 Back
             </button>
-              <div className="h-px w-8 bg-slate-300"></div>
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-sky-100 flex items-center justify-center overflow-hidden">
+              <div className="h-6 w-px bg-slate-300" />
+              <div className="flex items-center gap-3">
                   <img
                     src={bankData.logo}
                     alt={`${bankData.name} logo`}
-                    className="h-full w-full object-contain"
+                  className="h-8 w-8 rounded object-contain"
                     onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
+                    e.target.src = '/banks/default-bank.jpeg';
                     }}
                   />
-                  <div className="h-full w-full flex items-center justify-center text-xl" style={{display: 'none'}}>
-                    🏦
-            </div>
-                </div>
                 <div>
-                  <h1 className="text-xl font-semibold text-slate-900">{bankData.name}</h1>
-                  <p className="text-sm text-slate-600">
-                    {bankData.bankCode} • {formatRegion(bankData.region)}
-                  </p>
+                  <h1 className="text-lg font-semibold text-slate-900">{bankData.name}</h1>
+                  <p className="text-sm text-slate-500">{bankData.status}</p>
         </div>
       </div>
             </div>
             <div className="flex items-center gap-3">
-                <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold ring-1 ${getRiskColor(bankData.riskLevel)}`}>
-                  <span className={`inline-block h-2 w-2 rounded-full ${getRiskColor(bankData.riskLevel).split(' ')[1].replace('text-', 'bg-')}`}></span>
-                  {bankData.riskLevel} Risk
-                </span>
-              <button className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors">
-                <Star className="h-4 w-4" />
-                Watchlist
+              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                <Download className="h-4 w-4" />
+                Export
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content with top padding to account for fixed header */}
+      <div className="pt-24 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Basic Information */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
+            {/* Bank Information */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-sky-600" />
-                  Basic Information
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                  Bank Information
                 </h2>
-                <button
-                  onClick={() => toggleSection('basicInfo')}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  {expandedSections.basicInfo ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                <button className="text-slate-400 hover:text-slate-600">
+                  <RefreshCw className="h-5 w-5" />
                 </button>
                 </div>
               
-              {expandedSections.basicInfo && (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div className="space-y-4">
                     <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
@@ -790,14 +535,7 @@ const BankDetail = () => {
                         <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Bank Code</span>
                       </div>
                       <p className="text-sm font-semibold text-gray-900">{bankData.bankCode}</p>
-                    </div>
-                    
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Award className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">License Number</span>
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900">{bankData.licenseNumber}</p>
+                    <p className="text-xs text-gray-600">SWIFT: {bankData.swiftCode}</p>
                     </div>
                   </div>
                   
@@ -805,109 +543,19 @@ const BankDetail = () => {
                     <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
                       <div className="flex items-center space-x-2 mb-1">
                         <MapPin className="w-4 h-4 text-green-600" />
-                        <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Location</span>
+                      <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Headquarters</span>
                       </div>
-                      <p className="text-sm font-semibold text-green-900">{formatRegion(bankData.region)}</p>
-                      <p className="text-xs text-green-700">{bankData.city}, {bankData.country}</p>
+                    <p className="text-sm font-semibold text-green-900">{bankData.headquarters}</p>
+                    <p className="text-xs text-green-700">{bankData.address}</p>
                     </div>
                     
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <div className="flex items-center space-x-2 mb-1">
-                        <Building2 className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Bank Type</span>
+                      <Phone className="w-4 h-4 text-gray-600" />
+                      <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Contact</span>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900">{bankData.bankType}</p>
-                    </div>
-                    
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <User className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Ownership</span>
-                </div>
-                      <p className="text-sm font-semibold text-gray-900">{bankData.ownershipType}</p>
-                </div>
-                    
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Star className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Rating</span>
-                </div>
-                      <p className="text-sm font-semibold text-gray-900">{bankData.rating}</p>
-                </div>
-                </div>
-                </div>
-              )}
-            </section>
-
-            {/* Previous Names */}
-            {bankData.previousNames && bankData.previousNames.length > 0 && (
-              <section className="rounded-xl border border-slate-200 bg-white p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-purple-600" />
-                    Previous Names
-                  </h2>
-                  <button
-                    onClick={() => toggleSection('previousNames')}
-                    className="text-slate-400 hover:text-slate-600"
-                  >
-                    {expandedSections.previousNames ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-                
-                {expandedSections.previousNames && (
-                  <div className="space-y-3">
-                    <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Clock className="w-4 h-4 text-purple-600" />
-                        <span className="text-xs font-medium text-purple-800 uppercase tracking-wide">Historical Names</span>
-                      </div>
-                      <div className="space-y-2">
-                        {bankData.previousNames.map((name, index) => (
-                          <div key={index} className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                            <span className="text-sm text-purple-900">{name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {/* Contact Information */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <Phone className="h-5 w-5 text-sky-600" />
-                  Contact Information
-                </h2>
-                <button
-                  onClick={() => toggleSection('contactInfo')}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  {expandedSections.contactInfo ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-
-              {expandedSections.contactInfo && (
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="space-y-4">
-                    <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Phone className="w-4 h-4 text-blue-600" />
-                        <span className="text-xs font-medium text-blue-800 uppercase tracking-wide">Phone</span>
-                      </div>
-                      <p className="text-sm font-semibold text-blue-900">{bankData.phone}</p>
-                    </div>
-                    
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Mail className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Email</span>
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900 break-all">{bankData.email}</p>
+                    <p className="text-sm font-semibold text-gray-900">{bankData.phone}</p>
+                    <p className="text-xs text-gray-600">{bankData.email}</p>
                     </div>
                     
                     <div className="bg-gray-50 p-4 rounded-lg">
@@ -915,645 +563,473 @@ const BankDetail = () => {
                         <Globe className="w-4 h-4 text-gray-600" />
                         <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Website</span>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900 break-all">{bankData.website}</p>
+                    <a href={bankData.website} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-blue-600 hover:text-blue-800">
+                      {bankData.website}
+                    </a>
                     </div>
                   </div>
-                  
-                  <div className="space-y-4">
-                    <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <MapPin className="w-4 h-4 text-green-600" />
-                        <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Address</span>
                       </div>
-                      <p className="text-sm font-semibold text-green-900">{bankData.address}</p>
-                      <p className="text-xs text-green-700">{bankData.postalCode}</p>
                     </div>
                     
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Phone className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Customer Service</span>
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900">{bankData.customerServicePhone}</p>
-                      <p className="text-xs text-gray-600 break-all">{bankData.customerServiceEmail}</p>
-                    </div>
-                    
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <CreditCard className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">SWIFT Code</span>
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900">{bankData.swiftCode}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </section>
-
-            {/* Services & Features */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-sky-600" />
-                  Services & Features
-                </h2>
+            {/* Tabs */}
+            <div className="bg-white rounded-lg border border-slate-200">
+              <div className="border-b border-slate-200">
+                <nav className="flex space-x-8 px-6" aria-label="Tabs">
+                  {['manager', 'board', 'secretaries', 'cases'].map((tab) => (
                 <button
-                  onClick={() => toggleSection('services')}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  {expandedSections.services ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      key={tab}
+                      className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
+                        activeTab === tab
+                          ? 'border-blue-500 text-blue-600'
+                          : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                      }`}
+                      onClick={() => setActiveTab(tab)}
+                    >
+                      {tab}
                 </button>
+                  ))}
+                </nav>
               </div>
               
-              {expandedSections.services && (
-                <div className="space-y-6">
-                  {/* Digital Services */}
+              <div className="p-6">
+                {activeTab === 'manager' && (
                 <div>
-                    <h3 className="text-sm font-medium text-slate-700 mb-3">Digital Services</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className={`p-4 rounded-lg border ${bankData.hasMobileApp ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
-                        <div className="flex items-center gap-3">
-                          <Smartphone className={`h-5 w-5 ${bankData.hasMobileApp ? 'text-green-600' : 'text-gray-400'}`} />
-                      <div>
-                            <p className="text-sm font-medium text-slate-900">Mobile App</p>
-                            <p className="text-xs text-slate-500">{bankData.hasMobileApp ? 'Available' : 'Not Available'}</p>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Management Team</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {managementData.map((member) => (
+                        <div key={member.id} className="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                              <span className="text-blue-600 font-semibold text-xs">
+                                {member.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                              </span>
                 </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-slate-900 mb-1">{member.name}</h4>
+                              <p className="text-sm font-medium text-blue-600 mb-2">{member.position}</p>
+                              <div className="space-y-1 text-xs text-slate-600">
+                                <p><span className="font-medium">Tenure:</span> {member.tenure}</p>
+                                <p><span className="font-medium">Qualifications:</span> {member.qualifications}</p>
+                                <p><span className="font-medium">Experience:</span> {member.experience}</p>
                         </div>
                       </div>
-                      
-                      <div className={`p-4 rounded-lg border ${bankData.hasOnlineBanking ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
-                        <div className="flex items-center gap-3">
-                          <Globe className={`h-5 w-5 ${bankData.hasOnlineBanking ? 'text-green-600' : 'text-gray-400'}`} />
-                <div>
-                            <p className="text-sm font-medium text-slate-900">Online Banking</p>
-                            <p className="text-xs text-slate-500">{bankData.hasOnlineBanking ? 'Available' : 'Not Available'}</p>
                 </div>
                       </div>
+                      ))}
                     </div>
-                    
-                      <div className={`p-4 rounded-lg border ${bankData.hasAtmServices ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
-                        <div className="flex items-center gap-3">
-                          <Atm className={`h-5 w-5 ${bankData.hasAtmServices ? 'text-green-600' : 'text-gray-400'}`} />
-                <div>
-                            <p className="text-sm font-medium text-slate-900">ATM Services</p>
-                            <p className="text-xs text-slate-500">{bankData.hasAtmServices ? 'Available' : 'Not Available'}</p>
                 </div>
-                        </div>
-                      </div>
+              )}
                       
-                      <div className={`p-4 rounded-lg border ${bankData.hasForeignExchange ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
-                        <div className="flex items-center gap-3">
-                          <DollarSign className={`h-5 w-5 ${bankData.hasForeignExchange ? 'text-green-600' : 'text-gray-400'}`} />
+                {activeTab === 'board' && (
                 <div>
-                            <p className="text-sm font-medium text-slate-900">Foreign Exchange</p>
-                            <p className="text-xs text-slate-500">{bankData.hasForeignExchange ? 'Available' : 'Not Available'}</p>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Board of Directors</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {managementData.map((member) => (
+                        <div key={member.id} className="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center">
+                              <span className="text-sky-600 font-semibold text-xs">
+                                {member.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                              </span>
                 </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-slate-900 mb-1">{member.name}</h4>
+                              <p className="text-sm font-medium text-sky-600 mb-2">{member.position}</p>
+                              <div className="space-y-1 text-xs text-slate-600">
+                                <p><span className="font-medium">Tenure:</span> {member.tenure}</p>
+                                <p><span className="font-medium">Qualifications:</span> {member.qualifications}</p>
+                                <p><span className="font-medium">Experience:</span> {member.experience}</p>
                         </div>
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Services List */}
-                  {bankData.services && bankData.services.length > 0 && (
-                <div>
-                      <h3 className="text-sm font-medium text-slate-700 mb-3">Additional Services</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {bankData.services.map((service, index) => (
-                          <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-sky-100 text-sky-800">
-                            {service}
-                          </span>
                         ))}
                 </div>
-              </div>
-                  )}
-                </div>
-              )}
-            </section>
-
-            {/* Financial Information */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-sky-600" />
-                  Financial Information
-                </h2>
-                <button
-                  onClick={() => toggleSection('financialInfo')}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  {expandedSections.financialInfo ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-                </div>
-
-              {expandedSections.financialInfo && (
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <DollarSign className="w-4 h-4 text-blue-600" />
-                        <span className="text-xs font-medium text-blue-800 uppercase tracking-wide">Total Assets</span>
-                      </div>
-                      <p className="text-sm font-semibold text-blue-900">{formatCurrency(bankData.totalAssets)}</p>
-              </div>
-
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <TrendingUp className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Net Worth</span>
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900">{formatCurrency(bankData.netWorth)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Building2 className="w-4 h-4 text-green-600" />
-                        <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Branches</span>
-                      </div>
-                      <p className="text-sm font-semibold text-green-900">{bankData.branchesCount}</p>
-                    </div>
                     
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Atm className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">ATM Count</span>
+                    {/* Board Committees */}
+                    <div className="mt-8">
+                      <h4 className="text-lg font-semibold text-slate-900 mb-4">Board Committees</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="bg-white rounded-lg p-4">
+                          <h5 className="font-medium text-slate-900 mb-2">Audit Committee</h5>
+                          <p className="text-sm text-slate-600">Oversees financial reporting and internal controls</p>
+                          <p className="text-xs text-slate-500 mt-2">Chair: Dr. Kwame Asante</p>
+                </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <h5 className="font-medium text-slate-900 mb-2">Risk Management Committee</h5>
+                          <p className="text-sm text-slate-600">Monitors and manages operational and financial risks</p>
+                          <p className="text-xs text-slate-500 mt-2">Chair: Mrs. Efua Adjei</p>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900">{bankData.atmCount}</p>
+                        <div className="bg-white rounded-lg p-4">
+                          <h5 className="font-medium text-slate-900 mb-2">Nominations Committee</h5>
+                          <p className="text-sm text-slate-600">Reviews board composition and director appointments</p>
+                          <p className="text-xs text-slate-500 mt-2">Chair: Dr. Kwame Asante</p>
+              </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <h5 className="font-medium text-slate-900 mb-2">Technology Committee</h5>
+                          <p className="text-sm text-slate-600">Oversees digital transformation and IT strategy</p>
+                          <p className="text-xs text-slate-500 mt-2">Chair: Mrs. Efua Adjei</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
-            </section>
-
-            {/* Management Team */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <Users className="h-5 w-5 text-sky-600" />
-                  Management Team
-                </h2>
-                <button
-                  onClick={() => toggleSection('management')}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  {expandedSections.management ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
+                  
+                {activeTab === 'secretaries' && (
+                <div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Secretaries</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {[
+                        { 
+                          name: 'Ms. Grace Adjei', 
+                          position: 'Company Secretary', 
+                          experience: '12 years in corporate governance',
+                          background: 'Former Legal Counsel at Ghana Stock Exchange',
+                          qualifications: 'LLB, ICSA, ACIS'
+                        },
+                        { 
+                          name: 'Mr. Samuel Ofori', 
+                          position: 'Assistant Secretary', 
+                          experience: '8 years in corporate affairs',
+                          background: 'Former Corporate Affairs Officer at Ecobank',
+                          qualifications: 'BA Law, ICSA Part I'
+                        },
+                        { 
+                          name: 'Mrs. Comfort Asante', 
+                          position: 'Compliance Secretary', 
+                          experience: '10 years in regulatory compliance',
+                          background: 'Former Compliance Officer at Bank of Ghana',
+                          qualifications: 'MSc Banking, CAMS, CCO'
+                        }
+                      ].map((secretary, index) => (
+                        <div key={index} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                              <span className="text-green-600 font-semibold text-xs">
+                                {secretary.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                              </span>
               </div>
-              
-              {expandedSections.management && (
-                <div className="space-y-6">
-                  {managementData.map((executive) => (
-                    <div key={executive.id} className="bg-slate-50 rounded-lg p-6 border border-slate-200 hover:border-sky-300 transition-colors">
-                      <div className="flex items-start gap-4">
-                        <div className="h-16 w-16 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0">
-                          <User className="h-8 w-8 text-sky-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <h3 className="text-lg font-semibold text-slate-900 mb-1">{executive.name}</h3>
-                              <p className="text-sm font-medium text-sky-600 mb-2">{executive.position}</p>
-                              <div className="flex items-center gap-4 text-xs text-slate-500 mb-3">
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  {executive.tenure}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Briefcase className="h-3 w-3" />
-                                  {executive.experience}
-                                </span>
+                              <h4 className="font-semibold text-gray-900 mb-1">{secretary.name}</h4>
+                              <p className="text-sm font-medium text-green-600 mb-2">{secretary.position}</p>
+                              <div className="space-y-1 text-xs text-gray-600">
+                                <p><span className="font-medium">Experience:</span> {secretary.experience}</p>
+                                <p><span className="font-medium">Background:</span> {secretary.background}</p>
+                                <p><span className="font-medium">Qualifications:</span> {secretary.qualifications}</p>
                               </div>
                             </div>
-                            <button
-                              onClick={() => navigate(`/person-profile/${executive.profileId}`)}
-                              className="ml-4 inline-flex items-center gap-1 px-3 py-1 bg-sky-50 text-sky-700 rounded-md hover:bg-sky-100 text-sm font-medium transition-colors"
-                            >
-                              <User className="h-3 w-3" />
-                              View Profile
-                            </button>
               </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <GraduationCap className="h-4 w-4 text-slate-400" />
-                                <span className="text-sm font-medium text-slate-600">Qualifications:</span>
                               </div>
-                              <p className="text-sm text-slate-700 ml-6">{executive.qualifications}</p>
+                  ))}
                             </div>
                             
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Mail className="h-4 w-4 text-slate-400" />
-                                <span className="text-sm font-medium text-slate-600">Contact:</span>
+                    {/* Secretary Responsibilities */}
+                    <div className="mt-6 bg-green-50 rounded-lg p-6">
+                      <h5 className="text-lg font-semibold text-gray-900 mb-4">Secretarial Functions</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg p-4">
+                          <h6 className="font-medium text-gray-900 mb-2">Corporate Governance</h6>
+                          <p className="text-sm text-gray-600">Maintains corporate records, ensures compliance with regulatory requirements, and manages board documentation</p>
                               </div>
-                              <div className="ml-6 space-y-1">
-                                <p className="text-sm text-slate-700">{executive.email}</p>
-                                <p className="text-sm text-slate-700">{executive.phone}</p>
+                        <div className="bg-white rounded-lg p-4">
+                          <h6 className="font-medium text-gray-900 mb-2">Regulatory Compliance</h6>
+                          <p className="text-sm text-gray-600">Monitors regulatory changes, ensures timely filings, and maintains relationships with regulatory bodies</p>
                               </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <h6 className="font-medium text-gray-900 mb-2">Board Support</h6>
+                          <p className="text-sm text-gray-600">Coordinates board meetings, prepares agendas, and ensures proper documentation of board decisions</p>
+                            </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <h6 className="font-medium text-gray-900 mb-2">Shareholder Relations</h6>
+                          <p className="text-sm text-gray-600">Manages shareholder communications, annual general meetings, and dividend distributions</p>
+                          </div>
                             </div>
                           </div>
-                          
-                          <div className="mt-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <FileText className="h-4 w-4 text-slate-400" />
-                              <span className="text-sm font-medium text-slate-600">Bio:</span>
-                            </div>
-                            <p className="text-sm text-slate-700 ml-6">{executive.bio}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {managementData.length === 0 && (
-                    <div className="text-center py-8">
-                      <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                      <p className="text-slate-500">No management information available</p>
                     </div>
                   )}
-                </div>
-              )}
-            </section>
 
-            {/* Related Cases */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
+                {activeTab === 'cases' && (
+                  <div>
+                    {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <Scale className="h-5 w-5 text-sky-600" />
-                  Related Cases ({filteredCases.length} of {relatedCases.length})
-                </h2>
-                <button
-                  onClick={() => toggleSection('cases')}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  {expandedSections.cases ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                        <Scale className="h-5 w-5 text-blue-600" />
+                        Related Cases ({relatedCases.length})
+                      </h3>
+                      <button className="text-slate-400 hover:text-slate-600">
+                        <RefreshCw className="h-5 w-5" />
                 </button>
               </div>
               
-              {expandedSections.cases && (
-                <div className="space-y-4">
-                  {/* Search and Filter Controls */}
-                  {relatedCases.length > 0 && (
-                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {/* Search Input */}
-                        <div className="relative">
+                    {/* Search and Filter Bar */}
+                    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                      <div className="flex-1 relative">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                           <input
                             type="text"
                             placeholder="Search cases..."
                             value={caseSearchQuery}
                             onChange={(e) => setCaseSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm"
+                          className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
-                        
-                        {/* Sort By */}
-                        <div className="relative">
-                          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <div className="flex gap-2">
                 <select
                             value={caseSortBy}
                             onChange={(e) => setCaseSortBy(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm appearance-none bg-white"
+                          className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           >
                             <option value="date">Sort by Date</option>
                             <option value="title">Sort by Title</option>
-                            <option value="suit_number">Sort by Suit Number</option>
+                          <option value="court">Sort by Court</option>
                 </select>
-                        </div>
-
-                        {/* Sort Order */}
-                        <div className="relative">
-                          <ArrowUpDown className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <select
                             value={caseSortOrder}
                             onChange={(e) => setCaseSortOrder(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm appearance-none bg-white"
+                          className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           >
-                            <option value="desc">Newest First</option>
-                            <option value="asc">Oldest First</option>
+                          <option value="desc">Descending</option>
+                          <option value="asc">Ascending</option>
                 </select>
-                        </div>
-              </div>
-
-                      {/* Clear Filters */}
-                      {(caseSearchQuery || caseSortBy !== 'date' || caseSortOrder !== 'desc') && (
-                        <div className="mt-3 flex justify-end">
                           <button
                             onClick={() => {
                               setCaseSearchQuery('');
                               setCaseSortBy('date');
                               setCaseSortOrder('desc');
                             }}
-                            className="text-sm text-slate-600 hover:text-slate-800 underline"
+                          className="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
                           >
-                            Clear all filters
+                          Clear
                           </button>
                         </div>
-                      )}
                     </div>
-                  )}
 
+                    {/* Cases List */}
                   {casesLoading ? (
                     <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600 mx-auto"></div>
-                      <p className="mt-2 text-slate-600">Loading related cases...</p>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-2 text-slate-600">Loading cases...</p>
                     </div>
                   ) : filteredCases.length > 0 ? (
               <div className="space-y-4">
-                      {filteredCases
-                        .slice((currentPage - 1) * casesPerPage, currentPage * casesPerPage)
-                        .map((caseItem) => (
-                  <div key={caseItem.id} className="border border-slate-200 rounded-lg p-4 hover:border-sky-300 transition-colors">
-                    <div className="flex justify-between items-start mb-3">
+                        {filteredCases.map((caseItem) => (
+                          <div key={caseItem.id} className="bg-slate-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-medium text-slate-900 mb-1">{caseItem.title}</h3>
-                              <p className="text-sm text-slate-600">Suit No: {caseItem.suit_reference_number}</p>
+                                <h4 className="font-semibold text-slate-900 mb-2">{caseItem.title}</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-slate-600 mb-3">
+                                  <div>
+                                    <span className="font-medium">Suit Number:</span> {caseItem.suit_reference_number}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    caseItem.status === 'Active' ? 'bg-amber-100 text-amber-700' : 
-                                    caseItem.status === 'Resolved' ? 'bg-emerald-100 text-emerald-700' : 
-                                    'bg-slate-100 text-slate-700'
-                        }`}>
-                          {caseItem.status}
-                        </span>
-                              <span className="text-xs text-slate-500">
-                                {caseItem.date ? new Date(caseItem.date).toLocaleDateString('en-US', { 
-                                  year: 'numeric', 
-                                  month: 'short', 
-                                  day: 'numeric' 
-                                }) : 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                    
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600 mb-3">
                       <div>
                               <span className="font-medium">Court:</span> {caseItem.court_type || 'N/A'}
                       </div>
                       <div>
-                              <span className="font-medium">Judge:</span> {caseItem.presiding_judge || 'N/A'}
+                                    <span className="font-medium">Date:</span> {caseItem.date ? new Date(caseItem.date).toLocaleDateString('en-US', { 
+                                      year: 'numeric', 
+                                      month: 'long', 
+                                      day: 'numeric' 
+                                    }) : 'N/A'}
                       </div>
                       <div>
-                              <span className="font-medium">Plaintiff:</span> {caseItem.protagonist || 'N/A'}
+                                    <span className="font-medium">Nature:</span> {caseItem.area_of_law || 'N/A'}
                       </div>
-                      <div>
-                              <span className="font-medium">Defendant:</span> {caseItem.antagonist || 'N/A'}
                       </div>
+                                {caseItem.ai_case_outcome && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm text-slate-600">Outcome:</span>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      caseItem.ai_case_outcome === 'WON' ? 'bg-emerald-100 text-emerald-800' :
+                                      caseItem.ai_case_outcome === 'LOST' ? 'bg-red-100 text-red-800' :
+                                      'bg-amber-100 text-amber-800'
+                                    }`}>
+                                      {caseItem.ai_case_outcome}
+                                    </span>
                     </div>
-                    
-                          {caseItem.case_summary && (
-                            <p className="text-sm text-slate-700 mb-3 line-clamp-2">
-                              {caseItem.case_summary.length > 150 
-                                ? `${caseItem.case_summary.substring(0, 150)}...` 
-                                : caseItem.case_summary
-                              }
-                            </p>
-                    )}
-                    
-                    <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-500">
-                              Case ID: {caseItem.id}
-                            </span>
-                      <div className="flex items-center gap-2">
+                                )}
+                              </div>
+                              <div className="ml-4">
                         <button 
-                          onClick={() => handleRequestDetails(caseItem)}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-sky-50 text-sky-700 rounded-md hover:bg-sky-100 text-sm font-medium transition-colors"
-                        >
-                                <FileText className="w-3 h-3" />
-                          Request Details
-                        </button>
-                        <button 
-                                onClick={() => navigate(`/case-details/${caseItem.id}?q=${encodeURIComponent(bankData.name)}`)}
-                          className="text-sky-600 hover:text-sky-700 text-sm font-medium"
-                        >
-                          View Full Details →
+                                  onClick={() => navigate(`/case-details/${caseItem.id}`)}
+                                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                >
+                                  View Case
                         </button>
                       </div>
                     </div>
                   </div>
                 ))}
-              </div>
-                  ) : relatedCases.length > 0 ? (
-                    <div className="text-center py-8">
-                      <Search className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                      <p className="text-slate-500">No cases match your search criteria</p>
-                      <p className="text-sm text-slate-400 mt-1">Try adjusting your search terms or filters</p>
                     </div>
                   ) : (
                     <div className="text-center py-8">
                       <Scale className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                      <p className="text-slate-500">No related cases found</p>
-                      <p className="text-sm text-slate-400 mt-1">Cases involving this bank will appear here</p>
+                        <p className="text-slate-500">No related cases found for this bank.</p>
+                        {caseSearchQuery && (
+                          <p className="text-sm text-slate-400 mt-2">Try adjusting your search criteria.</p>
+                        )}
                     </div>
                   )}
-                  
-                  {/* Pagination Controls */}
-                  {filteredCases.length > 0 && filteredCases.length > casesPerPage && (
-                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-200">
-                  <div className="text-sm text-slate-600">
-                        Showing {((currentPage - 1) * casesPerPage) + 1} to {Math.min(currentPage * casesPerPage, filteredCases.length)} of {filteredCases.length} cases
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      disabled={currentPage === 1}
-                          className="px-3 py-1 text-sm border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Previous
-                    </button>
-                        <span className="px-3 py-1 text-sm text-slate-600">
-                          Page {currentPage} of {Math.ceil(filteredCases.length / casesPerPage)}
+                )}
+              </div>
+                        </div>
+                        </div>
+
+          {/* Right Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Risk Assessment */}
+            {analytics && (
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                  Financial Risk Assessment
+                  {analyticsLoading && <RefreshCw className="h-4 w-4 animate-spin text-red-600" />}
+                </h3>
+                {analyticsLoading ? (
+                  <div className="space-y-3">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  </div>
+              </div>
+                ) : (
+                  <>
+                    <div className="text-center mb-4">
+                      <div className="relative w-24 h-24 mx-auto mb-2">
+                        <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                          <circle
+                            cx="50"
+                            cy="50"
+                            r="40"
+                            stroke="#e5e7eb"
+                            strokeWidth="8"
+                            fill="none"
+                          />
+                          <circle
+                            cx="50"
+                            cy="50"
+                            r="40"
+                            stroke={analytics.risk_score <= 30 ? '#10b981' : analytics.risk_score <= 70 ? '#f59e0b' : '#ef4444'}
+                            strokeWidth="8"
+                            fill="none"
+                            strokeDasharray={`${(analytics.risk_score / 100) * 251.2} 251.2`}
+                            className="transition-all duration-1000 ease-out"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className={`text-2xl font-bold ${getRiskScoreColor(analytics.risk_score)}`}>
+                            {analytics.risk_score}
                         </span>
-                        <button
-                          onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredCases.length / casesPerPage), prev + 1))}
-                          disabled={currentPage >= Math.ceil(filteredCases.length / casesPerPage)}
-                          className="px-3 py-1 text-sm border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
                   </div>
                     </div>
-                  )}
+                      <div className="space-y-1">
+                        <p className={`text-lg font-semibold ${getRiskScoreColor(analytics.risk_score)}`}>
+                          {analytics.risk_level} Risk
+                        </p>
+                        <p className="text-sm text-slate-600">Financial Risk Score</p>
                 </div>
-              )}
-            </section>
           </div>
 
-          {/* Right Column - Sidebar */}
-          <div className="space-y-6">
-            {/* Risk Assessment */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-sky-600" />
-                Risk Assessment
-              </h2>
-              <div className="text-center">
-                <div className={`text-3xl font-bold mb-2 ${getRiskScoreColor(bankData.riskScore)}`}>
-                  {bankData.riskScore}%
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600">Resolved:</span>
+                        <span className="font-semibold text-green-600">{caseStats?.resolved_cases || 0}</span>
                 </div>
-                <div className="text-sm text-slate-600 mb-4">{bankData.riskLevel} Risk Score</div>
-                <div className="w-full bg-slate-200 rounded-full h-3">
-                  <div
-                    className={`h-3 rounded-full ${getProgressBarColor(bankData.riskScore)}`}
-                    style={{ width: `${bankData.riskScore}%` }}
-                  ></div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600">Unresolved:</span>
+                        <span className="font-semibold text-orange-600">{caseStats?.unresolved_cases || 0}</span>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">Based on case history and outcomes</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600">Mixed:</span>
+                        <span className="font-semibold text-yellow-600">{caseStats?.mixed_cases || 0}</span>
               </div>
-            </section>
-
-            {/* Verification Status */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                {bankData.isVerified ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                ) : (
-                  <XCircle className="h-5 w-5 text-red-600" />
-                )}
-                Verification Status
-              </h2>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  {bankData.isVerified ? (
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <XCircle className="h-4 w-4 text-red-600" />
-                  )}
-                  <span className="text-sm font-medium text-slate-900">
-                    {bankData.isVerified ? 'Verified' : 'Not Verified'}
+                    </div>
+                    
+                    {analytics.risk_factors && analytics.risk_factors.length > 0 && (
+                      <div className="text-left mt-4">
+                        <p className="text-xs font-medium text-slate-700 mb-2">Key Risk Factors:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {analytics.risk_factors.slice(0, 4).map((factor, index) => (
+                            <span key={index} className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">
+                              {factor}
                   </span>
+                          ))}
+                          {analytics.risk_factors.length > 4 && (
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                              +{analytics.risk_factors.length - 4} more
+                            </span>
+                          )}
                 </div>
-                {bankData.verificationDate && (
-                  <div className="text-xs text-slate-500">
-                    Verified on: {bankData.verificationDate}
                   </div>
                 )}
-                {bankData.verificationNotes && (
-                  <div className="text-xs text-slate-500">
-                    {bankData.verificationNotes}
-                  </div>
+                  </>
                 )}
               </div>
-            </section>
+            )}
 
             {/* Quick Stats */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <Clock className="h-5 w-5 text-sky-600" />
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <Clock className="h-5 w-5 text-blue-600" />
                 Quick Stats
-              </h2>
+                {(caseStatsLoading || analyticsLoading) && <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />}
+              </h3>
+              {(caseStatsLoading || analyticsLoading) ? (
+                <div className="space-y-3">
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                </div>
+                </div>
+              ) : (
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Search Count</span>
-                  <span className="text-sm font-medium text-slate-900">{bankData.searchCount}</span>
+                    <span className="text-sm text-slate-600">Total Cases:</span>
+                    <span className="text-sm font-semibold text-slate-900">{caseStats?.total_cases || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Last Searched</span>
-                  <span className="text-sm font-medium text-slate-900">{bankData.lastSearched || 'Never'}</span>
+                    <span className="text-sm text-slate-600">Resolved Cases:</span>
+                    <span className="text-sm font-semibold text-slate-900">{caseStats?.resolved_cases || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Status</span>
-                  <span className={`text-sm font-medium ${
-                    bankData.isActive ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {bankData.isActive ? 'Active' : 'Inactive'}
+                    <span className="text-sm text-slate-600">Unresolved Cases:</span>
+                    <span className="text-sm font-semibold text-slate-900">{caseStats?.unresolved_cases || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Favorable Cases:</span>
+                    <span className="text-sm font-semibold text-green-600">{caseStats?.favorable_cases || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Unfavorable Cases:</span>
+                    <span className="text-sm font-semibold text-red-600">{caseStats?.unfavorable_cases || 0}</span>
+              </div>
+                <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Mixed Cases:</span>
+                    <span className="text-sm font-semibold text-yellow-600">{caseStats?.mixed_cases || 0}</span>
+              </div>
+                <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">Overall Outcome:</span>
+                    <span className={`text-sm font-semibold ${
+                      caseStats?.case_outcome === 'Favorable' ? 'text-green-600' :
+                      caseStats?.case_outcome === 'Unfavorable' ? 'text-red-600' :
+                      caseStats?.case_outcome === 'Mixed' ? 'text-yellow-600' :
+                      'text-gray-600'
+                    }`}>
+                      {caseStats?.case_outcome || 'N/A'}
                   </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">Created</span>
-                  <span className="text-sm font-medium text-slate-900">{bankData.createdAt}</span>
-                </div>
-              </div>
-            </section>
-
-            {/* Quick Actions */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-sky-600" />
-                Quick Actions
-              </h2>
-              <div className="space-y-3">
-                <button className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
-                  <User className="h-4 w-4 inline mr-2" />
-                  View Related People
-                </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
-                  <Scale className="h-4 w-4 inline mr-2" />
-                  View Similar Cases
-                </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
-                  <Download className="h-4 w-4 inline mr-2" />
-                  Download Report
-                </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
-                  <ExternalLink className="h-4 w-4 inline mr-2" />
-                  Visit Website
-                </button>
-              </div>
-            </section>
           </div>
         </div>
+              )}
       </div>
 
-      {/* Request Details Modal */}
-      {showRequestModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Request Case Details</h3>
-            
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-slate-700 mb-2">Request Type</label>
-              <select
-                value={requestType}
-                onChange={(e) => setRequestType(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-              >
-                <option value="case_details">Case Details</option>
-                <option value="full_report">Full Report</option>
-                <option value="legal_documents">Legal Documents</option>
-              </select>
             </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-slate-700 mb-2">Case Information</label>
-              <div className="bg-slate-50 p-3 rounded-lg text-sm">
-                <p><strong>Case:</strong> {selectedCase?.suit_reference_number}</p>
-                <p><strong>Title:</strong> {selectedCase?.title}</p>
-                <p><strong>Bank:</strong> {bankData?.name}</p>
               </div>
             </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-700 mb-2">Additional Message (Optional)</label>
-              <textarea
-                value={requestMessage}
-                onChange={(e) => setRequestMessage(e.target.value)}
-                placeholder="Please specify any additional information you need..."
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 h-20 resize-none"
-              />
-            </div>
-
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowRequestModal(false)}
-                className="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmitRequest}
-                className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"
-              >
-                Submit Request
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

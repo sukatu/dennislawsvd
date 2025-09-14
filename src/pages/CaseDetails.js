@@ -48,6 +48,8 @@ const CaseDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [caseData, setCaseData] = useState(null);
+  const [relatedCases, setRelatedCases] = useState([]);
+  const [originalPersonCases, setOriginalPersonCases] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,12 +63,10 @@ const CaseDetails = () => {
   const [expandedSections, setExpandedSections] = useState({
     basicInfo: true,
     caseSummary: true,
-    caseContent: true,
     people: false,
     riskAssessment: true,
     financialImpact: true,
     caseTimeline: true,
-    conclusion: true,
     caseDocuments: true,
     subjectMatter: true
   });
@@ -78,13 +78,18 @@ const CaseDetails = () => {
   useEffect(() => {
     console.log('CaseDetails useEffect triggered with caseId:', caseId);
     if (caseId) {
+      // Check if we have original person cases from navigation state
+      const state = location.state;
+      if (state && state.originalPersonCases) {
+        setOriginalPersonCases(state.originalPersonCases);
+      }
       loadCaseDetails();
     } else {
       console.error('No caseId provided');
       setError('No case ID provided');
       setLoading(false);
     }
-  }, [caseId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [caseId, location.state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadCaseDetails = async () => {
     try {
@@ -94,23 +99,55 @@ const CaseDetails = () => {
       const token = localStorage.getItem('accessToken') || 'test-token-123';
       console.log('Using token:', token ? 'Present' : 'Missing');
       
-      const response = await fetch(`http://localhost:8000/api/case-search/${caseId}/details`, {
+      // Load case details and related cases in parallel
+      const [caseResponse, relatedResponse] = await Promise.all([
+        fetch(`http://localhost:8000/api/case-search/${caseId}/details`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
-      });
+        }),
+        fetch(`http://localhost:8000/api/case-search/${caseId}/related-cases?limit=8`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+      ]);
 
-      console.log('API Response status:', response.status);
+      console.log('API Response status:', caseResponse.status);
       
-      if (response.ok) {
-        const data = await response.json();
+      if (caseResponse.ok) {
+        const data = await caseResponse.json();
         console.log('Case data loaded:', data);
         setCaseData(data);
       } else {
-        const errorText = await response.text();
+        const errorText = await caseResponse.text();
         console.error('API Error:', errorText);
-        setError(`Failed to load case details: ${response.status} - ${errorText}`);
+        setError(`Failed to load case details: ${caseResponse.status} - ${errorText}`);
+      }
+
+      if (relatedResponse.ok) {
+        const relatedData = await relatedResponse.json();
+        console.log('Related cases loaded:', relatedData);
+        
+        // If we have original person cases, filter to only show those
+        if (originalPersonCases) {
+          const originalCaseIds = originalPersonCases.map(caseItem => caseItem.id);
+          console.log('Original person case IDs:', originalCaseIds);
+          console.log('Related cases from API:', relatedData.related_cases);
+          const filteredCases = relatedData.related_cases.filter(relatedCase => 
+            originalCaseIds.includes(relatedCase.id)
+          );
+          console.log('Filtered to original person cases:', filteredCases);
+          setRelatedCases(filteredCases);
+        } else {
+          console.log('No original person cases, showing all related cases:', relatedData.related_cases);
+          setRelatedCases(relatedData.related_cases || []);
+        }
+      } else {
+        console.log('Failed to load related cases, continuing without them');
+        setRelatedCases([]);
       }
     } catch (err) {
       setError('Error loading case details');
@@ -566,6 +603,44 @@ const CaseDetails = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Bank Name - Display if bank is involved in the case */}
+                {(() => {
+                  // List of known bank names to check against
+                  const bankNames = [
+                    'Access Bank', 'Ghana Commercial Bank', 'Ecobank', 'Standard Chartered Bank',
+                    'Absa Bank', 'Fidelity Bank', 'Agricultural Development Bank', 'Bank of Africa',
+                    'Bank of Ghana', 'Consolidated Bank Ghana', 'First Atlantic Bank', 'Guaranty Trust Bank',
+                    'National Investment Bank', 'Omnibsic Bank', 'Prudential Bank', 'Societe Generale',
+                    'Stanbic Bank', 'The Royal Bank', 'Universal Merchant Bank', 'Zenith Bank',
+                    'ABII National Bank', 'CalBank', 'CBG Bank', 'First Bank of Nigeria',
+                    'Ghana Exim Bank', 'NIB Bank', 'Republic Bank', 'Societe Generale Bank'
+                  ];
+                  
+                  // Check protagonist and antagonist fields for bank names
+                  const protagonist = caseData?.protagonist || '';
+                  const antagonist = caseData?.antagonist || '';
+                  const title = caseData?.title || '';
+                  
+                  // Find bank name in any of these fields
+                  const foundBank = bankNames.find(bank => 
+                    protagonist.toLowerCase().includes(bank.toLowerCase()) ||
+                    antagonist.toLowerCase().includes(bank.toLowerCase()) ||
+                    title.toLowerCase().includes(bank.toLowerCase())
+                  );
+                  
+                  return foundBank ? (
+                    <div className="mb-2">
+                      <h1 className="text-2xl font-bold text-green-900 break-words leading-tight">
+                        {foundBank}
+                      </h1>
+                      <div className="flex items-center space-x-2 text-sm text-green-600">
+                        <Building2 className="w-4 h-4" />
+                        <span>Bank Profile</span>
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
                 
                 {/* Case Title */}
                 <h2 className="text-xl font-bold text-gray-900 break-words leading-tight">
@@ -605,7 +680,9 @@ const CaseDetails = () => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="space-y-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Main Content */}
+          <div className="flex-1 space-y-6">
           {/* Basic Information */}
           <div className="bg-white rounded-lg shadow-sm border">
             <SectionHeader
@@ -750,9 +827,10 @@ const CaseDetails = () => {
                           
                           // Generate comprehensive AI-based banking summary
                           const generateBankingSummary = () => {
-                            const caseText = caseData?.decision || caseData?.judgement || caseData?.conclusion || '';
+                            const caseText = caseData?.decision || caseData?.judgement || '';
+                            const conclusion = caseData?.conclusion || '';
                             const title = caseData?.title || '';
-                            const fullText = (caseText + ' ' + title + ' ' + (caseData?.case_summary || '')).toLowerCase();
+                            const fullText = (caseText + ' ' + conclusion + ' ' + title + ' ' + (caseData?.case_summary || '')).toLowerCase();
                             
                             // Enhanced outcome analysis
                             let wonLost = 'UNRESOLVED';
@@ -839,6 +917,14 @@ const CaseDetails = () => {
                                 detailedOutcome += 'Criminal or fraud-related matter with serious legal implications.';
                               } else {
                                 detailedOutcome += 'General legal matter with standard legal implications.';
+                              }
+                              
+                              // Add conclusion if available
+                              if (conclusion && conclusion.trim()) {
+                                const conclusionText = conclusion.replace(/<[^>]*>/g, '').trim();
+                                if (conclusionText.length > 0) {
+                                  detailedOutcome += ` Court Conclusion: ${conclusionText.substring(0, 200)}${conclusionText.length > 200 ? '...' : ''}`;
+                                }
                               }
                             } else {
                               detailedOutcome = 'Case outcome details not clearly specified in available information.';
@@ -961,56 +1047,134 @@ const CaseDetails = () => {
             )}
           </div>
 
-          {/* Case Content */}
+          {/* Case Document */}
           <div className="bg-white rounded-lg shadow-sm border">
             <SectionHeader
-              title="Case Content"
+              title="Case Document"
               icon={FileText}
-              isExpanded={expandedSections.caseContent}
-              onToggle={() => toggleSection('caseContent')}
+              isExpanded={expandedSections.caseDocuments}
+              onToggle={() => toggleSection('caseDocuments')}
             />
-            {expandedSections.caseContent && (
-              <div className="p-6 space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium text-gray-600">Case Content</h4>
-                    <button
-                      onClick={() => setIsModalOpen(true)}
-                      className="inline-flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                      <Eye className="w-4 h-4" />
-                      <span>View Full Case</span>
-                    </button>
+            {expandedSections.caseDocuments && (
+              <div className="p-6">
+                {/* Document Table */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <FileText className="w-5 h-5 text-gray-600" />
+                    <span className="text-sm font-semibold text-gray-800 uppercase tracking-wide">Document Information</span>
                   </div>
-                  <div 
-                    className="text-sm text-gray-900 leading-relaxed max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{
-                      __html: caseData.summernote_content || caseData.summernote || caseData.summarnote || caseData.metadata?.case_summary || caseData.case_summary || 'No case content available'
-                    }}
-                  />
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 uppercase tracking-wide">Date</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 uppercase tracking-wide">Nature of Doc</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 uppercase tracking-wide">Doc. By</th>
+                          <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700 uppercase tracking-wide">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-gray-100 hover:bg-white transition-colors">
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            {caseData?.date ? formatDate(caseData.date) : 'N/A'}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            <div className="flex items-center space-x-2">
+                              <BookOpen className="w-4 h-4 text-blue-500" />
+                              <span className="font-medium">
+                                {caseData?.area_of_law || caseData?.type || 'Judgement'}
+                              </span>
+                            </div>
+                            {caseData?.dl_type && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                Type: {caseData.dl_type}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            <div className="flex items-center space-x-2">
+                              <Scale className="w-4 h-4 text-green-500" />
+                              <span className="font-medium">
+                                Court
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              Court Document
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <div className="flex items-center justify-center space-x-2">
+                    <button
+                                onClick={() => window.open('https://dennislawgh.com', '_blank')}
+                                className="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                                title="View on DennisLawGH.com"
+                    >
+                                <Eye className="w-3 h-3" />
+                                <span>View</span>
+                    </button>
+                              <button
+                                onClick={() => {
+                                  const link = document.createElement('a');
+                                  link.href = caseData?.file_url || caseData?.firebase_url || '#';
+                                  link.download = caseData?.file_name || `${caseData?.title?.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
+                                  link.target = '_blank';
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                }}
+                                className="inline-flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors duration-200"
+                                title="Download PDF"
+                              >
+                                <Download className="w-3 h-3" />
+                                <span>Download</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
                 
-                {/* Link to full case on dennislawgh.com */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-3">
-                    <ExternalLink className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium text-blue-900 mb-1">Full Case Details</h4>
-                      <p className="text-sm text-blue-700 mb-3">
-                        For the complete case details, including full decision, judgement, commentary, and legal analysis, visit:
-                      </p>
-                      <a
-                        href="https://dennislawgh.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View on DennisLawGH.com
-                      </a>
+                {/* Additional Document Details */}
+                {(caseData?.file_name || caseData?.dl_citation_no || caseData?.citation) && (
+                  <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h4 className="text-sm font-medium text-blue-900 mb-3 flex items-center space-x-2">
+                      <FileText className="w-4 h-4" />
+                      <span>Document Details</span>
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      {caseData?.file_name && (
+                        <div className="flex items-center space-x-2 text-blue-800">
+                          <FileText className="w-4 h-4" />
+                          <div>
+                            <div className="font-medium">File Name</div>
+                            <div className="text-xs text-blue-600 truncate">{caseData.file_name}</div>
                     </div>
                   </div>
+                      )}
+                      {caseData?.dl_citation_no && (
+                        <div className="flex items-center space-x-2 text-blue-800">
+                          <BookOpen className="w-4 h-4" />
+                          <div>
+                            <div className="font-medium">Citation No</div>
+                            <div className="text-xs text-blue-600">{caseData.dl_citation_no}</div>
                 </div>
+                        </div>
+                      )}
+                      {caseData?.citation && (
+                        <div className="flex items-center space-x-2 text-blue-800">
+                          <Scale className="w-4 h-4" />
+                          <div>
+                            <div className="font-medium">Citation</div>
+                            <div className="text-xs text-blue-600">{caseData.citation}</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1298,172 +1462,7 @@ const CaseDetails = () => {
             </div>
           </div>
 
-          {/* Conclusion of the Court */}
-          <div className="bg-white rounded-lg shadow-sm border">
-            <SectionHeader
-              title="Conclusion of the Court"
-              icon={Gavel}
-              isExpanded={expandedSections.conclusion}
-              onToggle={() => toggleSection('conclusion')}
-            />
-            {expandedSections.conclusion && (
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div className="bg-amber-50 p-6 rounded-lg border-l-4 border-amber-500">
-                    <div className="flex items-center space-x-2 mb-3">
-                      <Gavel className="w-5 h-5 text-amber-600" />
-                      <span className="text-sm font-semibold text-amber-800 uppercase tracking-wide">Court's Conclusion</span>
-                    </div>
-                    <div className="prose prose-sm max-w-none">
-                      <div 
-                        className="text-gray-900 leading-relaxed"
-                        dangerouslySetInnerHTML={{
-                          __html: caseData?.conclusion || caseData?.court_order || caseData?.final_orders || 'No conclusion available'
-                        }}
-                      />
-                    </div>
-                  </div>
-                  
-                  {caseData?.board_resolution && (
-                    <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
-                      <div className="flex items-center space-x-2 mb-3">
-                        <FileText className="w-5 h-5 text-blue-600" />
-                        <span className="text-sm font-semibold text-blue-800 uppercase tracking-wide">Board Resolution</span>
-                      </div>
-                      <div className="prose prose-sm max-w-none">
-                        <div 
-                          className="text-gray-900 leading-relaxed"
-                          dangerouslySetInnerHTML={{
-                            __html: caseData.board_resolution
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
 
-          {/* Case Documents */}
-          <div className="bg-white rounded-lg shadow-sm border">
-            <SectionHeader
-              title="Case Documents"
-              icon={FileText}
-              isExpanded={expandedSections.caseDocuments}
-              onToggle={() => toggleSection('caseDocuments')}
-            />
-            {expandedSections.caseDocuments && (
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <FileText className="w-5 h-5 text-gray-600" />
-                      <span className="text-sm font-semibold text-gray-800 uppercase tracking-wide">Available Documents</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {/* Main Case Document */}
-                      <div className="bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors duration-200">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <FileText className="w-5 h-5 text-blue-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">Case Judgment</p>
-                            <p className="text-xs text-gray-500">PDF Document</p>
-                          </div>
-                        </div>
-                        <div className="mt-3 flex space-x-2">
-                          <button className="flex-1 inline-flex items-center justify-center space-x-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                            <Eye className="w-3 h-3" />
-                            <span>View</span>
-                          </button>
-                          <button className="flex-1 inline-flex items-center justify-center space-x-1 px-3 py-1.5 bg-gray-600 text-white text-xs font-medium rounded-lg hover:bg-gray-700 transition-colors duration-200">
-                            <Download className="w-3 h-3" />
-                            <span>Download</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Court Order Document */}
-                      {caseData?.court_order && (
-                        <div className="bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 transition-colors duration-200">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                              <Gavel className="w-5 h-5 text-green-600" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">Court Order</p>
-                              <p className="text-xs text-gray-500">PDF Document</p>
-                            </div>
-                          </div>
-                          <div className="mt-3 flex space-x-2">
-                            <button className="flex-1 inline-flex items-center justify-center space-x-1 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors duration-200">
-                              <Eye className="w-3 h-3" />
-                              <span>View</span>
-                            </button>
-                            <button className="flex-1 inline-flex items-center justify-center space-x-1 px-3 py-1.5 bg-gray-600 text-white text-xs font-medium rounded-lg hover:bg-gray-700 transition-colors duration-200">
-                              <Download className="w-3 h-3" />
-                              <span>Download</span>
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Board Resolution Document */}
-                      {caseData?.board_resolution && (
-                        <div className="bg-white p-4 rounded-lg border border-gray-200 hover:border-purple-300 transition-colors duration-200">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                              <FileText className="w-5 h-5 text-purple-600" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">Board Resolution</p>
-                              <p className="text-xs text-gray-500">PDF Document</p>
-                            </div>
-                          </div>
-                          <div className="mt-3 flex space-x-2">
-                            <button className="flex-1 inline-flex items-center justify-center space-x-1 px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors duration-200">
-                              <Eye className="w-3 h-3" />
-                              <span>View</span>
-                            </button>
-                            <button className="flex-1 inline-flex items-center justify-center space-x-1 px-3 py-1.5 bg-gray-600 text-white text-xs font-medium rounded-lg hover:bg-gray-700 transition-colors duration-200">
-                              <Download className="w-3 h-3" />
-                              <span>Download</span>
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Additional Documents Placeholder */}
-                      <div className="bg-white p-4 rounded-lg border border-gray-200 hover:border-orange-300 transition-colors duration-200">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                            <FileText className="w-5 h-5 text-orange-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">Supporting Documents</p>
-                            <p className="text-xs text-gray-500">Multiple Files</p>
-                          </div>
-                        </div>
-                        <div className="mt-3 flex space-x-2">
-                          <button className="flex-1 inline-flex items-center justify-center space-x-1 px-3 py-1.5 bg-orange-600 text-white text-xs font-medium rounded-lg hover:bg-orange-700 transition-colors duration-200">
-                            <Eye className="w-3 h-3" />
-                            <span>View All</span>
-                          </button>
-                          <button className="flex-1 inline-flex items-center justify-center space-x-1 px-3 py-1.5 bg-gray-600 text-white text-xs font-medium rounded-lg hover:bg-gray-700 transition-colors duration-200">
-                            <Download className="w-3 h-3" />
-                            <span>Download</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Subject Matter */}
           <div className="bg-white rounded-lg shadow-sm border">
@@ -1516,6 +1515,118 @@ const CaseDetails = () => {
               </div>
             )}
           </div>
+          </div>
+
+          {/* Right Sidebar - Related Cases */}
+          {console.log('Related cases length:', relatedCases.length, 'Related cases:', relatedCases)}
+          {(relatedCases.length > 0 || true) && (
+            <div className="lg:w-80 space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border">
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex items-center space-x-2">
+                    <Users className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">Related Cases</h3>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {originalPersonCases ? 
+                      `Cases from original search (${relatedCases.length} of ${originalPersonCases.length})` :
+                      `Cases involving the same people (${relatedCases.length})`
+                    }
+                  </p>
+                </div>
+                <div className="p-4">
+                  {relatedCases.length > 0 ? (
+                    <div className="space-y-3">
+                      {relatedCases.map((relatedCase, index) => (
+                      <div
+                        key={relatedCase.id}
+                        onClick={() => navigate(`/case-details/${relatedCase.id}${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`, {
+                          state: { originalPersonCases: originalPersonCases || relatedCases }
+                        })}
+                        className="p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-colors duration-200 group"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="text-sm font-medium text-gray-900 group-hover:text-blue-900 line-clamp-2">
+                            {relatedCase.title}
+                          </h4>
+                          <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-500 flex-shrink-0 ml-2" />
+                        </div>
+                        
+                        <div className="space-y-1 text-xs text-gray-600">
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-3 h-3" />
+                            <span>{formatDate(relatedCase.date)}</span>
+                          </div>
+                          
+                          {relatedCase.suit_reference_number && (
+                            <div className="flex items-center space-x-2">
+                              <Scale className="w-3 h-3" />
+                              <span className="truncate">{relatedCase.suit_reference_number}</span>
+                            </div>
+                          )}
+                          
+                          {relatedCase.area_of_law && (
+                            <div className="flex items-center space-x-2">
+                              <BookOpen className="w-3 h-3" />
+                              <span className="truncate">{relatedCase.area_of_law}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center justify-between mt-2">
+                          <div className="flex items-center space-x-2">
+                            {relatedCase.ai_case_outcome && (
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                relatedCase.ai_case_outcome === 'WON' ? 'bg-green-100 text-green-800' :
+                                relatedCase.ai_case_outcome === 'LOST' ? 'bg-red-100 text-red-800' :
+                                relatedCase.ai_case_outcome === 'PARTIALLY_WON' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {relatedCase.ai_case_outcome}
+                              </span>
+                            )}
+                            {relatedCase.ai_financial_impact && (
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                relatedCase.ai_financial_impact.includes('HIGH') ? 'bg-red-100 text-red-800' :
+                                relatedCase.ai_financial_impact.includes('MODERATE') ? 'bg-yellow-100 text-yellow-800' :
+                                relatedCase.ai_financial_impact.includes('LOW') ? 'bg-green-100 text-green-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {relatedCase.ai_financial_impact.split(' - ')[0]}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="mt-2 text-xs text-blue-600 group-hover:text-blue-700">
+                          <span className="font-medium">Matched:</span> {relatedCase.matched_person}
+                        </div>
+                      </div>
+                      ))}
+                      
+                      {relatedCases.length >= 8 && (
+                        <div className="mt-4 p-3 bg-gray-50 rounded-lg text-center">
+                          <p className="text-xs text-gray-500">
+                            Showing 8 of many related cases
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                      <p className="text-gray-500 text-sm">
+                        {originalPersonCases ? 
+                          'No related cases found from original search' :
+                          'No related cases found'
+                        }
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

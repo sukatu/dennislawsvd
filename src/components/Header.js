@@ -6,6 +6,7 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [userName, setUserName] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -13,15 +14,39 @@ const Header = () => {
   useEffect(() => {
     const authStatus = localStorage.getItem('isAuthenticated');
     const email = localStorage.getItem('userEmail');
+    const name = localStorage.getItem('userName');
     const authProvider = localStorage.getItem('authProvider');
     setIsAuthenticated(authStatus === 'true');
     setUserEmail(email || '');
+    setUserName(name || '');
     
     // Log authentication provider for debugging
     if (authProvider) {
       console.log('User authenticated via:', authProvider);
     }
   }, []);
+
+  // Function to get user initials
+  const getUserInitials = () => {
+    if (userName) {
+      return userName
+        .split(' ')
+        .map(name => name.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    if (userEmail) {
+      const emailName = userEmail.split('@')[0];
+      return emailName
+        .split('.')
+        .map(part => part.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    return 'U';
+  };
 
   const handleLogout = () => {
     // Clear all authentication data
@@ -38,6 +63,7 @@ const Header = () => {
     
     setIsAuthenticated(false);
     setUserEmail('');
+    setUserName('');
     navigate('/');
   };
 
@@ -79,9 +105,13 @@ const Header = () => {
         <div className="hidden md:flex items-center gap-3">
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-sm text-slate-200">
-                <User className="h-4 w-4" />
-                <span className="hidden lg:inline">{userEmail}</span>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  {getUserInitials()}
+                </div>
+                <span className="hidden lg:inline text-sm text-slate-200">
+                  {userName || userEmail.split('@')[0]}
+                </span>
               </div>
               <Link
                 to="/settings"
@@ -155,8 +185,10 @@ const Header = () => {
               {isAuthenticated ? (
                 <div className="space-y-1">
                   <div className="px-3 py-2 text-sm text-slate-300 flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    {userEmail}
+                    <div className="w-6 h-6 bg-sky-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                      {getUserInitials()}
+                    </div>
+                    {userName || userEmail.split('@')[0]}
                   </div>
                   <Link
                     to="/settings"

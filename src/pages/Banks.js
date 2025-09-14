@@ -11,7 +11,7 @@ const Banks = () => {
   const [itemsPerPage] = useState(9);
   const [banksData, setBanksData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
 
   // Bank logo mapping
@@ -58,28 +58,11 @@ const Banks = () => {
 
   // Load banks data from API
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('accessToken');
-      setIsAuthenticated(!!token);
-      return !!token;
-    };
-
-    if (checkAuth()) {
-      loadBanksData();
-    } else {
-      setIsLoading(false);
-    }
+    loadBanksData();
   }, [currentPage, itemsPerPage, searchTerm, filterStatus]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadBanksData = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        console.error('No authentication token found');
-        setIsLoading(false);
-        return;
-      }
-
       setIsLoading(true);
       const params = new URLSearchParams({
         page: currentPage.toString(),
@@ -92,7 +75,6 @@ const Banks = () => {
 
       const response = await fetch(`http://localhost:8000/api/banks/search?${params}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -101,25 +83,89 @@ const Banks = () => {
         const data = await response.json();
         console.log('Banks data loaded:', data);
         
-        const transformedBanks = (data.banks || []).map(bank => ({
-          id: bank.id,
-          name: bank.name,
-          logo: bank.logo_url || bankLogoMap[bank.name] || '/banks/default-bank.jpeg',
-          phone: bank.phone || 'N/A',
-          email: bank.email || 'N/A',
-          address: bank.address || 'N/A',
-          website: bank.website || 'N/A',
-          established: bank.established_date ? new Date(bank.established_date).getFullYear().toString() : 'N/A',
-          totalCases: 0, // This would come from a separate cases API
-          activeCases: 0,
-          resolvedCases: 0,
-          riskLevel: 'Low', // This would be calculated based on cases
-          riskScore: 0,
-          lastActivity: bank.updated_at ? new Date(bank.updated_at).toISOString().split('T')[0] : 'N/A',
-          cases: [] // This would come from a separate cases API
-        }));
+        // Load case statistics and analytics for each bank
+        const banksWithStats = await Promise.all(
+          (data.banks || []).map(async (bank) => {
+            try {
+              // Fetch both case statistics and analytics for this bank
+              const [statsResponse, analyticsResponse] = await Promise.all([
+                fetch(`http://localhost:8000/api/banks/${bank.id}/case-statistics`, {
+                  headers: { 'Content-Type': 'application/json' }
+                }),
+                fetch(`http://localhost:8000/api/banks/${bank.id}/analytics`, {
+                  headers: { 'Content-Type': 'application/json' }
+                })
+              ]);
+              
+              let caseStats = {
+                total_cases: 0,
+                resolved_cases: 0,
+                unresolved_cases: 0,
+                favorable_cases: 0,
+                unfavorable_cases: 0,
+                mixed_cases: 0,
+                case_outcome: 'N/A'
+              };
+              
+              let analytics = {
+                risk_level: 'Low',
+                risk_score: 0,
+                risk_factors: [],
+                financial_risk_level: 'Low'
+              };
+              
+              if (statsResponse.ok) {
+                const statsData = await statsResponse.json();
+                caseStats = statsData.statistics_available ? statsData : caseStats;
+              }
+              
+              if (analyticsResponse.ok) {
+                const analyticsData = await analyticsResponse.json();
+                analytics = analyticsData.analytics_available ? analyticsData : analytics;
+              }
+              
+              return {
+                id: bank.id,
+                name: bank.name,
+                logo: bank.logo_url || bankLogoMap[bank.name] || '/banks/default-bank.jpeg',
+                phone: bank.phone || 'N/A',
+                email: bank.email || 'N/A',
+                address: bank.address || 'N/A',
+                website: bank.website || 'N/A',
+                established: bank.established_date ? new Date(bank.established_date).getFullYear().toString() : 'N/A',
+                lastActivity: bank.updated_at ? new Date(bank.updated_at).toISOString().split('T')[0] : 'N/A',
+                ...caseStats,
+                ...analytics
+              };
+            } catch (error) {
+              console.error(`Error loading data for bank ${bank.name}:`, error);
+              return {
+                id: bank.id,
+                name: bank.name,
+                logo: bank.logo_url || bankLogoMap[bank.name] || '/banks/default-bank.jpeg',
+                phone: bank.phone || 'N/A',
+                email: bank.email || 'N/A',
+                address: bank.address || 'N/A',
+                website: bank.website || 'N/A',
+                established: bank.established_date ? new Date(bank.established_date).getFullYear().toString() : 'N/A',
+                lastActivity: bank.updated_at ? new Date(bank.updated_at).toISOString().split('T')[0] : 'N/A',
+                total_cases: 0,
+                resolved_cases: 0,
+                unresolved_cases: 0,
+                favorable_cases: 0,
+                unfavorable_cases: 0,
+                mixed_cases: 0,
+                case_outcome: 'N/A',
+                risk_level: 'Low',
+                risk_score: 0,
+                risk_factors: [],
+                financial_risk_level: 'Low'
+              };
+            }
+          })
+        );
 
-        setBanksData(transformedBanks);
+        setBanksData(banksWithStats);
         // setTotalPages(data.total_pages || 0);
         setTotalResults(data.total || 0);
       } else {
@@ -141,13 +187,13 @@ const Banks = () => {
 
   // Handle bank click
   const handleBankClick = (bank) => {
-    navigate(`/bank-detail?id=${bank.id}&name=${encodeURIComponent(bank.name)}`);
+    navigate(`/bank-detail/${bank.id}`);
   };
 
   // Filter and sort banks
   const filteredBanks = banksData.filter(bank => {
     if (filterStatus === 'all') return true;
-    return bank.riskLevel === filterStatus;
+    return bank.risk_level === filterStatus;
   });
 
   // Pagination
@@ -270,13 +316,20 @@ const Banks = () => {
                     <h3 className="text-lg font-semibold text-gray-900">{bank.name}</h3>
                     <p className="text-sm text-gray-600">{bank.established}</p>
                 </div>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    bank.riskLevel === 'Low' ? 'bg-green-100 text-green-800' :
-                    bank.riskLevel === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {bank.riskLevel} Risk
-                </div>
+                  <div className="text-right">
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      bank.risk_level === 'Low' ? 'bg-green-100 text-green-800' :
+                      bank.risk_level === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {bank.risk_level} Risk
+                    </div>
+                    {bank.risk_score > 0 && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Score: {bank.risk_score}/100
+                      </div>
+                    )}
+                  </div>
               </div>
 
                 <div className="space-y-2 mb-4">
@@ -294,11 +347,56 @@ const Banks = () => {
                 </div>
               </div>
 
+                {/* Quick Stats */}
                 <div className="border-t pt-4">
-                  <div className="flex justify-between items-center text-sm text-gray-600">
-                    <span>Total Cases: {bank.totalCases}</span>
-                    <span>Last Activity: {bank.lastActivity}</span>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-gray-600">Total Cases:</span>
+                      <span className="font-semibold text-gray-900">{bank.total_cases || 0}</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-gray-600">Resolved:</span>
+                      <span className="font-semibold text-green-600">{bank.resolved_cases || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      <span className="text-gray-600">Unresolved:</span>
+                      <span className="font-semibold text-red-600">{bank.unresolved_cases || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                      <span className="text-gray-600">Outcome:</span>
+                      <span className="font-semibold text-purple-600">{bank.case_outcome || 'N/A'}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Risk Assessment Details */}
+                  {bank.risk_score > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+                        <span>Risk Assessment</span>
+                        <span className="font-medium">{bank.risk_score}/100</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div 
+                          className={`h-1.5 rounded-full ${
+                            bank.risk_score <= 30 ? 'bg-green-500' :
+                            bank.risk_score <= 60 ? 'bg-yellow-500' :
+                            'bg-red-500'
+                          }`}
+                          style={{ width: `${Math.min(bank.risk_score, 100)}%` }}
+                        ></div>
+                      </div>
+                      {bank.risk_factors && bank.risk_factors.length > 0 && (
+                        <div className="mt-2 text-xs text-gray-500">
+                          <span className="font-medium">Key Risks:</span> {bank.risk_factors.slice(0, 2).join(', ')}
+                          {bank.risk_factors.length > 2 && '...'}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -1,20 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Search, Filter, TrendingUp, AlertTriangle, CheckCircle, Clock, ChevronLeft, ChevronRight, ArrowLeft, Phone, Mail } from 'lucide-react';
+import { Shield, Search, AlertTriangle, ChevronLeft, ChevronRight, ArrowLeft, Phone, Mail } from 'lucide-react';
 
 const Insurance = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
   const searchRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(9);
   const [insuranceData, setInsuranceData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [totalPages, setTotalPages] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
 
   // Insurance company logo mapping
@@ -139,7 +136,6 @@ const Insurance = () => {
         }));
 
         setInsuranceData(transformedInsurance);
-        setTotalPages(data.total_pages || 0);
         setTotalResults(data.total || 0);
       } else {
         console.error('Failed to load insurance data:', response.status);
@@ -160,7 +156,7 @@ const Insurance = () => {
 
   // Handle insurance click
   const handleInsuranceClick = (company) => {
-    navigate(`/insurance-detail?id=${company.id}`);
+    navigate(`/insurance-profile/${company.id}?name=${encodeURIComponent(company.name)}`);
   };
 
   // Filter and sort insurance

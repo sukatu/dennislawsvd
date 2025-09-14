@@ -49,6 +49,14 @@ class ReportedCases(Base):
     opinion_by = Column(String(200), nullable=True)
     conclusion = Column(Text, nullable=True)
     
+    # AI Banking Summary Fields
+    ai_case_outcome = Column(String(50), nullable=True, comment='AI-generated case outcome')
+    ai_court_orders = Column(Text, nullable=True, comment='AI-generated court orders analysis')
+    ai_financial_impact = Column(String(50), nullable=True, comment='AI-generated financial impact level')
+    ai_detailed_outcome = Column(Text, nullable=True, comment='AI-generated detailed outcome analysis')
+    ai_summary_generated_at = Column(DateTime, nullable=True, comment='Timestamp when AI summary was generated')
+    ai_summary_version = Column(String(10), nullable=True, default='1.0', comment='Version of AI summary generation algorithm')
+    
     # Relationships
     case_metadata = relationship("CaseMetadata", back_populates="case", uselist=False)
     case_search_index = relationship("CaseSearchIndex", back_populates="case", uselist=False)

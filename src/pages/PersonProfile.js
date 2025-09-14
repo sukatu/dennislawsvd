@@ -593,7 +593,9 @@ const PersonProfile = () => {
                   <div 
                     key={case_.id} 
                     className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/case-details/${case_.id}?q=${encodeURIComponent(personData?.full_name || searchQuery || '')}`)}
+                    onClick={() => navigate(`/case-details/${case_.id}?q=${encodeURIComponent(personData?.full_name || searchQuery || '')}`, {
+                      state: { originalPersonCases: personData?.cases || [] }
+                    })}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">

@@ -8,6 +8,8 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 from models.reported_cases import ReportedCases
+import openai
+from config import settings
 
 class BankingSummaryService:
     def __init__(self, db: Session):
@@ -15,17 +17,118 @@ class BankingSummaryService:
 
     def generate_banking_summary(self, case: ReportedCases) -> Dict[str, Any]:
         """
-        Generate comprehensive AI-based banking summary for a case.
+        Generate comprehensive AI-based banking summary for a case using OpenAI.
         """
-        case_text = case.decision or case.judgement or case.conclusion or ''
-        title = case.title or ''
-        full_text = (case_text + ' ' + title + ' ' + (case.case_summary or '')).lower()
+        # Collect all available case content
+        case_content = self._collect_case_content(case)
+        
+        if not case_content.strip():
+            return self._get_default_summary()
+        
+        try:
+            # Use OpenAI to analyze the case content
+            ai_analysis = self._analyze_with_openai(case_content)
+            return ai_analysis
+        except Exception as e:
+            print(f"OpenAI analysis failed for case {case.id}: {e}")
+            # Fallback to keyword analysis
+            return self._fallback_keyword_analysis(case_content)
+
+    def _collect_case_content(self, case: ReportedCases) -> str:
+        """Collect all available case content for analysis."""
+        content_parts = []
+        
+        # Add title
+        if case.title:
+            content_parts.append(f"Title: {case.title}")
+        
+        # Add case summary
+        if case.case_summary:
+            content_parts.append(f"Summary: {case.case_summary}")
+        
+        # Add headnotes
+        if case.headnotes:
+            content_parts.append(f"Headnotes: {case.headnotes}")
+        
+        # Add commentary
+        if case.commentary:
+            content_parts.append(f"Commentary: {case.commentary}")
+        
+        # Add decision/judgement
+        if case.decision:
+            content_parts.append(f"Decision: {case.decision}")
+        elif case.judgement:
+            content_parts.append(f"Judgement: {case.judgement}")
+        
+        # Add conclusion
+        if case.conclusion:
+            content_parts.append(f"Conclusion: {case.conclusion}")
+        
+        # Add area of law
+        if case.area_of_law:
+            content_parts.append(f"Area of Law: {case.area_of_law}")
+        
+        # Add keywords
+        if case.keywords_phrases:
+            content_parts.append(f"Keywords: {case.keywords_phrases}")
+        
+        return "\n\n".join(content_parts)
+
+    def _analyze_with_openai(self, case_content: str) -> Dict[str, Any]:
+        """Use OpenAI to analyze case content and generate banking summary."""
+        prompt = f"""
+        Analyze the following legal case and provide a banking summary with the following structure:
+
+        Case Content:
+        {case_content[:4000]}  # Limit to avoid token limits
+
+        Please analyze this case and provide:
+
+        1. Case Outcome: Choose ONE of: WON, LOST, PARTIALLY_WON, PARTIALLY_LOST, UNRESOLVED
+        2. Court Orders: Brief description of any court orders, injunctions, or directives issued
+        3. Financial Impact: Choose ONE of: NONE, LOW, MODERATE, HIGH (with brief explanation)
+        4. Detailed Outcome: A comprehensive 2-3 sentence summary of the case outcome, financial implications, and legal significance
+
+        Respond in this exact JSON format:
+        {{
+            "ai_case_outcome": "WON/LOST/PARTIALLY_WON/PARTIALLY_LOST/UNRESOLVED",
+            "ai_court_orders": "Description of court orders",
+            "ai_financial_impact": "NONE/LOW/MODERATE/HIGH - Brief explanation",
+            "ai_detailed_outcome": "Comprehensive summary of case outcome and implications"
+        }}
+        """
+
+        client = openai.OpenAI(api_key=settings.openai_api_key)
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a legal analyst specializing in banking and financial law. Analyze legal cases and provide accurate banking summaries."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500,
+            temperature=0.3
+        )
+
+        # Parse the JSON response
+        import json
+        try:
+            ai_data = json.loads(response.choices[0].message.content.strip())
+            ai_data['ai_summary_generated_at'] = datetime.now()
+            ai_data['ai_summary_version'] = '2.0'
+            return ai_data
+        except json.JSONDecodeError:
+            # If JSON parsing fails, return default
+            return self._get_default_summary()
+
+    def _fallback_keyword_analysis(self, case_content: str) -> Dict[str, Any]:
+        """Fallback to keyword analysis if OpenAI fails."""
+        text = case_content.lower()
         
         # Enhanced outcome analysis
-        won_lost = self._analyze_case_outcome(full_text)
-        court_orders = self._analyze_court_orders(full_text)
-        financial_impact = self._analyze_financial_impact(full_text)
-        detailed_outcome = self._generate_detailed_outcome(full_text, won_lost, court_orders, financial_impact)
+        won_lost = self._analyze_case_outcome(text)
+        court_orders = self._analyze_court_orders(text)
+        financial_impact = self._analyze_financial_impact(text)
+        detailed_outcome = self._generate_detailed_outcome(text, won_lost, court_orders, financial_impact)
         
         return {
             'ai_case_outcome': won_lost,
@@ -33,7 +136,18 @@ class BankingSummaryService:
             'ai_financial_impact': financial_impact,
             'ai_detailed_outcome': detailed_outcome,
             'ai_summary_generated_at': datetime.now(),
-            'ai_summary_version': '1.0'
+            'ai_summary_version': '1.0-fallback'
+        }
+
+    def _get_default_summary(self) -> Dict[str, Any]:
+        """Return default summary when no content is available."""
+        return {
+            'ai_case_outcome': 'UNRESOLVED',
+            'ai_court_orders': 'No specific court orders identified',
+            'ai_financial_impact': 'NONE - No clear monetary amounts or financial implications identified',
+            'ai_detailed_outcome': 'Case outcome details not clearly specified in available information.',
+            'ai_summary_generated_at': datetime.now(),
+            'ai_summary_version': '1.0-default'
         }
 
     def _analyze_case_outcome(self, text: str) -> str:

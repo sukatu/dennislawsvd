@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  Building2, 
+  Shield, 
   MapPin, 
   Phone, 
   Mail, 
@@ -16,19 +16,19 @@ import {
   ChevronDown,
   ChevronUp,
   Briefcase,
-  Shield,
   Award,
   Clock,
   CheckCircle,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
+  Building2
 } from 'lucide-react';
 
-const CompanyProfile = () => {
+const InsuranceProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [companyData, setCompanyData] = useState(null);
+  const [insuranceData, setInsuranceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedSections, setExpandedSections] = useState({
@@ -43,14 +43,14 @@ const CompanyProfile = () => {
 
   useEffect(() => {
     if (id) {
-      loadCompanyData();
+      loadInsuranceData();
     } else {
-      setError('No company ID provided');
+      setError('No insurance company ID provided');
       setLoading(false);
     }
   }, [id]);
 
-  const loadCompanyData = async () => {
+  const loadInsuranceData = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
@@ -61,7 +61,7 @@ const CompanyProfile = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:8000/api/companies/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/insurance/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -70,11 +70,11 @@ const CompanyProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Company data loaded:', data);
-        setCompanyData(data);
+        console.log('Insurance data loaded:', data);
+        setInsuranceData(data);
       } else {
         const errorData = await response.json();
-        setError(errorData.detail || 'Failed to load company data');
+        setError(errorData.detail || 'Failed to load insurance data');
       }
     } catch (err) {
       setError('Network error. Please try again.');
@@ -168,7 +168,7 @@ const CompanyProfile = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-sky-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Loading company profile...</p>
+          <p className="mt-4 text-slate-600">Loading insurance company profile...</p>
         </div>
       </div>
     );
@@ -180,34 +180,34 @@ const CompanyProfile = () => {
         <div className="text-center">
           <div className="text-red-600 mb-4">
             <AlertTriangle className="h-16 w-16 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold">Error Loading Company</h2>
+            <h2 className="text-2xl font-bold">Error Loading Insurance Company</h2>
             <p className="text-gray-600 mt-2">{error}</p>
           </div>
           <button
-            onClick={() => navigate('/companies')}
+            onClick={() => navigate('/insurance')}
             className="bg-sky-600 text-white px-6 py-2 rounded-lg hover:bg-sky-700 transition-colors"
           >
-            Back to Companies
+            Back to Insurance Companies
           </button>
         </div>
       </div>
     );
   }
 
-  if (!companyData) {
+  if (!insuranceData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-gray-600 mb-4">
-            <Building2 className="h-16 w-16 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold">Company Not Found</h2>
-            <p className="text-gray-600 mt-2">The requested company could not be found</p>
+            <Shield className="h-16 w-16 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold">Insurance Company Not Found</h2>
+            <p className="text-gray-600 mt-2">The requested insurance company could not be found</p>
           </div>
           <button
-            onClick={() => navigate('/companies')}
+            onClick={() => navigate('/insurance')}
             className="bg-sky-600 text-white px-6 py-2 rounded-lg hover:bg-sky-700 transition-colors"
           >
-            Back to Companies
+            Back to Insurance Companies
           </button>
         </div>
       </div>
@@ -222,18 +222,18 @@ const CompanyProfile = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => navigate('/companies')}
+                onClick={() => navigate('/insurance')}
                 className="flex items-center text-gray-600 hover:text-gray-900"
               >
                 <ArrowLeft className="h-5 w-5 mr-1" />
-                Back to Companies
+                Back to Insurance Companies
               </button>
               <div className="h-8 w-px bg-gray-300"></div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">{companyData.name}</h1>
+                <h1 className="text-3xl font-bold text-gray-900">{insuranceData.name}</h1>
                 <p className="text-gray-600 mt-1">
-                  {companyData.short_name && `${companyData.short_name} • `}
-                  {companyData.industry || 'Company Profile'}
+                  {insuranceData.insurance_type && `${insuranceData.insurance_type} • `}
+                  Insurance Company
                 </p>
               </div>
             </div>
@@ -301,24 +301,24 @@ const CompanyProfile = () => {
             <div className="bg-white rounded-lg shadow-sm border">
               <SectionHeader
                 title="Company Overview"
-                icon={Building2}
+                icon={Shield}
                 isExpanded={expandedSections.overview}
                 onToggle={() => toggleSection('overview')}
               />
               {expandedSections.overview && (
                 <div className="p-6 border-t border-gray-200 space-y-4">
-                  <InfoRow label="Company Name" value={companyData.name} icon={Building2} />
-                  <InfoRow label="Short Name" value={companyData.short_name} icon={Building2} />
-                  <InfoRow label="Industry" value={companyData.industry} icon={Briefcase} />
-                  <InfoRow label="Company Type" value={companyData.company_type} icon={Shield} />
-                  <InfoRow label="Established" value={formatDate(companyData.established_date)} icon={Calendar} />
-                  <InfoRow label="Registration Number" value={companyData.registration_number} icon={FileText} />
-                  <InfoRow label="Tax ID" value={companyData.tax_id} icon={FileText} />
+                  <InfoRow label="Company Name" value={insuranceData.name} icon={Shield} />
+                  <InfoRow label="Insurance Type" value={insuranceData.insurance_type} icon={Shield} />
+                  <InfoRow label="License Number" value={insuranceData.license_number} icon={FileText} />
+                  <InfoRow label="Registration Number" value={insuranceData.registration_number} icon={FileText} />
+                  <InfoRow label="Established" value={formatDate(insuranceData.established_date)} icon={Calendar} />
+                  <InfoRow label="Parent Company" value={insuranceData.parent_company} icon={Building2} />
+                  <InfoRow label="CEO/MD" value={insuranceData.ceo_name} icon={Users} />
                   
-                  {companyData.description && (
+                  {insuranceData.description && (
                     <div className="pt-4 border-t border-gray-200">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Description</h4>
-                      <p className="text-sm text-gray-900">{companyData.description}</p>
+                      <p className="text-sm text-gray-900">{insuranceData.description}</p>
                     </div>
                   )}
                 </div>
@@ -335,13 +335,13 @@ const CompanyProfile = () => {
               />
               {expandedSections.contact && (
                 <div className="p-6 border-t border-gray-200 space-y-4">
-                  <InfoRow label="Phone" value={companyData.phone} icon={Phone} />
-                  <InfoRow label="Email" value={companyData.email} icon={Mail} />
-                  <InfoRow label="Website" value={companyData.website} icon={Globe} />
-                  <InfoRow label="Address" value={companyData.address} icon={MapPin} />
-                  <InfoRow label="City" value={companyData.city} icon={MapPin} />
-                  <InfoRow label="Region" value={companyData.region} icon={MapPin} />
-                  <InfoRow label="Postal Code" value={companyData.postal_code} icon={MapPin} />
+                  <InfoRow label="Phone" value={insuranceData.phone} icon={Phone} />
+                  <InfoRow label="Email" value={insuranceData.email} icon={Mail} />
+                  <InfoRow label="Website" value={insuranceData.website} icon={Globe} />
+                  <InfoRow label="Address" value={insuranceData.address} icon={MapPin} />
+                  <InfoRow label="City" value={insuranceData.city} icon={MapPin} />
+                  <InfoRow label="Region" value={insuranceData.region} icon={MapPin} />
+                  <InfoRow label="Postal Code" value={insuranceData.postal_code} icon={MapPin} />
                 </div>
               )}
             </div>
@@ -357,46 +357,42 @@ const CompanyProfile = () => {
               {expandedSections.management && (
                 <div className="p-6 border-t border-gray-200 space-y-4">
                   <ArrayDisplay 
-                    label="Directors" 
-                    items={formatArray(companyData.directors)} 
+                    label="Board of Directors" 
+                    items={formatArray(insuranceData.board_directors)} 
                     icon={Users} 
                   />
                   <ArrayDisplay 
-                    label="Managers" 
-                    items={formatArray(companyData.managers)} 
+                    label="Senior Management" 
+                    items={formatArray(insuranceData.senior_management)} 
                     icon={Users} 
                   />
                   <ArrayDisplay 
-                    label="Secretaries" 
-                    items={formatArray(companyData.secretaries)} 
+                    label="Key Personnel" 
+                    items={formatArray(insuranceData.key_personnel)} 
                     icon={Users} 
                   />
-                  <ArrayDisplay 
-                    label="Shareholders" 
-                    items={formatArray(companyData.shareholders)} 
-                    icon={Users} 
-                  />
-                  <InfoRow label="Employee Count" value={companyData.employee_count} icon={Users} />
-                  <InfoRow label="Annual Revenue" value={formatCurrency(companyData.annual_revenue)} icon={TrendingUp} />
+                  <InfoRow label="Employee Count" value={insuranceData.employee_count} icon={Users} />
+                  <InfoRow label="Assets Under Management" value={formatCurrency(insuranceData.assets_under_management)} icon={TrendingUp} />
+                  <InfoRow label="Annual Premium Income" value={formatCurrency(insuranceData.annual_premium_income)} icon={TrendingUp} />
                 </div>
               )}
             </div>
 
-            {/* Business Activities */}
-            {companyData.business_activities && formatArray(companyData.business_activities).length > 0 && (
+            {/* Insurance Products */}
+            {insuranceData.insurance_products && formatArray(insuranceData.insurance_products).length > 0 && (
               <div className="bg-white rounded-lg shadow-sm border">
                 <SectionHeader
-                  title="Business Activities"
-                  icon={Briefcase}
-                  isExpanded={expandedSections.activities}
-                  onToggle={() => toggleSection('activities')}
+                  title="Insurance Products"
+                  icon={Shield}
+                  isExpanded={expandedSections.products}
+                  onToggle={() => toggleSection('products')}
                 />
-                {expandedSections.activities && (
+                {expandedSections.products && (
                   <div className="p-6 border-t border-gray-200">
                     <ArrayDisplay 
-                      label="Activities" 
-                      items={formatArray(companyData.business_activities)} 
-                      icon={Briefcase} 
+                      label="Products Offered" 
+                      items={formatArray(insuranceData.insurance_products)} 
+                      icon={Shield} 
                     />
                   </div>
                 )}
@@ -416,7 +412,7 @@ const CompanyProfile = () => {
                   <div className="text-center py-8">
                     <Scale className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No Cases Found</h3>
-                    <p className="text-gray-600">This company has no legal cases in the database</p>
+                    <p className="text-gray-600">This insurance company has no legal cases in the database</p>
                   </div>
                 </div>
               )}
@@ -449,21 +445,31 @@ const CompanyProfile = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Company Status</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Active Status</span>
+                  <span className="text-sm text-gray-600">License Status</span>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    companyData.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    insuranceData.license_status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
-                    {companyData.is_active ? 'Active' : 'Inactive'}
+                    {insuranceData.license_status || 'Unknown'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Last Updated</span>
-                  <span className="text-sm text-gray-900">{formatDate(companyData.updated_at)}</span>
+                  <span className="text-sm text-gray-900">{formatDate(insuranceData.updated_at)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Created</span>
-                  <span className="text-sm text-gray-900">{formatDate(companyData.created_at)}</span>
+                  <span className="text-sm text-gray-900">{formatDate(insuranceData.created_at)}</span>
                 </div>
+              </div>
+            </div>
+
+            {/* Regulatory Information */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Regulatory Information</h3>
+              <div className="space-y-3">
+                <InfoRow label="Regulatory Body" value={insuranceData.regulatory_body} icon={Shield} />
+                <InfoRow label="License Expiry" value={formatDate(insuranceData.license_expiry_date)} icon={Calendar} />
+                <InfoRow label="Compliance Rating" value={insuranceData.compliance_rating} icon={Award} />
               </div>
             </div>
           </div>
@@ -473,4 +479,4 @@ const CompanyProfile = () => {
   );
 };
 
-export default CompanyProfile;
+export default InsuranceProfile;
