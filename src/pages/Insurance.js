@@ -126,11 +126,12 @@ const Insurance = () => {
           website: company.website || 'N/A',
           established: company.established_date ? new Date(company.established_date).getFullYear().toString() : 'N/A',
           insuranceType: company.insurance_type || 'N/A',
-          totalCases: 0, // This would come from a separate cases API
-          activeCases: 0,
-          resolvedCases: 0,
-          riskLevel: 'Low', // This would be calculated based on cases
-          riskScore: 0,
+          totalCases: company.total_cases || 0, // Use real data from backend
+          activeCases: company.total_cases || 0, // Using total cases as active for now
+          resolvedCases: company.total_cases || 0, // Using total cases as resolved for now
+          riskLevel: company.risk_level || 'Low', // Use real risk level from backend
+          riskScore: company.risk_score || 0, // Use real risk score from backend
+          successRate: company.success_rate || 0, // Use real success rate from backend
           lastActivity: company.updated_at ? new Date(company.updated_at).toISOString().split('T')[0] : 'N/A',
           cases: [] // This would come from a separate cases API
         }));
@@ -310,10 +311,20 @@ const Insurance = () => {
               </div>
 
                 <div className="border-t pt-4">
-                  <div className="flex justify-between items-center text-sm text-gray-600">
-                    <span>Total Cases: {company.totalCases}</span>
-                    <span>Last Activity: {company.lastActivity}</span>
+                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                    <div>
+                      <span className="font-medium">Total Cases: {company.totalCases}</span>
                     </div>
+                    <div>
+                      <span className="font-medium">Success Rate: {company.successRate}%</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Risk Score: {company.riskScore}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Last Activity: {company.lastActivity}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 from typing import List, Optional
@@ -283,7 +283,7 @@ async def get_requests_by_entity(
 
 @router.get("/recent/{days}", response_model=List[RequestDetailsList])
 async def get_recent_requests(
-    days: int = Query(7, ge=1, le=30),
+    days: int = Path(..., ge=1, le=30),
     db: Session = Depends(get_db)
 ):
     """Get recent requests from the last N days"""

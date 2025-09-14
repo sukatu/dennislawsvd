@@ -99,21 +99,13 @@ const CaseDetails = () => {
       const token = localStorage.getItem('accessToken') || 'test-token-123';
       console.log('Using token:', token ? 'Present' : 'Missing');
       
-      // Load case details and related cases in parallel
-      const [caseResponse, relatedResponse] = await Promise.all([
-        fetch(`http://localhost:8000/api/case-search/${caseId}/details`, {
+      // Load case details first
+      const caseResponse = await fetch(`http://localhost:8000/api/case-search/${caseId}/details`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
-        }),
-        fetch(`http://localhost:8000/api/case-search/${caseId}/related-cases?limit=8`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-      ]);
+      });
 
       console.log('API Response status:', caseResponse.status);
       
@@ -121,11 +113,158 @@ const CaseDetails = () => {
         const data = await caseResponse.json();
         console.log('Case data loaded:', data);
         setCaseData(data);
+        
+        // After loading case data, determine if this is an insurance-related case
+        const isInsuranceCase = checkIfInsuranceCase(data);
+        console.log('Is insurance case:', isInsuranceCase);
+        
+        if (isInsuranceCase) {
+          // Load insurance-related cases
+          await loadInsuranceRelatedCases(data);
+        } else {
+          // Load person-related cases as before
+          await loadPersonRelatedCases();
+        }
       } else {
         const errorText = await caseResponse.text();
         console.error('API Error:', errorText);
         setError(`Failed to load case details: ${caseResponse.status} - ${errorText}`);
       }
+    } catch (err) {
+      setError('Error loading case details');
+      console.error('Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkIfInsuranceCase = (caseData) => {
+    const insuranceNames = [
+      'SIC Insurance', 'Vanguard Assurance', 'Metropolitan Insurance', 'Enterprise Insurance',
+      'Ghana Reinsurance', 'Star Assurance', 'Provident Insurance', 'Donewell Insurance',
+      'GLICO Insurance', 'Quality Insurance', 'Prudential Life Insurance', 'Old Mutual Life Assurance',
+      'Sanlam Life Insurance', 'Allianz Life Insurance', 'AXA Mansard Insurance', 'Zenith General Insurance',
+      'Cornerstone Insurance', 'Leadway Assurance', 'Mutual Benefits Assurance', 'Custodian Life Insurance',
+      'FBN Insurance', 'AIICO Insurance', 'Lagos Building Investment', 'NEM Insurance',
+      'Wapic Insurance', 'Sovereign Trust Insurance', 'Consolidated Hallmark Insurance', 'Linkage Assurance',
+      'Lasaco Assurance', 'Royal Exchange General Insurance', 'Hygeia HMO', 'Avon Healthcare',
+      'Clearline HMO', 'Reliance HMO', 'Total Health Trust', 'Health Partners HMO',
+      'Mediplan Healthcare', 'Wellness HMO', 'Ultimate Health HMO', 'Prepaid Medicare',
+      'IHMS HMO', 'Ronsberger HMO', 'Vcare HMO', 'Healthguard HMO',
+      'ProHealth HMO', 'Healthplus HMO', 'SIC Insurance Company', 'Vanguard Assurance Company',
+      'Metropolitan Insurance Company', 'Enterprise Insurance Company', 'Ghana Reinsurance Company',
+      'Star Assurance Company', 'Provident Insurance Company', 'Donewell Insurance Company',
+      'GLICO General Insurance', 'Quality Insurance Company', 'Prudential Life Insurance Company',
+      'Old Mutual Life Assurance Company', 'Sanlam Life Insurance Company', 'Allianz Life Insurance Company',
+      'AXA Mansard Insurance Company', 'Zenith General Insurance Company', 'Cornerstone Insurance Company',
+      'Leadway Assurance Company', 'Mutual Benefits Assurance Company', 'Custodian Life Insurance Company',
+      'FBN Insurance Company', 'AIICO Insurance Company', 'Lagos Building Investment Company',
+      'NEM Insurance Company', 'Wapic Insurance Company', 'Sovereign Trust Insurance Company',
+      'Consolidated Hallmark Insurance Company', 'Linkage Assurance Company', 'Lasaco Assurance Company',
+      'Royal Exchange General Insurance Company', 'Hygeia HMO Company', 'Avon Healthcare Company',
+      'Clearline HMO Company', 'Reliance HMO Company', 'Total Health Trust Company',
+      'Health Partners HMO Company', 'Mediplan Healthcare Company', 'Wellness HMO Company',
+      'Ultimate Health HMO Company', 'Prepaid Medicare Company', 'IHMS HMO Company',
+      'Ronsberger HMO Company', 'Vcare HMO Company', 'Healthguard HMO Company',
+      'ProHealth HMO Company', 'Healthplus HMO Company'
+    ];
+    
+    const protagonist = caseData?.protagonist || '';
+    const antagonist = caseData?.antagonist || '';
+    const title = caseData?.title || '';
+    
+    return insuranceNames.some(insurance => 
+      protagonist.toLowerCase().includes(insurance.toLowerCase()) ||
+      antagonist.toLowerCase().includes(insurance.toLowerCase()) ||
+      title.toLowerCase().includes(insurance.toLowerCase())
+    );
+  };
+
+  const loadInsuranceRelatedCases = async (caseData) => {
+    try {
+      // Find the insurance company name from the case data
+      const insuranceNames = [
+        'SIC Insurance', 'Vanguard Assurance', 'Metropolitan Insurance', 'Enterprise Insurance',
+        'Ghana Reinsurance', 'Star Assurance', 'Provident Insurance', 'Donewell Insurance',
+        'GLICO Insurance', 'Quality Insurance', 'Prudential Life Insurance', 'Old Mutual Life Assurance',
+        'Sanlam Life Insurance', 'Allianz Life Insurance', 'AXA Mansard Insurance', 'Zenith General Insurance',
+        'Cornerstone Insurance', 'Leadway Assurance', 'Mutual Benefits Assurance', 'Custodian Life Insurance',
+        'FBN Insurance', 'AIICO Insurance', 'Lagos Building Investment', 'NEM Insurance',
+        'Wapic Insurance', 'Sovereign Trust Insurance', 'Consolidated Hallmark Insurance', 'Linkage Assurance',
+        'Lasaco Assurance', 'Royal Exchange General Insurance', 'Hygeia HMO', 'Avon Healthcare',
+        'Clearline HMO', 'Reliance HMO', 'Total Health Trust', 'Health Partners HMO',
+        'Mediplan Healthcare', 'Wellness HMO', 'Ultimate Health HMO', 'Prepaid Medicare',
+        'IHMS HMO', 'Ronsberger HMO', 'Vcare HMO', 'Healthguard HMO',
+        'ProHealth HMO', 'Healthplus HMO', 'SIC Insurance Company', 'Vanguard Assurance Company',
+        'Metropolitan Insurance Company', 'Enterprise Insurance Company', 'Ghana Reinsurance Company',
+        'Star Assurance Company', 'Provident Insurance Company', 'Donewell Insurance Company',
+        'GLICO General Insurance', 'Quality Insurance Company', 'Prudential Life Insurance Company',
+        'Old Mutual Life Assurance Company', 'Sanlam Life Insurance Company', 'Allianz Life Insurance Company',
+        'AXA Mansard Insurance Company', 'Zenith General Insurance Company', 'Cornerstone Insurance Company',
+        'Leadway Assurance Company', 'Mutual Benefits Assurance Company', 'Custodian Life Insurance Company',
+        'FBN Insurance Company', 'AIICO Insurance Company', 'Lagos Building Investment Company',
+        'NEM Insurance Company', 'Wapic Insurance Company', 'Sovereign Trust Insurance Company',
+        'Consolidated Hallmark Insurance Company', 'Linkage Assurance Company', 'Lasaco Assurance Company',
+        'Royal Exchange General Insurance Company', 'Hygeia HMO Company', 'Avon Healthcare Company',
+        'Clearline HMO Company', 'Reliance HMO Company', 'Total Health Trust Company',
+        'Health Partners HMO Company', 'Mediplan Healthcare Company', 'Wellness HMO Company',
+        'Ultimate Health HMO Company', 'Prepaid Medicare Company', 'IHMS HMO Company',
+        'Ronsberger HMO Company', 'Vcare HMO Company', 'Healthguard HMO Company',
+        'ProHealth HMO Company', 'Healthplus HMO Company'
+      ];
+      
+      const protagonist = caseData?.protagonist || '';
+      const antagonist = caseData?.antagonist || '';
+      const title = caseData?.title || '';
+      
+      const foundInsurance = insuranceNames.find(insurance => 
+        protagonist.toLowerCase().includes(insurance.toLowerCase()) ||
+        antagonist.toLowerCase().includes(insurance.toLowerCase()) ||
+        title.toLowerCase().includes(insurance.toLowerCase())
+      );
+      
+      if (foundInsurance) {
+        console.log('Found insurance company:', foundInsurance);
+        
+        // Search for cases related to this insurance company
+        const searchResponse = await fetch(`http://localhost:8000/api/case-search/search?query=${encodeURIComponent(foundInsurance)}&limit=8`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken') || 'test-token-123'}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          console.log('Insurance-related cases loaded:', searchData);
+          
+          // Filter out the current case and format the results
+          const relatedCases = (searchData.results || []).filter(caseItem => caseItem.id !== parseInt(caseId));
+          setRelatedCases(relatedCases);
+        } else {
+          console.log('Failed to load insurance-related cases');
+          setRelatedCases([]);
+        }
+      } else {
+        console.log('No insurance company found in case data');
+        setRelatedCases([]);
+      }
+    } catch (err) {
+      console.error('Error loading insurance-related cases:', err);
+      setRelatedCases([]);
+    }
+  };
+
+  const loadPersonRelatedCases = async () => {
+    try {
+      const token = localStorage.getItem('accessToken') || 'test-token-123';
+      
+      const relatedResponse = await fetch(`http://localhost:8000/api/case-search/${caseId}/related-cases?limit=8`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
       if (relatedResponse.ok) {
         const relatedData = await relatedResponse.json();
@@ -150,10 +289,8 @@ const CaseDetails = () => {
         setRelatedCases([]);
       }
     } catch (err) {
-      setError('Error loading case details');
-      console.error('Error:', err);
-    } finally {
-      setLoading(false);
+      console.error('Error loading person-related cases:', err);
+      setRelatedCases([]);
     }
   };
 
@@ -637,6 +774,64 @@ const CaseDetails = () => {
                       <div className="flex items-center space-x-2 text-sm text-green-600">
                         <Building2 className="w-4 h-4" />
                         <span>Bank Profile</span>
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
+
+                {/* Insurance Company Name - Display if insurance company is involved in the case */}
+                {(() => {
+                  // List of known insurance company names to check against
+                  const insuranceNames = [
+                    'SIC Insurance', 'Vanguard Assurance', 'Metropolitan Insurance', 'Enterprise Insurance',
+                    'Ghana Reinsurance', 'Star Assurance', 'Provident Insurance', 'Donewell Insurance',
+                    'GLICO Insurance', 'Quality Insurance', 'Prudential Life Insurance', 'Old Mutual Life Assurance',
+                    'Sanlam Life Insurance', 'Allianz Life Insurance', 'AXA Mansard Insurance', 'Zenith General Insurance',
+                    'Cornerstone Insurance', 'Leadway Assurance', 'Mutual Benefits Assurance', 'Custodian Life Insurance',
+                    'FBN Insurance', 'AIICO Insurance', 'Lagos Building Investment', 'NEM Insurance',
+                    'Wapic Insurance', 'Sovereign Trust Insurance', 'Consolidated Hallmark Insurance', 'Linkage Assurance',
+                    'Lasaco Assurance', 'Royal Exchange General Insurance', 'Hygeia HMO', 'Avon Healthcare',
+                    'Clearline HMO', 'Reliance HMO', 'Total Health Trust', 'Health Partners HMO',
+                    'Mediplan Healthcare', 'Wellness HMO', 'Ultimate Health HMO', 'Prepaid Medicare',
+                    'IHMS HMO', 'Ronsberger HMO', 'Vcare HMO', 'Healthguard HMO',
+                    'ProHealth HMO', 'Healthplus HMO', 'SIC Insurance Company', 'Vanguard Assurance Company',
+                    'Metropolitan Insurance Company', 'Enterprise Insurance Company', 'Ghana Reinsurance Company',
+                    'Star Assurance Company', 'Provident Insurance Company', 'Donewell Insurance Company',
+                    'GLICO General Insurance', 'Quality Insurance Company', 'Prudential Life Insurance Company',
+                    'Old Mutual Life Assurance Company', 'Sanlam Life Insurance Company', 'Allianz Life Insurance Company',
+                    'AXA Mansard Insurance Company', 'Zenith General Insurance Company', 'Cornerstone Insurance Company',
+                    'Leadway Assurance Company', 'Mutual Benefits Assurance Company', 'Custodian Life Insurance Company',
+                    'FBN Insurance Company', 'AIICO Insurance Company', 'Lagos Building Investment Company',
+                    'NEM Insurance Company', 'Wapic Insurance Company', 'Sovereign Trust Insurance Company',
+                    'Consolidated Hallmark Insurance Company', 'Linkage Assurance Company', 'Lasaco Assurance Company',
+                    'Royal Exchange General Insurance Company', 'Hygeia HMO Company', 'Avon Healthcare Company',
+                    'Clearline HMO Company', 'Reliance HMO Company', 'Total Health Trust Company',
+                    'Health Partners HMO Company', 'Mediplan Healthcare Company', 'Wellness HMO Company',
+                    'Ultimate Health HMO Company', 'Prepaid Medicare Company', 'IHMS HMO Company',
+                    'Ronsberger HMO Company', 'Vcare HMO Company', 'Healthguard HMO Company',
+                    'ProHealth HMO Company', 'Healthplus HMO Company'
+                  ];
+                  
+                  // Check protagonist and antagonist fields for insurance company names
+                  const protagonist = caseData?.protagonist || '';
+                  const antagonist = caseData?.antagonist || '';
+                  const title = caseData?.title || '';
+                  
+                  // Find insurance company name in any of these fields
+                  const foundInsurance = insuranceNames.find(insurance => 
+                    protagonist.toLowerCase().includes(insurance.toLowerCase()) ||
+                    antagonist.toLowerCase().includes(insurance.toLowerCase()) ||
+                    title.toLowerCase().includes(insurance.toLowerCase())
+                  );
+                  
+                  return foundInsurance ? (
+                    <div className="mb-2">
+                      <h1 className="text-2xl font-bold text-blue-900 break-words leading-tight">
+                        {foundInsurance}
+                      </h1>
+                      <div className="flex items-center space-x-2 text-sm text-blue-600">
+                        <Shield className="w-4 h-4" />
+                        <span>Insurance Profile</span>
                       </div>
                     </div>
                   ) : null;
@@ -1528,10 +1723,18 @@ const CaseDetails = () => {
                     <h3 className="text-lg font-semibold text-gray-900">Related Cases</h3>
                   </div>
                   <p className="text-sm text-gray-500 mt-1">
-                    {originalPersonCases ? 
-                      `Cases from original search (${relatedCases.length} of ${originalPersonCases.length})` :
-                      `Cases involving the same people (${relatedCases.length})`
-                    }
+                    {(() => {
+                      // Check if this is an insurance case
+                      const isInsuranceCase = caseData && checkIfInsuranceCase(caseData);
+                      
+                      if (isInsuranceCase) {
+                        return `Cases involving the same insurance company (${relatedCases.length})`;
+                      } else if (originalPersonCases) {
+                        return `Cases from original search (${relatedCases.length} of ${originalPersonCases.length})`;
+                      } else {
+                        return `Cases involving the same people (${relatedCases.length})`;
+                      }
+                    })()}
                   </p>
                 </div>
                 <div className="p-4">

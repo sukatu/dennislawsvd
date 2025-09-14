@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Float, JSON
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from database import Base
 
 class Insurance(Base):
@@ -76,3 +77,7 @@ class Insurance(Base):
     description = Column(Text, nullable=True)
     notes = Column(Text, nullable=True)
     status = Column(String(20), default="ACTIVE")  # ACTIVE, INACTIVE, SUSPENDED
+    
+    # Relationships
+    analytics = relationship("InsuranceAnalytics", back_populates="insurance", uselist=False)
+    case_statistics = relationship("InsuranceCaseStatistics", back_populates="insurance", uselist=False)

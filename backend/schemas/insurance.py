@@ -110,6 +110,13 @@ class InsuranceResponse(InsuranceBase):
     created_by: Optional[int] = None
     updated_by: Optional[int] = None
     status: str
+    # Analytics data
+    total_cases: Optional[int] = 0
+    risk_score: Optional[int] = 0
+    risk_level: Optional[str] = "Low"
+    success_rate: Optional[float] = 0.0
+    analytics_available: Optional[bool] = False
+    case_statistics_available: Optional[bool] = False
 
     class Config:
         from_attributes = True
