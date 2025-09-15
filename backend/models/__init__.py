@@ -9,6 +9,8 @@ from .banks import Banks
 from .bank_analytics import BankAnalytics
 from .bank_case_statistics import BankCaseStatistics
 from .companies import Companies
+from .company_analytics import CompanyAnalytics
+from .company_case_statistics import CompanyCaseStatistics
 from .insurance import Insurance
 from .insurance_analytics import InsuranceAnalytics
 from .insurance_case_statistics import InsuranceCaseStatistics

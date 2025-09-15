@@ -1,0 +1,52 @@
+# DennisLaw SVD Backend - Cloudways Production Requirements
+# Install with: pip install -r requirements-cloudways.txt
+
+# Core FastAPI and ASGI server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+gunicorn==21.2.0
+
+# Database
+sqlalchemy==2.0.23
+pymysql==1.1.0
+cryptography==41.0.7
+
+# Authentication and Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# HTTP and CORS
+httpx==0.25.2
+python-cors==1.7.0
+
+# Data Processing
+pandas==2.1.3
+numpy==1.25.2
+
+# Environment and Configuration
+python-dotenv==1.0.0
+
+# Logging and Monitoring
+structlog==23.2.0
+
+# File Processing
+openpyxl==3.1.2
+python-magic==0.4.27
+
+# Date and Time
+python-dateutil==2.8.2
+
+# Utilities
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Optional: Redis for caching (if available on Cloudways)
+redis==5.0.1
+
+# Optional: Email support
+fastapi-mail==1.4.1
+
+# Development and Testing (optional for production)
+pytest==7.4.3
+pytest-asyncio==0.21.1

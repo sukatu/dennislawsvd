@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Float, JSON, Date, DECIMAL
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from database import Base
 
 class Companies(Base):
@@ -91,3 +92,7 @@ class Companies(Base):
     description = Column(Text, nullable=True)
     notes = Column(Text, nullable=True)
     status = Column(String(20), default="ACTIVE")
+
+    # Relationships
+    analytics = relationship("CompanyAnalytics", back_populates="company", uselist=False)
+    case_statistics = relationship("CompanyCaseStatistics", back_populates="company", uselist=False)

@@ -11,8 +11,42 @@ const Companies = () => {
   const [itemsPerPage] = useState(9);
   const [companiesData, setCompaniesData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
+
+  // Company logo mapping
+  const companyLogoMap = {
+    'MTN Ghana Limited': '/companies/mtn-ghana.svg',
+    'Vodafone Ghana Limited': '/companies/vodafone-ghana.svg',
+    'Gold Fields Ghana Limited': '/companies/goldfields-ghana.svg',
+    'AngloGold Ashanti Ghana Limited': '/companies/anglogold-ashanti-ghana.svg',
+    'Access Bank Ghana Limited': '/companies/access-bank-ghana.svg',
+    'Ecobank Ghana Limited': '/companies/ecobank-ghana.svg',
+    'Newmont Ghana Gold Limited': '/companies/newmont-ghana.svg',
+    // Bank logos (keeping existing ones)
+    'GCB Bank Limited': '/banks/gcb bank.jpeg',
+    'Standard Chartered Bank Ghana': '/banks/stanchart.jpeg',
+    'Absa Bank Ghana': '/banks/absa.jpeg',
+    'Fidelity Bank Ghana': '/banks/Fidelity.jpeg',
+    'Zenith Bank Ghana': '/banks/zenith.jpeg',
+    'First Atlantic Bank': '/banks/first atlantic.jpeg',
+    'Ghana Exim Bank': '/banks/ghana exim bank.jpeg',
+    'GTBank Ghana': '/banks/gtbank.jpeg',
+    'National Investment Bank': '/banks/national invenstment bank.jpeg',
+    'Prudential Bank': '/banks/prudential bank.jpeg',
+    'Republic Bank Ghana': '/banks/republic bank.jpeg',
+    'Societe Generale Bank Ghana': '/banks/societe generale bank.jpeg',
+    'The Royal Bank': '/banks/the royal bank.jpeg',
+    'Universal Merchant Bank': '/banks/universal merchant bank.jpeg',
+    'FBN Bank Ghana': '/banks/fbn.jpeg',
+    'Agricultural Development Bank': '/banks/adb.jpeg',
+    'Bank of Africa Ghana': '/banks/bank of africa.jpeg',
+    'Bank of Ghana': '/banks/Bank of ghana.jpeg',
+    'CAL Bank': '/banks/calbank.jpeg',
+    'Consolidated Bank Ghana': '/banks/cbg.jpeg',
+    'Stanbic Bank Ghana': '/banks/stanbic bank.jpeg',
+    'UMB Bank Ghana': '/banks/umb.jpeg'
+  };
 
   // Load companies data from API
   useEffect(() => {
@@ -31,13 +65,6 @@ const Companies = () => {
 
   const loadCompaniesData = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        console.error('No authentication token found');
-        setIsLoading(false);
-        return;
-      }
-
       setIsLoading(true);
       const params = new URLSearchParams({
         page: currentPage.toString(),
@@ -50,7 +77,6 @@ const Companies = () => {
 
       const response = await fetch(`http://localhost:8000/api/companies/search?${params}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -59,27 +85,95 @@ const Companies = () => {
         const data = await response.json();
         console.log('Companies data loaded:', data);
         
-        const transformedCompanies = (data.results || []).map(company => ({
-          id: company.id,
-          name: company.name,
-          shortName: company.short_name,
-          industry: company.industry,
-          phone: company.phone || 'N/A',
-          email: company.email || 'N/A',
-          address: company.address || 'N/A',
-          website: company.website || 'N/A',
-          established: company.established_date ? new Date(company.established_date).getFullYear().toString() : 'N/A',
-          companyType: company.company_type || 'N/A',
-          totalCases: 0, // This would come from a separate cases API
-          activeCases: 0,
-          resolvedCases: 0,
-          riskLevel: 'Low', // This would be calculated based on cases
-          riskScore: 0,
-          lastActivity: company.updated_at ? new Date(company.updated_at).toISOString().split('T')[0] : 'N/A',
-          cases: [] // This would come from a separate cases API
-        }));
+        // Load case statistics and analytics for each company
+        const companiesWithStats = await Promise.all(
+          (data.results || []).map(async (company) => {
+            try {
+              // Fetch both case statistics and analytics for this company
+              const [statsResponse, analyticsResponse] = await Promise.all([
+                fetch(`http://localhost:8000/api/companies/${company.id}/case-statistics`, {
+                  headers: { 'Content-Type': 'application/json' }
+                }),
+                fetch(`http://localhost:8000/api/companies/${company.id}/analytics`, {
+                  headers: { 'Content-Type': 'application/json' }
+                })
+              ]);
+              
+              let caseStats = {
+                total_cases: 0,
+                resolved_cases: 0,
+                unresolved_cases: 0,
+                favorable_cases: 0,
+                unfavorable_cases: 0,
+                mixed_cases: 0,
+                case_outcome: 'N/A'
+              };
+              
+              let analytics = {
+                risk_level: 'Low',
+                risk_score: 0,
+                risk_factors: [],
+                financial_risk_level: 'Low'
+              };
+              
+              if (statsResponse.ok) {
+                const statsData = await statsResponse.json();
+                caseStats = statsData.case_statistics_available ? statsData : caseStats;
+              }
+              
+              if (analyticsResponse.ok) {
+                const analyticsData = await analyticsResponse.json();
+                analytics = analyticsData.analytics_available ? analyticsData : analytics;
+              }
+              
+              return {
+                id: company.id,
+                name: String(company.name || 'N/A'),
+                shortName: String(company.short_name || 'N/A'),
+                industry: String(company.industry || 'N/A'),
+                phone: String(company.phone || 'N/A'),
+                email: String(company.email || 'N/A'),
+                address: String(company.address || 'N/A'),
+                website: String(company.website || 'N/A'),
+                established: company.established_date ? new Date(company.established_date).getFullYear().toString() : 'N/A',
+                companyType: String(company.company_type || 'N/A'),
+                logo: company.logo_url || companyLogoMap[company.name] || '/companies/default-company.svg',
+                lastActivity: company.updated_at ? new Date(company.updated_at).toISOString().split('T')[0] : 'N/A',
+                ...caseStats,
+                ...analytics
+              };
+            } catch (error) {
+              console.error(`Error loading data for company ${company.name}:`, error);
+              return {
+                id: company.id,
+                name: String(company.name || 'N/A'),
+                shortName: String(company.short_name || 'N/A'),
+                industry: String(company.industry || 'N/A'),
+                phone: String(company.phone || 'N/A'),
+                email: String(company.email || 'N/A'),
+                address: String(company.address || 'N/A'),
+                website: String(company.website || 'N/A'),
+                established: company.established_date ? new Date(company.established_date).getFullYear().toString() : 'N/A',
+                companyType: String(company.company_type || 'N/A'),
+                logo: company.logo_url || companyLogoMap[company.name] || '/companies/default-company.svg',
+                lastActivity: company.updated_at ? new Date(company.updated_at).toISOString().split('T')[0] : 'N/A',
+                total_cases: 0,
+                resolved_cases: 0,
+                unresolved_cases: 0,
+                favorable_cases: 0,
+                unfavorable_cases: 0,
+                mixed_cases: 0,
+                case_outcome: 'N/A',
+                risk_level: 'Low',
+                risk_score: 0,
+                risk_factors: [],
+                financial_risk_level: 'Low'
+              };
+            }
+          })
+        );
 
-        setCompaniesData(transformedCompanies);
+        setCompaniesData(companiesWithStats);
         setTotalResults(data.total || 0);
       } else {
         console.error('Failed to load companies data:', response.status);
@@ -217,20 +311,32 @@ const Companies = () => {
             >
               <div className="p-6">
                 <div className="flex items-center mb-4">
-                  <div className="h-12 w-12 rounded-lg bg-sky-100 flex items-center justify-center mr-4">
-                    <Building2 className="h-6 w-6 text-sky-600" />
-                  </div>
+                  <img
+                    src={company.logo}
+                    alt={company.name}
+                    className="h-12 w-12 rounded-lg object-cover mr-4"
+                    onError={(e) => {
+                      e.target.src = '/companies/default-company.svg';
+                    }}
+                  />
                 <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900">{company.name}</h3>
                     <p className="text-sm text-gray-600">{company.established}</p>
                 </div>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    company.riskLevel === 'Low' ? 'bg-green-100 text-green-800' :
-                    company.riskLevel === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {company.riskLevel} Risk
-                </div>
+                  <div className="text-right">
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      company.risk_level === 'Low' ? 'bg-green-100 text-green-800' :
+                      company.risk_level === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {company.risk_level} Risk
+                    </div>
+                    {company.risk_score > 0 && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Score: {company.risk_score}/100
+                      </div>
+                    )}
+                  </div>
               </div>
 
                 <div className="space-y-2 mb-4">
@@ -248,11 +354,56 @@ const Companies = () => {
                 </div>
               </div>
 
+                {/* Quick Stats */}
                 <div className="border-t pt-4">
-                  <div className="flex justify-between items-center text-sm text-gray-600">
-                    <span>Total Cases: {company.totalCases}</span>
-                    <span>Last Activity: {company.lastActivity}</span>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-gray-600">Total Cases:</span>
+                      <span className="font-semibold text-gray-900">{company.total_cases || 0}</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-gray-600">Resolved:</span>
+                      <span className="font-semibold text-green-600">{company.resolved_cases || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      <span className="text-gray-600">Unresolved:</span>
+                      <span className="font-semibold text-red-600">{company.unresolved_cases || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                      <span className="text-gray-600">Outcome:</span>
+                      <span className="font-semibold text-purple-600">{company.case_outcome || 'N/A'}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Risk Assessment Details */}
+                  {company.risk_score > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+                        <span>Risk Assessment</span>
+                        <span className="font-medium">{company.risk_score}/100</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div 
+                          className={`h-1.5 rounded-full ${
+                            company.risk_score <= 30 ? 'bg-green-500' :
+                            company.risk_score <= 60 ? 'bg-yellow-500' :
+                            'bg-red-500'
+                          }`}
+                          style={{ width: `${Math.min(company.risk_score, 100)}%` }}
+                        ></div>
+                      </div>
+                      {company.risk_factors && company.risk_factors.length > 0 && (
+                        <div className="mt-2 text-xs text-gray-500">
+                          <span className="font-medium">Key Risks:</span> {company.risk_factors.slice(0, 2).join(', ')}
+                          {company.risk_factors.length > 2 && '...'}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
