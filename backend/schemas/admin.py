@@ -91,6 +91,55 @@ class UserListResponse(BaseModel):
     limit: int
     total_pages: int
 
+# Settings Management CRUD Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str
+    description: Optional[str] = None
+    is_public: bool
+    is_editable: bool
+    is_required: bool
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class SettingsCreateRequest(BaseModel):
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str = "string"
+    description: Optional[str] = None
+    is_public: bool = False
+    is_editable: bool = True
+    is_required: bool = False
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[str] = None
+    value_type: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    is_editable: Optional[bool] = None
+    is_required: Optional[bool] = None
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsListResponse(BaseModel):
+    settings: List[SettingsResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
 # API Key Management
 class ApiKeyBase(BaseModel):
     user_id: int
@@ -247,6 +296,55 @@ class CaseListResponse(BaseModel):
     limit: int
     total_pages: int
 
+# Settings Management CRUD Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str
+    description: Optional[str] = None
+    is_public: bool
+    is_editable: bool
+    is_required: bool
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class SettingsCreateRequest(BaseModel):
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str = "string"
+    description: Optional[str] = None
+    is_public: bool = False
+    is_editable: bool = True
+    is_required: bool = False
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[str] = None
+    value_type: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    is_editable: Optional[bool] = None
+    is_required: Optional[bool] = None
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsListResponse(BaseModel):
+    settings: List[SettingsResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
 # People Management
 class PeopleResponse(BaseResponse):
     id: int
@@ -296,6 +394,55 @@ class PeopleResponse(BaseResponse):
 
 class PeopleListResponse(BaseModel):
     people: List[PeopleResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
+# Settings Management CRUD Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str
+    description: Optional[str] = None
+    is_public: bool
+    is_editable: bool
+    is_required: bool
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class SettingsCreateRequest(BaseModel):
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str = "string"
+    description: Optional[str] = None
+    is_public: bool = False
+    is_editable: bool = True
+    is_required: bool = False
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[str] = None
+    value_type: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    is_editable: Optional[bool] = None
+    is_required: Optional[bool] = None
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsListResponse(BaseModel):
+    settings: List[SettingsResponse]
     total: int
     page: int
     limit: int
@@ -356,6 +503,55 @@ class BankListResponse(BaseModel):
     limit: int
     total_pages: int
 
+# Settings Management CRUD Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str
+    description: Optional[str] = None
+    is_public: bool
+    is_editable: bool
+    is_required: bool
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class SettingsCreateRequest(BaseModel):
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str = "string"
+    description: Optional[str] = None
+    is_public: bool = False
+    is_editable: bool = True
+    is_required: bool = False
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[str] = None
+    value_type: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    is_editable: Optional[bool] = None
+    is_required: Optional[bool] = None
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsListResponse(BaseModel):
+    settings: List[SettingsResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
 # Insurance Management
 class InsuranceResponse(BaseResponse):
     id: int
@@ -403,6 +599,55 @@ class InsuranceResponse(BaseResponse):
 
 class InsuranceListResponse(BaseModel):
     insurance: List[InsuranceResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
+# Settings Management CRUD Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str
+    description: Optional[str] = None
+    is_public: bool
+    is_editable: bool
+    is_required: bool
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class SettingsCreateRequest(BaseModel):
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str = "string"
+    description: Optional[str] = None
+    is_public: bool = False
+    is_editable: bool = True
+    is_required: bool = False
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[str] = None
+    value_type: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    is_editable: Optional[bool] = None
+    is_required: Optional[bool] = None
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsListResponse(BaseModel):
+    settings: List[SettingsResponse]
     total: int
     page: int
     limit: int
@@ -458,6 +703,55 @@ class CompanyListResponse(BaseModel):
     limit: int
     total_pages: int
 
+# Settings Management CRUD Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str
+    description: Optional[str] = None
+    is_public: bool
+    is_editable: bool
+    is_required: bool
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class SettingsCreateRequest(BaseModel):
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str = "string"
+    description: Optional[str] = None
+    is_public: bool = False
+    is_editable: bool = True
+    is_required: bool = False
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[str] = None
+    value_type: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    is_editable: Optional[bool] = None
+    is_required: Optional[bool] = None
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsListResponse(BaseModel):
+    settings: List[SettingsResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
 # Payment Management
 class PaymentResponse(BaseResponse):
     id: int
@@ -479,6 +773,55 @@ class PaymentListResponse(BaseModel):
     limit: int
     total_pages: int
 
+# Settings Management CRUD Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str
+    description: Optional[str] = None
+    is_public: bool
+    is_editable: bool
+    is_required: bool
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class SettingsCreateRequest(BaseModel):
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str = "string"
+    description: Optional[str] = None
+    is_public: bool = False
+    is_editable: bool = True
+    is_required: bool = False
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[str] = None
+    value_type: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    is_editable: Optional[bool] = None
+    is_required: Optional[bool] = None
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsListResponse(BaseModel):
+    settings: List[SettingsResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
 # Subscription Management
 class SubscriptionResponse(BaseResponse):
     id: int
@@ -493,6 +836,437 @@ class SubscriptionResponse(BaseResponse):
 
 class SubscriptionListResponse(BaseModel):
     subscriptions: List[SubscriptionResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
+# Settings Management CRUD Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str
+    description: Optional[str] = None
+    is_public: bool
+    is_editable: bool
+    is_required: bool
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class SettingsCreateRequest(BaseModel):
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str = "string"
+    description: Optional[str] = None
+    is_public: bool = False
+    is_editable: bool = True
+    is_required: bool = False
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[str] = None
+    value_type: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    is_editable: Optional[bool] = None
+    is_required: Optional[bool] = None
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsListResponse(BaseModel):
+    settings: List[SettingsResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
+# Bank Management CRUD Schemas
+class BankCreateRequest(BaseModel):
+    name: str
+    short_name: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
+    country: Optional[str] = None
+    postal_code: Optional[str] = None
+    bank_code: Optional[str] = None
+    swift_code: Optional[str] = None
+    license_number: Optional[str] = None
+    established_date: Optional[datetime] = None
+    bank_type: Optional[str] = None
+    ownership_type: Optional[str] = None
+    services: Optional[str] = None  # Comma-separated string
+    previous_names: Optional[str] = None  # Comma-separated string
+    branches_count: Optional[int] = None
+    atm_count: Optional[int] = None
+    total_assets: Optional[float] = None
+    net_worth: Optional[float] = None
+    rating: Optional[float] = None
+    head_office_address: Optional[str] = None
+    customer_service_phone: Optional[str] = None
+    customer_service_email: Optional[str] = None
+    has_mobile_app: Optional[bool] = None
+    has_online_banking: Optional[bool] = None
+    has_atm_services: Optional[bool] = None
+    has_foreign_exchange: Optional[bool] = None
+    is_active: Optional[bool] = True
+    is_verified: Optional[bool] = False
+    verification_notes: Optional[str] = None
+    description: Optional[str] = None
+    notes: Optional[str] = None
+    status: Optional[str] = "ACTIVE"
+
+class BankUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    short_name: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
+    country: Optional[str] = None
+    postal_code: Optional[str] = None
+    bank_code: Optional[str] = None
+    swift_code: Optional[str] = None
+    license_number: Optional[str] = None
+    established_date: Optional[datetime] = None
+    bank_type: Optional[str] = None
+    ownership_type: Optional[str] = None
+    services: Optional[str] = None  # Comma-separated string
+    previous_names: Optional[str] = None  # Comma-separated string
+    branches_count: Optional[int] = None
+    atm_count: Optional[int] = None
+    total_assets: Optional[float] = None
+    net_worth: Optional[float] = None
+    rating: Optional[float] = None
+    head_office_address: Optional[str] = None
+    customer_service_phone: Optional[str] = None
+    customer_service_email: Optional[str] = None
+    has_mobile_app: Optional[bool] = None
+    has_online_banking: Optional[bool] = None
+    has_atm_services: Optional[bool] = None
+    has_foreign_exchange: Optional[bool] = None
+    is_active: Optional[bool] = None
+    is_verified: Optional[bool] = None
+    verification_notes: Optional[str] = None
+    description: Optional[str] = None
+    notes: Optional[str] = None
+    status: Optional[str] = None
+
+# Insurance Management CRUD Schemas
+class InsuranceCreateRequest(BaseModel):
+    name: str
+    short_name: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
+    country: Optional[str] = None
+    postal_code: Optional[str] = None
+    license_number: Optional[str] = None
+    registration_number: Optional[str] = None
+    established_date: Optional[datetime] = None
+    insurance_type: Optional[str] = None
+    ownership_type: Optional[str] = None
+    services: Optional[str] = None  # Comma-separated string
+    previous_names: Optional[str] = None  # Comma-separated string
+    coverage_areas: Optional[str] = None  # Comma-separated string
+    branches_count: Optional[int] = None
+    agents_count: Optional[int] = None
+    total_assets: Optional[float] = None
+    net_worth: Optional[float] = None
+    premium_income: Optional[float] = None
+    claims_paid: Optional[float] = None
+    rating: Optional[float] = None
+    head_office_address: Optional[str] = None
+    customer_service_phone: Optional[str] = None
+    customer_service_email: Optional[str] = None
+    claims_phone: Optional[str] = None
+    claims_email: Optional[str] = None
+    has_mobile_app: Optional[bool] = None
+    has_online_portal: Optional[bool] = None
+    has_online_claims: Optional[bool] = None
+    has_24_7_support: Optional[bool] = None
+    specializes_in: Optional[str] = None  # Comma-separated string
+    target_market: Optional[str] = None
+    is_active: Optional[bool] = True
+    is_verified: Optional[bool] = False
+    verification_notes: Optional[str] = None
+    description: Optional[str] = None
+    notes: Optional[str] = None
+    status: Optional[str] = "ACTIVE"
+
+class InsuranceUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    short_name: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
+    country: Optional[str] = None
+    postal_code: Optional[str] = None
+    license_number: Optional[str] = None
+    registration_number: Optional[str] = None
+    established_date: Optional[datetime] = None
+    insurance_type: Optional[str] = None
+    ownership_type: Optional[str] = None
+    services: Optional[str] = None  # Comma-separated string
+    previous_names: Optional[str] = None  # Comma-separated string
+    coverage_areas: Optional[str] = None  # Comma-separated string
+    branches_count: Optional[int] = None
+    agents_count: Optional[int] = None
+    total_assets: Optional[float] = None
+    net_worth: Optional[float] = None
+    premium_income: Optional[float] = None
+    claims_paid: Optional[float] = None
+    rating: Optional[float] = None
+    head_office_address: Optional[str] = None
+    customer_service_phone: Optional[str] = None
+    customer_service_email: Optional[str] = None
+    claims_phone: Optional[str] = None
+    claims_email: Optional[str] = None
+    has_mobile_app: Optional[bool] = None
+    has_online_portal: Optional[bool] = None
+    has_online_claims: Optional[bool] = None
+    has_24_7_support: Optional[bool] = None
+    specializes_in: Optional[str] = None  # Comma-separated string
+    target_market: Optional[str] = None
+    is_active: Optional[bool] = None
+    is_verified: Optional[bool] = None
+    verification_notes: Optional[str] = None
+    description: Optional[str] = None
+    notes: Optional[str] = None
+    status: Optional[str] = None
+
+# Company Management CRUD Schemas
+class CompanyCreateRequest(BaseModel):
+    name: str
+    short_name: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
+    country: Optional[str] = None
+    postal_code: Optional[str] = None
+    type_of_company: Optional[str] = None
+    district: Optional[str] = None
+    date_of_incorporation: Optional[datetime] = None
+    date_of_commencement: Optional[datetime] = None
+    nature_of_business: Optional[str] = None
+    registration_number: Optional[str] = None
+    tax_identification_number: Optional[str] = None
+    phone_number: Optional[str] = None
+    directors: Optional[str] = None  # Comma-separated string
+    secretary: Optional[str] = None  # Single name
+    auditor: Optional[str] = None  # Single name
+    authorized_shares: Optional[int] = None
+    stated_capital: Optional[float] = None
+    shareholders: Optional[str] = None
+    other_linked_companies: Optional[str] = None
+    tin_number: Optional[str] = None
+    established_date: Optional[datetime] = None
+    company_type: Optional[str] = None
+    industry: Optional[str] = None
+    ownership_type: Optional[str] = None
+    business_activities: Optional[str] = None  # Comma-separated string
+    previous_names: Optional[str] = None
+    board_of_directors: Optional[str] = None
+    key_personnel: Optional[str] = None
+    subsidiaries: Optional[str] = None
+    annual_revenue: Optional[float] = None
+    net_worth: Optional[float] = None
+    employee_count: Optional[int] = None
+    rating: Optional[float] = None
+    head_office_address: Optional[str] = None
+    customer_service_phone: Optional[str] = None
+    customer_service_email: Optional[str] = None
+    has_website: Optional[bool] = None
+    has_social_media: Optional[bool] = None
+    has_mobile_app: Optional[bool] = None
+    is_active: Optional[bool] = True
+    is_verified: Optional[bool] = False
+    verification_notes: Optional[str] = None
+    description: Optional[str] = None
+    notes: Optional[str] = None
+    status: Optional[str] = "ACTIVE"
+
+class CompanyUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    short_name: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
+    country: Optional[str] = None
+    postal_code: Optional[str] = None
+    type_of_company: Optional[str] = None
+    district: Optional[str] = None
+    date_of_incorporation: Optional[datetime] = None
+    date_of_commencement: Optional[datetime] = None
+    nature_of_business: Optional[str] = None
+    registration_number: Optional[str] = None
+    tax_identification_number: Optional[str] = None
+    phone_number: Optional[str] = None
+    directors: Optional[str] = None  # Comma-separated string
+    secretary: Optional[str] = None  # Single name
+    auditor: Optional[str] = None  # Single name
+    authorized_shares: Optional[int] = None
+    stated_capital: Optional[float] = None
+    shareholders: Optional[str] = None
+    other_linked_companies: Optional[str] = None
+    tin_number: Optional[str] = None
+    established_date: Optional[datetime] = None
+    company_type: Optional[str] = None
+    industry: Optional[str] = None
+    ownership_type: Optional[str] = None
+    business_activities: Optional[str] = None  # Comma-separated string
+    previous_names: Optional[str] = None
+    board_of_directors: Optional[str] = None
+    key_personnel: Optional[str] = None
+    subsidiaries: Optional[str] = None
+    annual_revenue: Optional[float] = None
+    net_worth: Optional[float] = None
+    employee_count: Optional[int] = None
+    rating: Optional[float] = None
+    head_office_address: Optional[str] = None
+    customer_service_phone: Optional[str] = None
+    customer_service_email: Optional[str] = None
+    has_website: Optional[bool] = None
+    has_social_media: Optional[bool] = None
+    has_mobile_app: Optional[bool] = None
+    is_active: Optional[bool] = None
+    is_verified: Optional[bool] = None
+    verification_notes: Optional[str] = None
+    description: Optional[str] = None
+    notes: Optional[str] = None
+    status: Optional[str] = None
+
+# Payment Management CRUD Schemas
+class PaymentResponse(BaseModel):
+    id: int
+    subscription_id: int
+    user_id: int
+    amount: float
+    currency: str
+    status: str
+    stripe_payment_intent_id: Optional[str] = None
+    stripe_charge_id: Optional[str] = None
+    payment_method: Optional[str] = None
+    last_four: Optional[str] = None
+    billing_period_start: datetime
+    billing_period_end: datetime
+    created_at: datetime
+    updated_at: datetime
+    paid_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+class PaymentCreateRequest(BaseModel):
+    subscription_id: int
+    user_id: int
+    amount: float
+    currency: str = "USD"
+    status: str = "pending"
+    stripe_payment_intent_id: Optional[str] = None
+    stripe_charge_id: Optional[str] = None
+    payment_method: Optional[str] = None
+    last_four: Optional[str] = None
+    billing_period_start: datetime
+    billing_period_end: datetime
+    paid_at: Optional[datetime] = None
+
+class PaymentUpdateRequest(BaseModel):
+    amount: Optional[float] = None
+    currency: Optional[str] = None
+    status: Optional[str] = None
+    stripe_payment_intent_id: Optional[str] = None
+    stripe_charge_id: Optional[str] = None
+    payment_method: Optional[str] = None
+    last_four: Optional[str] = None
+    billing_period_start: Optional[datetime] = None
+    billing_period_end: Optional[datetime] = None
+    paid_at: Optional[datetime] = None
+
+class PaymentListResponse(BaseModel):
+    payments: List[PaymentResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
+# Settings Management CRUD Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str
+    description: Optional[str] = None
+    is_public: bool
+    is_editable: bool
+    is_required: bool
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class SettingsCreateRequest(BaseModel):
+    key: str
+    category: str
+    value: Optional[str] = None
+    value_type: str = "string"
+    description: Optional[str] = None
+    is_public: bool = False
+    is_editable: bool = True
+    is_required: bool = False
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[str] = None
+    value_type: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    is_editable: Optional[bool] = None
+    is_required: Optional[bool] = None
+    validation_rules: Optional[dict] = None
+    default_value: Optional[str] = None
+
+class SettingsListResponse(BaseModel):
+    settings: List[SettingsResponse]
     total: int
     page: int
     limit: int

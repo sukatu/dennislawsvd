@@ -36,6 +36,9 @@ const BankManagement = () => {
   const [showBankModal, setShowBankModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [analytics, setAnalytics] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingBank, setEditingBank] = useState(null);
 
   useEffect(() => {
     loadBanks();
@@ -121,6 +124,46 @@ const BankManagement = () => {
     }
   };
 
+  const handleCreateBank = () => {
+    setEditingBank(null);
+    setShowCreateModal(true);
+  };
+
+  const handleEditBank = (bank) => {
+    setEditingBank(bank);
+    setShowEditModal(true);
+  };
+
+  const handleSaveBank = async (bankData) => {
+    try {
+      const url = editingBank 
+        ? `http://localhost:8000/api/admin/banks/${editingBank.id}`
+        : 'http://localhost:8000/api/admin/banks/';
+      
+      const method = editingBank ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bankData)
+      });
+
+      if (response.ok) {
+        setShowCreateModal(false);
+        setShowEditModal(false);
+        setEditingBank(null);
+        loadBanks();
+      } else {
+        const data = await response.json();
+        console.error('Error saving bank:', data.detail);
+      }
+    } catch (error) {
+      console.error('Error saving bank:', error);
+    }
+  };
+
   const getBankTypeBadgeColor = (bankType) => {
     switch (bankType?.toLowerCase()) {
       case 'commercial': return 'bg-blue-100 text-blue-800';
@@ -164,6 +207,13 @@ const BankManagement = () => {
           <h2 className="text-2xl font-bold text-slate-900">Bank Management</h2>
           <p className="text-slate-600">Manage bank records and analytics</p>
         </div>
+        <button
+          onClick={handleCreateBank}
+          className="inline-flex items-center px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-colors"
+        >
+          <Building2 className="h-4 w-4 mr-2" />
+          Create Bank
+        </button>
       </div>
 
       {/* Analytics Cards */}
@@ -354,6 +404,13 @@ const BankManagement = () => {
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEditBank(bank)}
+                            className="text-green-600 hover:text-green-900 p-1"
+                            title="Edit Bank"
+                          >
+                            <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteBank(bank)}
@@ -619,7 +676,422 @@ const BankManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Create/Edit Bank Modal */}
+      {(showCreateModal || showEditModal) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">
+                {editingBank ? 'Edit Bank' : 'Create New Bank'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setShowEditModal(false);
+                  setEditingBank(null);
+                }}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <BankForm
+              bankData={editingBank}
+              onSave={handleSaveBank}
+              onCancel={() => {
+                setShowCreateModal(false);
+                setShowEditModal(false);
+                setEditingBank(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
+  );
+};
+
+// Bank Form Component
+const BankForm = ({ bankData, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    short_name: '',
+    logo_url: '',
+    website: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    region: '',
+    country: '',
+    postal_code: '',
+    bank_code: '',
+    swift_code: '',
+    license_number: '',
+    established_date: '',
+    bank_type: '',
+    ownership_type: '',
+    services: '',
+    previous_names: '',
+    branches_count: '',
+    atm_count: '',
+    total_assets: '',
+    net_worth: '',
+    rating: '',
+    head_office_address: '',
+    customer_service_phone: '',
+    customer_service_email: '',
+    has_mobile_app: false,
+    has_online_banking: false,
+    has_atm_services: false,
+    has_foreign_exchange: false,
+    is_active: true,
+    is_verified: false,
+    verification_notes: '',
+    description: '',
+    notes: '',
+    status: 'ACTIVE'
+  });
+
+  useEffect(() => {
+    if (bankData) {
+      setFormData({
+        name: bankData.name || '',
+        short_name: bankData.short_name || '',
+        logo_url: bankData.logo_url || '',
+        website: bankData.website || '',
+        phone: bankData.phone || '',
+        email: bankData.email || '',
+        address: bankData.address || '',
+        city: bankData.city || '',
+        region: bankData.region || '',
+        country: bankData.country || '',
+        postal_code: bankData.postal_code || '',
+        bank_code: bankData.bank_code || '',
+        swift_code: bankData.swift_code || '',
+        license_number: bankData.license_number || '',
+        established_date: bankData.established_date ? bankData.established_date.split('T')[0] : '',
+        bank_type: bankData.bank_type || '',
+        ownership_type: bankData.ownership_type || '',
+        services: bankData.services || '',
+        previous_names: bankData.previous_names || '',
+        branches_count: bankData.branches_count || '',
+        atm_count: bankData.atm_count || '',
+        total_assets: bankData.total_assets || '',
+        net_worth: bankData.net_worth || '',
+        rating: bankData.rating || '',
+        head_office_address: bankData.head_office_address || '',
+        customer_service_phone: bankData.customer_service_phone || '',
+        customer_service_email: bankData.customer_service_email || '',
+        has_mobile_app: bankData.has_mobile_app || false,
+        has_online_banking: bankData.has_online_banking || false,
+        has_atm_services: bankData.has_atm_services || false,
+        has_foreign_exchange: bankData.has_foreign_exchange || false,
+        is_active: bankData.is_active !== undefined ? bankData.is_active : true,
+        is_verified: bankData.is_verified || false,
+        verification_notes: bankData.verification_notes || '',
+        description: bankData.description || '',
+        notes: bankData.notes || '',
+        status: bankData.status || 'ACTIVE'
+      });
+    }
+  }, [bankData]);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Basic Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Basic Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Bank Name *</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Short Name</label>
+            <input
+              type="text"
+              name="short_name"
+              value={formData.short_name}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Bank Code</label>
+            <input
+              type="text"
+              name="bank_code"
+              value={formData.bank_code}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">SWIFT Code</label>
+            <input
+              type="text"
+              name="swift_code"
+              value={formData.swift_code}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">License Number</label>
+            <input
+              type="text"
+              name="license_number"
+              value={formData.license_number}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Established Date</label>
+            <input
+              type="date"
+              name="established_date"
+              value={formData.established_date}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Contact Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Website</label>
+            <input
+              type="url"
+              name="website"
+              value={formData.website}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
+            <textarea
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+              <input
+                type="text"
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Services and Previous Names */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Services & History</h4>
+        
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Services (comma-separated)</label>
+          <input
+            type="text"
+            name="services"
+            value={formData.services}
+            onChange={handleInputChange}
+            placeholder="e.g., Personal Banking, Corporate Banking, Digital Banking"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Previous Names (comma-separated)</label>
+          <input
+            type="text"
+            name="previous_names"
+            value={formData.previous_names}
+            onChange={handleInputChange}
+            placeholder="e.g., Old Bank Name, Previous Bank Ltd"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+      </div>
+
+      {/* Financial Information */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Financial Information</h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Branches Count</label>
+            <input
+              type="number"
+              name="branches_count"
+              value={formData.branches_count}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Total Assets (GHS)</label>
+            <input
+              type="number"
+              name="total_assets"
+              value={formData.total_assets}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Net Worth (GHS)</label>
+            <input
+              type="number"
+              name="net_worth"
+              value={formData.net_worth}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Status and Options */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Status & Options</h4>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="is_active"
+              checked={formData.is_active}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Active</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="is_verified"
+              checked={formData.is_verified}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Verified</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="has_mobile_app"
+              checked={formData.has_mobile_app}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Mobile App</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="has_online_banking"
+              checked={formData.has_online_banking}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Online Banking</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="flex justify-end space-x-3 pt-4 border-t">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"
+        >
+          {bankData ? 'Update Bank' : 'Create Bank'}
+        </button>
+      </div>
+    </form>
   );
 };
 

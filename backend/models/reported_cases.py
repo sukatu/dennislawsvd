@@ -50,9 +50,9 @@ class ReportedCases(Base):
     conclusion = Column(Text, nullable=True)
     
     # AI Banking Summary Fields
-    ai_case_outcome = Column(String(50), nullable=True, comment='AI-generated case outcome')
+    ai_case_outcome = Column(Text, nullable=True, comment='AI-generated case outcome')
     ai_court_orders = Column(Text, nullable=True, comment='AI-generated court orders analysis')
-    ai_financial_impact = Column(String(50), nullable=True, comment='AI-generated financial impact level')
+    ai_financial_impact = Column(Text, nullable=True, comment='AI-generated financial impact level')
     ai_detailed_outcome = Column(Text, nullable=True, comment='AI-generated detailed outcome analysis')
     ai_summary_generated_at = Column(DateTime, nullable=True, comment='Timestamp when AI summary was generated')
     ai_summary_version = Column(String(10), nullable=True, default='1.0', comment='Version of AI summary generation algorithm')

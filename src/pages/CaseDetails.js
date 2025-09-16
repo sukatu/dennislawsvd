@@ -73,7 +73,8 @@ const CaseDetails = () => {
 
   // Get search query from URL params
   const searchParams = new URLSearchParams(location.search);
-  const searchQuery = searchParams.get('q') || '';
+  const searchQuery = searchParams.get('q') || ''; // Full person name
+  const originalSearch = searchParams.get('search') || searchQuery; // Original search term
 
   useEffect(() => {
     console.log('CaseDetails useEffect triggered with caseId:', caseId);
@@ -725,14 +726,7 @@ const CaseDetails = () => {
                 {searchQuery && (
                   <div className="mb-2">
                     <h1 className="text-2xl font-bold text-blue-900 break-words leading-tight">
-                      {(() => {
-                        // Try to get the full person name from case data first
-                        const personName = caseData?.plaintiffs || caseData?.defendants || caseData?.judges || caseData?.lawyers || '';
-                        const fullName = personName.split(',').find(name => 
-                          name.toLowerCase().includes(searchQuery.toLowerCase())
-                        )?.trim() || searchQuery;
-                        return fullName;
-                      })()}
+                      {searchQuery}
                     </h1>
                     <div className="flex items-center space-x-2 text-sm text-blue-600">
                       <User className="w-4 h-4" />
@@ -842,11 +836,11 @@ const CaseDetails = () => {
                   {caseData?.title || 'Case Details'}
                 </h2>
                 <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  {searchQuery && (
+                  {originalSearch && (
                     <span className="flex items-center space-x-1">
                       <span className="font-medium">Searched for:</span>
                       <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                        "{searchQuery}"
+                        "{originalSearch}"
                       </span>
                     </span>
                   )}

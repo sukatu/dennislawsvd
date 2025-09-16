@@ -36,6 +36,9 @@ const InsuranceManagement = () => {
   const [showInsuranceModal, setShowInsuranceModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [analytics, setAnalytics] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingInsurance, setEditingInsurance] = useState(null);
 
   useEffect(() => {
     loadInsurance();
@@ -121,6 +124,46 @@ const InsuranceManagement = () => {
     }
   };
 
+  const handleCreateInsurance = () => {
+    setEditingInsurance(null);
+    setShowCreateModal(true);
+  };
+
+  const handleEditInsurance = (insuranceItem) => {
+    setEditingInsurance(insuranceItem);
+    setShowEditModal(true);
+  };
+
+  const handleSaveInsurance = async (insuranceData) => {
+    try {
+      const url = editingInsurance 
+        ? `http://localhost:8000/api/admin/insurance/${editingInsurance.id}`
+        : 'http://localhost:8000/api/admin/insurance/';
+      
+      const method = editingInsurance ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(insuranceData)
+      });
+
+      if (response.ok) {
+        setShowCreateModal(false);
+        setShowEditModal(false);
+        setEditingInsurance(null);
+        loadInsurance();
+      } else {
+        const data = await response.json();
+        console.error('Error saving insurance:', data.detail);
+      }
+    } catch (error) {
+      console.error('Error saving insurance:', error);
+    }
+  };
+
   const getInsuranceTypeBadgeColor = (insuranceType) => {
     switch (insuranceType?.toLowerCase()) {
       case 'life': return 'bg-blue-100 text-blue-800';
@@ -165,6 +208,13 @@ const InsuranceManagement = () => {
           <h2 className="text-2xl font-bold text-slate-900">Insurance Management</h2>
           <p className="text-slate-600">Manage insurance records and analytics</p>
         </div>
+        <button
+          onClick={handleCreateInsurance}
+          className="inline-flex items-center px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-colors"
+        >
+          <Shield className="h-4 w-4 mr-2" />
+          Create Insurance
+        </button>
       </div>
 
       {/* Analytics Cards */}
@@ -356,6 +406,13 @@ const InsuranceManagement = () => {
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEditInsurance(insuranceItem)}
+                            className="text-green-600 hover:text-green-900 p-1"
+                            title="Edit Insurance"
+                          >
+                            <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteInsurance(insuranceItem)}
@@ -631,7 +688,463 @@ const InsuranceManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Create/Edit Insurance Modal */}
+      {(showCreateModal || showEditModal) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">
+                {editingInsurance ? 'Edit Insurance Company' : 'Create New Insurance Company'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setShowEditModal(false);
+                  setEditingInsurance(null);
+                }}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <InsuranceForm
+              insuranceData={editingInsurance}
+              onSave={handleSaveInsurance}
+              onCancel={() => {
+                setShowCreateModal(false);
+                setShowEditModal(false);
+                setEditingInsurance(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
+  );
+};
+
+// Insurance Form Component
+const InsuranceForm = ({ insuranceData, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    short_name: '',
+    logo_url: '',
+    website: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    region: '',
+    country: '',
+    postal_code: '',
+    license_number: '',
+    registration_number: '',
+    established_date: '',
+    insurance_type: '',
+    ownership_type: '',
+    services: '',
+    previous_names: '',
+    coverage_areas: '',
+    branches_count: '',
+    agents_count: '',
+    total_assets: '',
+    net_worth: '',
+    premium_income: '',
+    claims_paid: '',
+    rating: '',
+    head_office_address: '',
+    customer_service_phone: '',
+    customer_service_email: '',
+    claims_phone: '',
+    claims_email: '',
+    has_mobile_app: false,
+    has_online_portal: false,
+    has_online_claims: false,
+    has_24_7_support: false,
+    specializes_in: '',
+    target_market: '',
+    is_active: true,
+    is_verified: false,
+    verification_notes: '',
+    description: '',
+    notes: '',
+    status: 'ACTIVE'
+  });
+
+  useEffect(() => {
+    if (insuranceData) {
+      setFormData({
+        name: insuranceData.name || '',
+        short_name: insuranceData.short_name || '',
+        logo_url: insuranceData.logo_url || '',
+        website: insuranceData.website || '',
+        phone: insuranceData.phone || '',
+        email: insuranceData.email || '',
+        address: insuranceData.address || '',
+        city: insuranceData.city || '',
+        region: insuranceData.region || '',
+        country: insuranceData.country || '',
+        postal_code: insuranceData.postal_code || '',
+        license_number: insuranceData.license_number || '',
+        registration_number: insuranceData.registration_number || '',
+        established_date: insuranceData.established_date ? insuranceData.established_date.split('T')[0] : '',
+        insurance_type: insuranceData.insurance_type || '',
+        ownership_type: insuranceData.ownership_type || '',
+        services: insuranceData.services || '',
+        previous_names: insuranceData.previous_names || '',
+        coverage_areas: insuranceData.coverage_areas || '',
+        branches_count: insuranceData.branches_count || '',
+        agents_count: insuranceData.agents_count || '',
+        total_assets: insuranceData.total_assets || '',
+        net_worth: insuranceData.net_worth || '',
+        premium_income: insuranceData.premium_income || '',
+        claims_paid: insuranceData.claims_paid || '',
+        rating: insuranceData.rating || '',
+        head_office_address: insuranceData.head_office_address || '',
+        customer_service_phone: insuranceData.customer_service_phone || '',
+        customer_service_email: insuranceData.customer_service_email || '',
+        claims_phone: insuranceData.claims_phone || '',
+        claims_email: insuranceData.claims_email || '',
+        has_mobile_app: insuranceData.has_mobile_app || false,
+        has_online_portal: insuranceData.has_online_portal || false,
+        has_online_claims: insuranceData.has_online_claims || false,
+        has_24_7_support: insuranceData.has_24_7_support || false,
+        specializes_in: insuranceData.specializes_in || '',
+        target_market: insuranceData.target_market || '',
+        is_active: insuranceData.is_active !== undefined ? insuranceData.is_active : true,
+        is_verified: insuranceData.is_verified || false,
+        verification_notes: insuranceData.verification_notes || '',
+        description: insuranceData.description || '',
+        notes: insuranceData.notes || '',
+        status: insuranceData.status || 'ACTIVE'
+      });
+    }
+  }, [insuranceData]);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Basic Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Basic Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Company Name *</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Short Name</label>
+            <input
+              type="text"
+              name="short_name"
+              value={formData.short_name}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Insurance Type</label>
+            <select
+              name="insurance_type"
+              value={formData.insurance_type}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            >
+              <option value="">Select Type</option>
+              <option value="Life Insurance">Life Insurance</option>
+              <option value="General Insurance">General Insurance</option>
+              <option value="Health Insurance">Health Insurance</option>
+              <option value="Motor Insurance">Motor Insurance</option>
+              <option value="Property Insurance">Property Insurance</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">License Number</label>
+            <input
+              type="text"
+              name="license_number"
+              value={formData.license_number}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Established Date</label>
+            <input
+              type="date"
+              name="established_date"
+              value={formData.established_date}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Contact Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Website</label>
+            <input
+              type="url"
+              name="website"
+              value={formData.website}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
+            <textarea
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+              <input
+                type="text"
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Services and Coverage */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Services & Coverage</h4>
+        
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Services (comma-separated)</label>
+          <input
+            type="text"
+            name="services"
+            value={formData.services}
+            onChange={handleInputChange}
+            placeholder="e.g., Motor Insurance, Property Insurance, Health Insurance"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Coverage Areas (comma-separated)</label>
+          <input
+            type="text"
+            name="coverage_areas"
+            value={formData.coverage_areas}
+            onChange={handleInputChange}
+            placeholder="e.g., Greater Accra, Ashanti, Western"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Specializes In (comma-separated)</label>
+          <input
+            type="text"
+            name="specializes_in"
+            value={formData.specializes_in}
+            onChange={handleInputChange}
+            placeholder="e.g., General Insurance, Motor Insurance, Property Insurance"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Previous Names (comma-separated)</label>
+          <input
+            type="text"
+            name="previous_names"
+            value={formData.previous_names}
+            onChange={handleInputChange}
+            placeholder="e.g., Old Insurance Name, Previous Insurance Ltd"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+      </div>
+
+      {/* Financial Information */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Financial Information</h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Branches Count</label>
+            <input
+              type="number"
+              name="branches_count"
+              value={formData.branches_count}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Agents Count</label>
+            <input
+              type="number"
+              name="agents_count"
+              value={formData.agents_count}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Total Assets (GHS)</label>
+            <input
+              type="number"
+              name="total_assets"
+              value={formData.total_assets}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Net Worth (GHS)</label>
+            <input
+              type="number"
+              name="net_worth"
+              value={formData.net_worth}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Status and Options */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Status & Options</h4>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="is_active"
+              checked={formData.is_active}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Active</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="is_verified"
+              checked={formData.is_verified}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Verified</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="has_mobile_app"
+              checked={formData.has_mobile_app}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Mobile App</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="has_online_portal"
+              checked={formData.has_online_portal}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Online Portal</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="flex justify-end space-x-3 pt-4 border-t">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"
+        >
+          {insuranceData ? 'Update Insurance' : 'Create Insurance'}
+        </button>
+      </div>
+    </form>
   );
 };
 

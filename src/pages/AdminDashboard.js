@@ -29,6 +29,7 @@ import BankManagement from '../components/admin/BankManagement';
 import InsuranceManagement from '../components/admin/InsuranceManagement';
 import CompanyManagement from '../components/admin/CompanyManagement';
 import PaymentManagement from '../components/admin/PaymentManagement';
+import SettingsManagement from '../components/admin/SettingsManagement';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -236,7 +237,7 @@ const AdminDashboard = () => {
       case 'payments':
         return <PaymentManagement />;
       case 'settings':
-        return <SettingsTab />;
+        return <SettingsManagement />;
       default:
         return <OverviewTab stats={stats} />;
     }

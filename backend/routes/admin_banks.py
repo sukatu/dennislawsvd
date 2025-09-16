@@ -4,8 +4,10 @@ from database import get_db
 from models.banks import Banks
 from models.bank_analytics import BankAnalytics
 from models.bank_case_statistics import BankCaseStatistics
+from schemas.admin import BankCreateRequest, BankUpdateRequest
 from typing import List, Optional
 import math
+import json
 
 router = APIRouter()
 
@@ -161,6 +163,71 @@ async def get_bank(bank_id: int, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching bank: {str(e)}")
+
+@router.post("/")
+async def create_bank(bank_data: BankCreateRequest, db: Session = Depends(get_db)):
+    """Create a new bank"""
+    try:
+        # Convert comma-separated strings to JSON arrays for storage
+        bank_dict = bank_data.dict()
+        
+        # Convert string fields to JSON arrays
+        if bank_dict.get('previous_names'):
+            bank_dict['previous_names'] = [name.strip() for name in bank_dict['previous_names'].split(',') if name.strip()]
+        else:
+            bank_dict['previous_names'] = []
+            
+        if bank_dict.get('services'):
+            bank_dict['services'] = [service.strip() for service in bank_dict['services'].split(',') if service.strip()]
+        else:
+            bank_dict['services'] = []
+        
+        # Create the bank
+        bank = Banks(**bank_dict)
+        db.add(bank)
+        db.commit()
+        db.refresh(bank)
+        
+        return {"message": "Bank created successfully", "bank_id": bank.id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating bank: {str(e)}")
+
+@router.put("/{bank_id}")
+async def update_bank(bank_id: int, bank_data: BankUpdateRequest, db: Session = Depends(get_db)):
+    """Update an existing bank"""
+    try:
+        bank = db.query(Banks).filter(Banks.id == bank_id).first()
+        if not bank:
+            raise HTTPException(status_code=404, detail="Bank not found")
+        
+        # Convert comma-separated strings to JSON arrays for storage
+        update_data = bank_data.dict(exclude_unset=True)
+        
+        # Convert string fields to JSON arrays
+        if 'previous_names' in update_data and update_data['previous_names']:
+            update_data['previous_names'] = [name.strip() for name in update_data['previous_names'].split(',') if name.strip()]
+        elif 'previous_names' in update_data and not update_data['previous_names']:
+            update_data['previous_names'] = []
+            
+        if 'services' in update_data and update_data['services']:
+            update_data['services'] = [service.strip() for service in update_data['services'].split(',') if service.strip()]
+        elif 'services' in update_data and not update_data['services']:
+            update_data['services'] = []
+        
+        # Update the bank
+        for field, value in update_data.items():
+            setattr(bank, field, value)
+        
+        db.commit()
+        db.refresh(bank)
+        
+        return {"message": "Bank updated successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error updating bank: {str(e)}")
 
 @router.delete("/{bank_id}")
 async def delete_bank(bank_id: int, db: Session = Depends(get_db)):

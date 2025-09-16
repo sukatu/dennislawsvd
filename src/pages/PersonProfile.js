@@ -621,6 +621,13 @@ const PersonProfile = () => {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
+                        {/* Person Name - Prominently displayed */}
+                        <div className="mb-2">
+                          <h2 className="text-lg font-bold text-blue-900 break-words leading-tight">
+                            {personData?.full_name || searchQuery || 'Unknown Person'}
+                          </h2>
+                        </div>
+                        {/* Case Title */}
                         <h3 className="font-semibold text-slate-900 mb-2">{case_.title}</h3>
                         <div className="grid grid-cols-2 gap-4 text-sm text-slate-600">
                           <div>
@@ -647,7 +654,9 @@ const PersonProfile = () => {
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/case-details/${case_.id}`);
+                            const fullName = personData?.full_name || searchQuery || '';
+                            const originalSearch = searchQuery || '';
+                            navigate(`/case-details/${case_.id}?q=${encodeURIComponent(fullName)}&search=${encodeURIComponent(originalSearch)}`);
                           }}
                           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                         >

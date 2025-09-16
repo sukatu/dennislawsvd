@@ -16,6 +16,8 @@ from models.subscription import Subscription
 from models.payment import Payment
 from models.notification import Notification
 from models.security import SecurityEvent, ApiKey
+from services.case_metadata_service import CaseMetadataService
+from services.simple_case_processing_service import SimpleCaseProcessingService
 from schemas.admin import (
     AdminStatsResponse,
     UserListResponse,
@@ -38,7 +40,7 @@ from schemas.admin import (
 )
 
 # Import the new admin route modules
-from . import admin_people, admin_banks, admin_insurance, admin_companies, admin_payments
+from . import admin_people, admin_banks, admin_insurance, admin_companies, admin_payments, admin_settings
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -413,8 +415,8 @@ async def get_cases(
                 "court_type": case.court_type,
                 "court_division": case.court_division,
                 "status": status_mapping.get(case.status) if case.status is not None else None,
-                "created_at": case.created_at,
-                "updated_at": case.updated_at
+                "created_at": case.created_at.isoformat() if case.created_at else None,
+                "updated_at": case.updated_at.isoformat() if case.updated_at else None
             }
             formatted_cases.append(case_dict)
         
@@ -519,6 +521,11 @@ async def get_case(case_id: int, db: Session = Depends(get_db)):
         if case_dict.get('status') is not None:
             case_dict['status'] = status_mapping.get(case_dict['status'])
         
+        # Convert datetime fields to strings for JSON serialization
+        for field in ['ai_summary_generated_at', 'created_at', 'updated_at', 'date']:
+            if case_dict.get(field) and hasattr(case_dict[field], 'isoformat'):
+                case_dict[field] = case_dict[field].isoformat()
+        
         return case_dict
     except HTTPException:
         raise
@@ -547,6 +554,20 @@ async def create_case(case_data: CaseCreateRequest, db: Session = Depends(get_db
         db.commit()
         db.refresh(new_case)
         
+        # Process case with analytics
+        try:
+            processor = SimpleCaseProcessingService(db)
+            processing_result = processor.process_case_with_analytics(new_case.id)
+            print(f"Processing result for case {new_case.id}: {processing_result}")
+        except Exception as e:
+            print(f"Error processing case {new_case.id}: {str(e)}")
+            # Fallback to basic metadata processing
+            try:
+                metadata_result = CaseMetadataService.process_case_metadata(new_case.id, db)
+                print(f"Fallback metadata processing result for case {new_case.id}: {metadata_result}")
+            except Exception as fallback_error:
+                print(f"Error in fallback metadata processing for case {new_case.id}: {str(fallback_error)}")
+        
         # Convert status back to string for response
         status_mapping = {
             1: 'active',
@@ -558,6 +579,11 @@ async def create_case(case_data: CaseCreateRequest, db: Session = Depends(get_db
         case_dict = new_case.__dict__.copy()
         if case_dict.get('status') is not None:
             case_dict['status'] = status_mapping.get(case_dict['status'])
+        
+        # Convert datetime fields to strings for JSON serialization
+        for field in ['ai_summary_generated_at', 'created_at', 'updated_at', 'date']:
+            if case_dict.get(field) and hasattr(case_dict[field], 'isoformat'):
+                case_dict[field] = case_dict[field].isoformat()
         
         return case_dict
     except Exception as e:
@@ -628,75 +654,42 @@ async def delete_case(case_id: int, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error deleting case: {str(e)}")
 
-# Insurance Management
-@router.get("/insurance", response_model=InsuranceListResponse)
-async def get_insurance(
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
-    search: Optional[str] = None,
-    db: Session = Depends(get_db)
-):
-    """Get paginated list of insurance companies with filtering"""
-    try:
-        query = db.query(Insurance)
-        
-        # Apply filters
-        if search:
-            query = query.filter(Insurance.name.contains(search))
-        
-        # Get total count
-        total = query.count()
-        
-        # Apply pagination
-        offset = (page - 1) * limit
-        insurance = query.offset(offset).limit(limit).all()
-        
-        return InsuranceListResponse(
-            insurance=insurance,
-            total=total,
-            page=page,
-            limit=limit,
-            total_pages=(total + limit - 1) // limit
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching insurance: {str(e)}")
-
-# Company Management
-@router.get("/companies", response_model=CompanyListResponse)
-async def get_companies(
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
-    search: Optional[str] = None,
-    company_type: Optional[str] = None,
-    db: Session = Depends(get_db)
-):
-    """Get paginated list of companies with filtering"""
-    try:
-        query = db.query(Companies)
-        
-        # Apply filters
-        if search:
-            query = query.filter(Companies.name.contains(search))
-        
-        if company_type:
-            query = query.filter(Companies.company_type == company_type)
-        
-        # Get total count
-        total = query.count()
-        
-        # Apply pagination
-        offset = (page - 1) * limit
-        companies = query.offset(offset).limit(limit).all()
-        
-        return CompanyListResponse(
-            companies=companies,
-            total=total,
-            page=page,
-            limit=limit,
-            total_pages=(total + limit - 1) // limit
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching companies: {str(e)}")
+# Company Management - COMMENTED OUT (using admin_companies.py instead)
+# @router.get("/companies", response_model=CompanyListResponse)
+# async def get_companies_OLD(
+#     page: int = Query(1, ge=1),
+#     limit: int = Query(10, ge=1, le=100),
+#     search: Optional[str] = None,
+#     company_type: Optional[str] = None,
+#     db: Session = Depends(get_db)
+# ):
+#     """Get paginated list of companies with filtering"""
+#     try:
+#         query = db.query(Companies)
+#         
+#         # Apply filters
+#         if search:
+#             query = query.filter(Companies.name.contains(search))
+#         
+#         if company_type:
+#             query = query.filter(Companies.company_type == company_type)
+#         
+#         # Get total count
+#         total = query.count()
+#         
+#         # Apply pagination
+#         offset = (page - 1) * limit
+#         companies = query.offset(offset).limit(limit).all()
+#         
+#         return CompanyListResponse(
+#             companies=companies,
+#             total=total,
+#             page=page,
+#             limit=limit,
+#             total_pages=(total + limit - 1) // limit
+#         )
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Error fetching companies: {str(e)}")
 
 # Payment Management
 @router.get("/payments", response_model=PaymentListResponse)
@@ -764,9 +757,45 @@ async def get_subscriptions(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching subscriptions: {str(e)}")
 
+# Case Metadata Processing Endpoints
+@router.post("/cases/{case_id}/process-metadata")
+async def process_case_metadata(case_id: int, db: Session = Depends(get_db)):
+    """Process metadata for a specific case"""
+    try:
+        result = CaseMetadataService.process_case_metadata(case_id, db)
+        if result.get("error"):
+            raise HTTPException(status_code=500, detail=result["error"])
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing case metadata: {str(e)}")
+
+@router.post("/cases/process-all-metadata")
+async def process_all_cases_metadata(db: Session = Depends(get_db)):
+    """Process metadata for all cases"""
+    try:
+        result = CaseMetadataService.reprocess_all_cases(db)
+        if result.get("error"):
+            raise HTTPException(status_code=500, detail=result["error"])
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing all cases metadata: {str(e)}")
+
+@router.post("/cases/{case_id}/process-enhanced")
+async def process_case_enhanced(case_id: int, db: Session = Depends(get_db)):
+    """Process case with analytics and entity extraction"""
+    try:
+        processor = SimpleCaseProcessingService(db)
+        result = processor.process_case_with_analytics(case_id)
+        if result.get("error"):
+            raise HTTPException(status_code=500, detail=result["error"])
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing case with analytics: {str(e)}")
+
 # Include the new admin route modules
 router.include_router(admin_people.router, prefix="/people", tags=["admin-people"])
 router.include_router(admin_banks.router, prefix="/banks", tags=["admin-banks"])
 router.include_router(admin_insurance.router, prefix="/insurance", tags=["admin-insurance"])
 router.include_router(admin_companies.router, prefix="/companies", tags=["admin-companies"])
 router.include_router(admin_payments.router, prefix="/payments", tags=["admin-payments"])
+router.include_router(admin_settings.router, prefix="/settings", tags=["admin-settings"])

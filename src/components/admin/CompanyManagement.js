@@ -36,6 +36,9 @@ const CompanyManagement = () => {
   const [showCompanyModal, setShowCompanyModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [analytics, setAnalytics] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingCompany, setEditingCompany] = useState(null);
 
   useEffect(() => {
     loadCompanies();
@@ -121,6 +124,46 @@ const CompanyManagement = () => {
     }
   };
 
+  const handleCreateCompany = () => {
+    setEditingCompany(null);
+    setShowCreateModal(true);
+  };
+
+  const handleEditCompany = (company) => {
+    setEditingCompany(company);
+    setShowEditModal(true);
+  };
+
+  const handleSaveCompany = async (companyData) => {
+    try {
+      const url = editingCompany 
+        ? `http://localhost:8000/api/admin/companies/${editingCompany.id}`
+        : 'http://localhost:8000/api/admin/companies/';
+      
+      const method = editingCompany ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(companyData)
+      });
+
+      if (response.ok) {
+        setShowCreateModal(false);
+        setShowEditModal(false);
+        setEditingCompany(null);
+        loadCompanies();
+      } else {
+        const data = await response.json();
+        console.error('Error saving company:', data.detail);
+      }
+    } catch (error) {
+      console.error('Error saving company:', error);
+    }
+  };
+
   const getCompanyTypeBadgeColor = (companyType) => {
     switch (companyType?.toLowerCase()) {
       case 'limited': return 'bg-blue-100 text-blue-800';
@@ -165,6 +208,13 @@ const CompanyManagement = () => {
           <h2 className="text-2xl font-bold text-slate-900">Company Management</h2>
           <p className="text-slate-600">Manage company records and analytics</p>
         </div>
+        <button
+          onClick={handleCreateCompany}
+          className="inline-flex items-center px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-colors"
+        >
+          <Building className="h-4 w-4 mr-2" />
+          Create Company
+        </button>
       </div>
 
       {/* Analytics Cards */}
@@ -356,6 +406,13 @@ const CompanyManagement = () => {
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEditCompany(company)}
+                            className="text-green-600 hover:text-green-900 p-1"
+                            title="Edit Company"
+                          >
+                            <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteCompany(company)}
@@ -600,7 +657,481 @@ const CompanyManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Create/Edit Company Modal */}
+      {(showCreateModal || showEditModal) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">
+                {editingCompany ? 'Edit Company' : 'Create New Company'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setShowEditModal(false);
+                  setEditingCompany(null);
+                }}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <CompanyForm
+              companyData={editingCompany}
+              onSave={handleSaveCompany}
+              onCancel={() => {
+                setShowCreateModal(false);
+                setShowEditModal(false);
+                setEditingCompany(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
+  );
+};
+
+// Company Form Component
+const CompanyForm = ({ companyData, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    short_name: '',
+    logo_url: '',
+    website: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    region: '',
+    country: '',
+    postal_code: '',
+    type_of_company: '',
+    district: '',
+    date_of_incorporation: '',
+    date_of_commencement: '',
+    nature_of_business: '',
+    registration_number: '',
+    tax_identification_number: '',
+    phone_number: '',
+    directors: '',
+    secretary: '',
+    auditor: '',
+    authorized_shares: '',
+    stated_capital: '',
+    shareholders: '',
+    other_linked_companies: '',
+    tin_number: '',
+    established_date: '',
+    company_type: '',
+    industry: '',
+    ownership_type: '',
+    business_activities: '',
+    previous_names: '',
+    board_of_directors: '',
+    key_personnel: '',
+    subsidiaries: '',
+    annual_revenue: '',
+    net_worth: '',
+    employee_count: '',
+    rating: '',
+    head_office_address: '',
+    customer_service_phone: '',
+    customer_service_email: '',
+    has_website: false,
+    has_social_media: false,
+    has_mobile_app: false,
+    is_active: true,
+    is_verified: false,
+    verification_notes: '',
+    description: '',
+    notes: '',
+    status: 'ACTIVE'
+  });
+
+  useEffect(() => {
+    if (companyData) {
+      setFormData({
+        name: companyData.name || '',
+        short_name: companyData.short_name || '',
+        logo_url: companyData.logo_url || '',
+        website: companyData.website || '',
+        phone: companyData.phone || '',
+        email: companyData.email || '',
+        address: companyData.address || '',
+        city: companyData.city || '',
+        region: companyData.region || '',
+        country: companyData.country || '',
+        postal_code: companyData.postal_code || '',
+        type_of_company: companyData.type_of_company || '',
+        district: companyData.district || '',
+        date_of_incorporation: companyData.date_of_incorporation ? companyData.date_of_incorporation.split('T')[0] : '',
+        date_of_commencement: companyData.date_of_commencement ? companyData.date_of_commencement.split('T')[0] : '',
+        nature_of_business: companyData.nature_of_business || '',
+        registration_number: companyData.registration_number || '',
+        tax_identification_number: companyData.tax_identification_number || '',
+        phone_number: companyData.phone_number || '',
+        directors: companyData.directors || '',
+        secretary: companyData.secretary || '',
+        auditor: companyData.auditor || '',
+        authorized_shares: companyData.authorized_shares || '',
+        stated_capital: companyData.stated_capital || '',
+        shareholders: companyData.shareholders || '',
+        other_linked_companies: companyData.other_linked_companies || '',
+        tin_number: companyData.tin_number || '',
+        established_date: companyData.established_date ? companyData.established_date.split('T')[0] : '',
+        company_type: companyData.company_type || '',
+        industry: companyData.industry || '',
+        ownership_type: companyData.ownership_type || '',
+        business_activities: companyData.business_activities || '',
+        previous_names: companyData.previous_names || '',
+        board_of_directors: companyData.board_of_directors || '',
+        key_personnel: companyData.key_personnel || '',
+        subsidiaries: companyData.subsidiaries || '',
+        annual_revenue: companyData.annual_revenue || '',
+        net_worth: companyData.net_worth || '',
+        employee_count: companyData.employee_count || '',
+        rating: companyData.rating || '',
+        head_office_address: companyData.head_office_address || '',
+        customer_service_phone: companyData.customer_service_phone || '',
+        customer_service_email: companyData.customer_service_email || '',
+        has_website: companyData.has_website || false,
+        has_social_media: companyData.has_social_media || false,
+        has_mobile_app: companyData.has_mobile_app || false,
+        is_active: companyData.is_active !== undefined ? companyData.is_active : true,
+        is_verified: companyData.is_verified || false,
+        verification_notes: companyData.verification_notes || '',
+        description: companyData.description || '',
+        notes: companyData.notes || '',
+        status: companyData.status || 'ACTIVE'
+      });
+    }
+  }, [companyData]);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Basic Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Basic Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Company Name *</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Short Name</label>
+            <input
+              type="text"
+              name="short_name"
+              value={formData.short_name}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Company Type</label>
+            <select
+              name="company_type"
+              value={formData.company_type}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            >
+              <option value="">Select Type</option>
+              <option value="Private Limited">Private Limited</option>
+              <option value="Public Limited">Public Limited</option>
+              <option value="Partnership">Partnership</option>
+              <option value="Sole Proprietorship">Sole Proprietorship</option>
+              <option value="Non-Profit">Non-Profit</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Industry</label>
+            <input
+              type="text"
+              name="industry"
+              value={formData.industry}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Registration Number</label>
+            <input
+              type="text"
+              name="registration_number"
+              value={formData.registration_number}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Established Date</label>
+            <input
+              type="date"
+              name="established_date"
+              value={formData.established_date}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Contact Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Website</label>
+            <input
+              type="url"
+              name="website"
+              value={formData.website}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
+            <textarea
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+              <input
+                type="text"
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Business Information */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Business Information</h4>
+        
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Business Activities (comma-separated)</label>
+          <input
+            type="text"
+            name="business_activities"
+            value={formData.business_activities}
+            onChange={handleInputChange}
+            placeholder="e.g., Software Development, IT Consulting, Digital Solutions"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Directors (comma-separated)</label>
+          <input
+            type="text"
+            name="directors"
+            value={formData.directors}
+            onChange={handleInputChange}
+            placeholder="e.g., John Doe, Jane Smith, Bob Johnson"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Secretary</label>
+            <input
+              type="text"
+              name="secretary"
+              value={formData.secretary}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Auditor</label>
+            <input
+              type="text"
+              name="auditor"
+              value={formData.auditor}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Financial Information */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Financial Information</h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Employee Count</label>
+            <input
+              type="number"
+              name="employee_count"
+              value={formData.employee_count}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Annual Revenue (GHS)</label>
+            <input
+              type="number"
+              name="annual_revenue"
+              value={formData.annual_revenue}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Net Worth (GHS)</label>
+            <input
+              type="number"
+              name="net_worth"
+              value={formData.net_worth}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Status and Options */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Status & Options</h4>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="is_active"
+              checked={formData.is_active}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Active</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="is_verified"
+              checked={formData.is_verified}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Verified</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="has_website"
+              checked={formData.has_website}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Has Website</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="has_mobile_app"
+              checked={formData.has_mobile_app}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+            />
+            <span className="ml-2 text-sm text-slate-700">Mobile App</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="flex justify-end space-x-3 pt-4 border-t">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"
+        >
+          {companyData ? 'Update Company' : 'Create Company'}
+        </button>
+      </div>
+    </form>
   );
 };
 

@@ -21,3 +21,4 @@ from .subscription import Subscription, UsageRecord, SubscriptionStatus, Subscri
 from .payment import Payment, PaymentMethod
 from .notification import Notification, NotificationPreference, NotificationType, NotificationStatus, NotificationPriority
 from .security import SecurityEvent, TwoFactorAuth, ApiKey, LoginSession, SecurityEventType
+from .settings import Settings

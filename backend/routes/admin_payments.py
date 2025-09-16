@@ -4,6 +4,7 @@ from database import get_db
 from models.payment import Payment
 from models.subscription import Subscription
 from models.user import User
+from schemas.admin import PaymentListResponse, PaymentResponse, PaymentCreateRequest, PaymentUpdateRequest
 from typing import List, Optional
 import math
 
@@ -18,7 +19,7 @@ async def get_payments_stats(db: Session = Depends(get_db)):
         
         # Financial analysis
         total_revenue = db.query(Payment.amount).filter(Payment.status == 'completed').all()
-        total_revenue = sum([payment[0] for payment in total_revenue]) if total_revenue else 0
+        total_revenue = sum([float(payment[0]) for payment in total_revenue]) if total_revenue else 0
         
         # Status breakdown
         completed_payments = db.query(Payment).filter(Payment.status == 'completed').count()
@@ -146,3 +147,53 @@ async def delete_payment(payment_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error deleting payment: {str(e)}")
+
+@router.post("/", response_model=PaymentResponse)
+async def create_payment(payment_data: PaymentCreateRequest, db: Session = Depends(get_db)):
+    """Create a new payment record"""
+    try:
+        # Verify subscription exists
+        subscription = db.query(Subscription).filter(Subscription.id == payment_data.subscription_id).first()
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        # Verify user exists
+        user = db.query(User).filter(User.id == payment_data.user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Create payment
+        payment = Payment(**payment_data.dict())
+        db.add(payment)
+        db.commit()
+        db.refresh(payment)
+        
+        return payment
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating payment: {str(e)}")
+
+@router.put("/{payment_id}", response_model=PaymentResponse)
+async def update_payment(payment_id: int, payment_data: PaymentUpdateRequest, db: Session = Depends(get_db)):
+    """Update an existing payment record"""
+    try:
+        payment = db.query(Payment).filter(Payment.id == payment_id).first()
+        if not payment:
+            raise HTTPException(status_code=404, detail="Payment not found")
+        
+        # Update only provided fields
+        update_data = payment_data.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(payment, field, value)
+        
+        db.commit()
+        db.refresh(payment)
+        
+        return payment
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error updating payment: {str(e)}")

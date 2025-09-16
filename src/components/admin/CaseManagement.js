@@ -16,13 +16,14 @@ import {
   ExternalLink,
   AlertCircle,
   CheckCircle,
+  XCircle,
   Clock,
   X,
   Save
 } from 'lucide-react';
 
 // Case Form Component
-const CaseForm = ({ caseData, onSave, onCancel }) => {
+const CaseForm = ({ caseData, onSave, onCancel, saving = false }) => {
   const [formData, setFormData] = useState({
     title: '',
     suit_reference_number: '',
@@ -375,10 +376,20 @@ const CaseForm = ({ caseData, onSave, onCancel }) => {
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors flex items-center gap-2"
+          disabled={saving}
+          className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Save className="h-4 w-4" />
-          {caseData ? 'Update Case' : 'Create Case'}
+          {saving ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              {caseData ? 'Updating...' : 'Creating...'}
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              {caseData ? 'Update Case' : 'Create Case'}
+            </>
+          )}
         </button>
       </div>
     </form>
@@ -400,6 +411,8 @@ const CaseManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCase, setEditingCase] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [notification, setNotification] = useState(null);
   const [caseStats, setCaseStats] = useState({
     totalCases: 0,
     activeCases: 0,
@@ -521,6 +534,46 @@ const CaseManagement = () => {
 
   const handleSaveCase = async (caseData) => {
     try {
+      setSaving(true);
+      
+      // Validate required fields
+      if (!caseData.title || caseData.title.trim() === '') {
+        setNotification({ type: 'error', message: 'Title is required' });
+        setTimeout(() => setNotification(null), 3000);
+        setSaving(false);
+        return;
+      }
+
+      // Validate year if provided
+      if (caseData.year && (isNaN(parseInt(caseData.year)) || parseInt(caseData.year) < 1900 || parseInt(caseData.year) > 2030)) {
+        setNotification({ type: 'error', message: 'Year must be a valid number between 1900 and 2030' });
+        setTimeout(() => setNotification(null), 3000);
+        setSaving(false);
+        return;
+      }
+
+      // Transform form data for backend
+      const transformedData = {
+        ...caseData,
+        // Convert date string to ISO format
+        date: caseData.date ? new Date(caseData.date).toISOString() : null,
+        // Convert year to integer
+        year: caseData.year ? parseInt(caseData.year) : null,
+        // Convert academic_programme_id to integer
+        academic_programme_id: caseData.academic_programme_id ? parseInt(caseData.academic_programme_id) : null,
+        // Convert published to boolean
+        published: Boolean(caseData.published),
+        // Remove empty strings and convert to null
+        ...Object.fromEntries(
+          Object.entries(caseData).map(([key, value]) => [
+            key, 
+            value === '' ? null : value
+          ])
+        )
+      };
+
+      console.log('Sending case data:', transformedData);
+
       const url = editingCase 
         ? `http://localhost:8000/api/admin/cases/${editingCase.id}`
         : 'http://localhost:8000/api/admin/cases';
@@ -532,20 +585,30 @@ const CaseManagement = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(caseData)
+        body: JSON.stringify(transformedData)
       });
 
       if (response.ok) {
+        const result = await response.json();
+        console.log('Case saved successfully:', result);
         setShowCreateModal(false);
         setShowEditModal(false);
         setEditingCase(null);
         loadCases();
+        setNotification({ type: 'success', message: 'Case saved successfully!' });
+        setTimeout(() => setNotification(null), 3000);
       } else {
-        const data = await response.json();
-        console.error('Error saving case:', data.detail);
+        const errorData = await response.json();
+        console.error('Error saving case:', errorData);
+        setNotification({ type: 'error', message: `Error saving case: ${errorData.detail || 'Unknown error'}` });
+        setTimeout(() => setNotification(null), 5000);
       }
     } catch (error) {
       console.error('Error saving case:', error);
+      setNotification({ type: 'error', message: `Error saving case: ${error.message}` });
+      setTimeout(() => setNotification(null), 5000);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -586,6 +649,30 @@ const CaseManagement = () => {
 
   return (
     <div className="space-y-6">
+      {/* Notification */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+          notification.type === 'success' 
+            ? 'bg-green-100 border border-green-400 text-green-700' 
+            : 'bg-red-100 border border-red-400 text-red-700'
+        }`}>
+          <div className="flex items-center">
+            {notification.type === 'success' ? (
+              <CheckCircle className="h-5 w-5 mr-2" />
+            ) : (
+              <XCircle className="h-5 w-5 mr-2" />
+            )}
+            <span>{notification.message}</span>
+            <button
+              onClick={() => setNotification(null)}
+              className="ml-4 text-current hover:opacity-70"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -1174,6 +1261,7 @@ const CaseManagement = () => {
                 setShowEditModal(false);
                 setEditingCase(null);
               }}
+              saving={saving}
             />
           </div>
         </div>
