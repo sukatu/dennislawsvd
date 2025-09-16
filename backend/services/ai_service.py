@@ -5,7 +5,7 @@ import json
 import re
 
 # Initialize OpenAI client
-client = OpenAI(api_key="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")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class AIService:
     @staticmethod
