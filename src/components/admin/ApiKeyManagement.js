@@ -258,7 +258,8 @@ const ApiKeyManagement = () => {
 
   const formatKeyDisplay = (key) => {
     if (visibleKeys.has(key.id)) {
-      return `sk-${key.key_prefix}.${key.key_hash}`;
+      // Use full_key if available (only on creation), otherwise show partial
+      return key.full_key || `sk-${key.key_prefix}.${'•'.repeat(32)}`;
     }
     return `sk-${key.key_prefix}.${'•'.repeat(32)}`;
   };

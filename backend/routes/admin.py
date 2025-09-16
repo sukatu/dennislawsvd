@@ -359,6 +359,24 @@ async def create_api_key(api_key_data: ApiKeyCreateRequest, db: Session = Depend
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error creating API key: {str(e)}")
 
+@router.delete("/api-keys/{key_id}")
+async def delete_api_key(key_id: int, db: Session = Depends(get_db)):
+    """Delete an API key"""
+    try:
+        api_key = db.query(ApiKey).filter(ApiKey.id == key_id).first()
+        if not api_key:
+            raise HTTPException(status_code=404, detail="API key not found")
+        
+        db.delete(api_key)
+        db.commit()
+        
+        return {"message": "API key deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error deleting API key: {str(e)}")
+
 # Case Management
 @router.get("/cases", response_model=CaseListResponse)
 async def get_cases(
