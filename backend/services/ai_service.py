@@ -3,13 +3,29 @@ import os
 from typing import Dict, Any, Optional
 import json
 import re
+from sqlalchemy.orm import Session
+from models.settings import Settings
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize OpenAI client with error handling
+def get_openai_client(db: Session = None):
+    # First try to get from database
+    if db:
+        try:
+            setting = db.query(Settings).filter(Settings.key == "openai_api_key").first()
+            if setting and setting.value:
+                return OpenAI(api_key=setting.value)
+        except Exception as e:
+            print(f"Error fetching API key from database: {e}")
+    
+    # Fallback to environment variable
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OpenAI API key not found in database or environment variables. Please set it via admin panel or OPENAI_API_KEY environment variable.")
+    return OpenAI(api_key=api_key)
 
 class AIService:
     @staticmethod
-    def generate_case_summary(case_data: Dict[str, Any]) -> Dict[str, Any]:
+    def generate_case_summary(case_data: Dict[str, Any], db: Session = None) -> Dict[str, Any]:
         """
         Generate AI-powered case summary and analysis
         """
@@ -65,6 +81,7 @@ class AIService:
             Make the analysis professional, detailed, and legally relevant.
             """
             
+            client = get_openai_client(db)
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -113,7 +130,7 @@ class AIService:
             }
     
     @staticmethod
-    def extract_entities_from_case(case_data: Dict[str, Any]) -> Dict[str, Any]:
+    def extract_entities_from_case(case_data: Dict[str, Any], db: Session = None) -> Dict[str, Any]:
         """
         Extract entities (people, companies, banks, insurance) from case data
         """
@@ -154,6 +171,7 @@ class AIService:
             Only include clearly identifiable entities. If none found, use empty arrays.
             """
             
+            client = get_openai_client(db)
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -197,7 +215,7 @@ class AIService:
             }
     
     @staticmethod
-    def generate_legal_keywords(case_data: Dict[str, Any]) -> str:
+    def generate_legal_keywords(case_data: Dict[str, Any], db: Session = None) -> str:
         """
         Generate relevant legal keywords and phrases for the case
         """
@@ -226,6 +244,7 @@ class AIService:
             Focus on terms that would be useful for legal research and case categorization.
             """
             
+            client = get_openai_client(db)
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[

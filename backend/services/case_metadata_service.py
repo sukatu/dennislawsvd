@@ -46,13 +46,13 @@ class CaseMetadataService:
             }
             
             # Generate AI summaries
-            ai_data = AIService.generate_case_summary(case_data)
+            ai_data = AIService.generate_case_summary(case_data, db)
             
             # Extract entities
-            entities = AIService.extract_entities_from_case(case_data)
+            entities = AIService.extract_entities_from_case(case_data, db)
             
             # Generate keywords
-            keywords = AIService.generate_legal_keywords(case_data)
+            keywords = AIService.generate_legal_keywords(case_data, db)
             
             # Update case with AI data
             case.ai_case_outcome = ai_data.get('ai_case_outcome', '')
