@@ -44,7 +44,7 @@ def set_openai_key(api_key: str):
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python set_openai_key.py <api_key>")
-        print("Example: python set_openai_key.py sk-proj-...")
+        print("Example: python set_openai_key.py ...")
         sys.exit(1)
     
     api_key = sys.argv[1]

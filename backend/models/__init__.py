@@ -22,3 +22,4 @@ from .payment import Payment, PaymentMethod
 from .notification import Notification, NotificationPreference, NotificationType, NotificationStatus, NotificationPriority
 from .security import SecurityEvent, TwoFactorAuth, ApiKey, LoginSession, SecurityEventType
 from .settings import Settings
+from .role import Role, Permission, UserRole

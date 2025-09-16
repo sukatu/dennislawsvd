@@ -45,7 +45,7 @@ async def get_settings_stats(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching settings stats: {str(e)}")
 
-@router.get("/", response_model=SettingsListResponse)
+@router.get("", response_model=SettingsListResponse)
 async def get_settings(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
@@ -127,7 +127,7 @@ async def get_setting_by_key(key: str, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching setting: {str(e)}")
 
-@router.post("/", response_model=SettingsResponse)
+@router.post("", response_model=SettingsResponse)
 async def create_setting(setting_data: SettingsCreateRequest, db: Session = Depends(get_db)):
     """Create a new setting"""
     try:

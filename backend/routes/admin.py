@@ -40,7 +40,7 @@ from schemas.admin import (
 )
 
 # Import the new admin route modules
-from . import admin_people, admin_banks, admin_insurance, admin_companies, admin_payments, admin_settings
+from . import admin_people, admin_banks, admin_insurance, admin_companies, admin_payments, admin_settings, admin_roles
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -817,3 +817,4 @@ router.include_router(admin_insurance.router, prefix="/insurance", tags=["admin-
 router.include_router(admin_companies.router, prefix="/companies", tags=["admin-companies"])
 router.include_router(admin_payments.router, prefix="/payments", tags=["admin-payments"])
 router.include_router(admin_settings.router, prefix="/settings", tags=["admin-settings"])
+router.include_router(admin_roles.router, prefix="/roles", tags=["admin-roles"])

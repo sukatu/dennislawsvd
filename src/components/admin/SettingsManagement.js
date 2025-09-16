@@ -19,6 +19,7 @@ const SettingsManagement = () => {
   const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [stats, setStats] = useState({});
   
   // Pagination
@@ -36,6 +37,10 @@ const SettingsManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingSetting, setEditingSetting] = useState(null);
+  
+  // Bulk operations
+  const [selectedSettings, setSelectedSettings] = useState([]);
+  const [showBulkActions, setShowBulkActions] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -45,6 +50,7 @@ const SettingsManagement = () => {
   const loadSettings = async () => {
     try {
       setLoading(true);
+      setError(null);
       const params = new URLSearchParams({
         page: currentPage,
         limit: 10,
@@ -54,14 +60,29 @@ const SettingsManagement = () => {
         ...(isEditableFilter !== '' && { is_editable: isEditableFilter })
       });
       
-      const response = await fetch(`/api/admin/settings?${params}`);
-      if (!response.ok) throw new Error('Failed to fetch settings');
+      // Use direct backend URL for now
+      const baseUrl = 'http://localhost:8000';
+      const response = await fetch(`${baseUrl}/api/admin/settings?${params}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', response.status, errorText);
+        throw new Error(`Failed to fetch settings: ${response.status} ${response.statusText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Non-JSON response:', responseText);
+        throw new Error('Server returned non-JSON response. Please check if the backend is running.');
+      }
       
       const data = await response.json();
       setSettings(data.settings || []);
       setTotalPages(data.total_pages || 1);
       setTotalSettings(data.total || 0);
     } catch (err) {
+      console.error('Settings loading error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -70,13 +91,28 @@ const SettingsManagement = () => {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('/api/admin/settings/stats');
-      if (!response.ok) throw new Error('Failed to fetch stats');
+      // Use direct backend URL for now
+      const baseUrl = 'http://localhost:8000';
+      const response = await fetch(`${baseUrl}/api/admin/settings/stats`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Stats API Error:', response.status, errorText);
+        throw new Error(`Failed to fetch stats: ${response.status} ${response.statusText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Non-JSON stats response:', responseText);
+        throw new Error('Server returned non-JSON response for stats.');
+      }
       
       const data = await response.json();
       setStats(data);
     } catch (err) {
       console.error('Error loading stats:', err);
+      // Don't set error state for stats as it's not critical
     }
   };
 
@@ -92,9 +128,13 @@ const SettingsManagement = () => {
 
   const handleSaveSetting = async (settingData) => {
     try {
+      setError(null);
+      setSuccess(null);
+      
+      const baseUrl = 'http://localhost:8000';
       const url = editingSetting 
-        ? `/api/admin/settings/${editingSetting.id}`
-        : '/api/admin/settings';
+        ? `${baseUrl}/api/admin/settings/${editingSetting.id}`
+        : `${baseUrl}/api/admin/settings`;
       
       const method = editingSetting ? 'PUT' : 'POST';
       
@@ -106,13 +146,20 @@ const SettingsManagement = () => {
         body: JSON.stringify(settingData),
       });
       
-      if (!response.ok) throw new Error('Failed to save setting');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to save setting');
+      }
       
       setShowCreateModal(false);
       setShowEditModal(false);
       setEditingSetting(null);
+      setSuccess(editingSetting ? 'Setting updated successfully!' : 'Setting created successfully!');
       loadSettings();
       loadStats();
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError(err.message);
     }
@@ -122,14 +169,73 @@ const SettingsManagement = () => {
     if (!window.confirm('Are you sure you want to delete this setting?')) return;
     
     try {
-      const response = await fetch(`/api/admin/settings/${settingId}`, {
+      setError(null);
+      setSuccess(null);
+      
+      const baseUrl = 'http://localhost:8000';
+      const response = await fetch(`${baseUrl}/api/admin/settings/${settingId}`, {
         method: 'DELETE',
       });
       
-      if (!response.ok) throw new Error('Failed to delete setting');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to delete setting');
+      }
       
+      setSuccess('Setting deleted successfully!');
       loadSettings();
       loadStats();
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleSelectSetting = (settingId) => {
+    setSelectedSettings(prev => 
+      prev.includes(settingId) 
+        ? prev.filter(id => id !== settingId)
+        : [...prev, settingId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedSettings.length === settings.length) {
+      setSelectedSettings([]);
+    } else {
+      setSelectedSettings(settings.map(s => s.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedSettings.length === 0) return;
+    
+    if (!window.confirm(`Are you sure you want to delete ${selectedSettings.length} settings?`)) return;
+    
+    try {
+      setError(null);
+      setSuccess(null);
+      
+      const baseUrl = 'http://localhost:8000';
+      const deletePromises = selectedSettings.map(id => 
+        fetch(`${baseUrl}/api/admin/settings/${id}`, { method: 'DELETE' })
+      );
+      
+      const results = await Promise.allSettled(deletePromises);
+      const failed = results.filter(r => r.status === 'rejected' || !r.value.ok);
+      
+      if (failed.length > 0) {
+        throw new Error(`${failed.length} settings failed to delete`);
+      }
+      
+      setSuccess(`${selectedSettings.length} settings deleted successfully!`);
+      setSelectedSettings([]);
+      loadSettings();
+      loadStats();
+      
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError(err.message);
     }
@@ -199,6 +305,33 @@ const SettingsManagement = () => {
 
   return (
     <div className="space-y-6">
+      {/* Notifications */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-2">
+          <XCircle className="h-5 w-5 text-red-500" />
+          <span className="text-red-700">{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="ml-auto text-red-500 hover:text-red-700"
+          >
+            <XCircle className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-2">
+          <CheckCircle className="h-5 w-5 text-green-500" />
+          <span className="text-green-700">{success}</span>
+          <button
+            onClick={() => setSuccess(null)}
+            className="ml-auto text-green-500 hover:text-green-700"
+          >
+            <XCircle className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -321,12 +454,43 @@ const SettingsManagement = () => {
         </div>
       </div>
 
+      {/* Bulk Actions */}
+      {selectedSettings.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+          <span className="text-blue-700 font-medium">
+            {selectedSettings.length} setting{selectedSettings.length !== 1 ? 's' : ''} selected
+          </span>
+          <div className="flex space-x-2">
+            <button
+              onClick={handleBulkDelete}
+              className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+            >
+              Delete Selected
+            </button>
+            <button
+              onClick={() => setSelectedSettings([])}
+              className="px-3 py-1 bg-slate-600 text-white text-sm rounded hover:bg-slate-700 transition-colors"
+            >
+              Clear Selection
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Settings Table */}
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <input
+                    type="checkbox"
+                    checked={selectedSettings.length === settings.length && settings.length > 0}
+                    onChange={handleSelectAll}
+                    className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+                  />
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Key
                 </th>
@@ -350,6 +514,14 @@ const SettingsManagement = () => {
             <tbody className="bg-white divide-y divide-slate-200">
               {settings.map((setting) => (
                 <tr key={setting.id} className="hover:bg-slate-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedSettings.includes(setting.id)}
+                      onChange={() => handleSelectSetting(setting.id)}
+                      className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+                    />
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-slate-900">{setting.key}</div>
                     {setting.description && (
@@ -496,6 +668,9 @@ const SettingForm = ({ setting, onSave, onCancel }) => {
     validation_rules: '',
     default_value: ''
   });
+  
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (setting) {
@@ -522,15 +697,79 @@ const SettingForm = ({ setting, onSave, onCancel }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Required fields
+    if (!formData.key.trim()) {
+      newErrors.key = 'Key is required';
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.key)) {
+      newErrors.key = 'Key can only contain letters, numbers, and underscores';
+    }
+    
+    if (!formData.category.trim()) {
+      newErrors.category = 'Category is required';
+    }
+    
+    if (!formData.value_type.trim()) {
+      newErrors.value_type = 'Value type is required';
+    }
+    
+    // Validate JSON for validation_rules
+    if (formData.validation_rules.trim()) {
+      try {
+        JSON.parse(formData.validation_rules);
+      } catch (e) {
+        newErrors.validation_rules = 'Validation rules must be valid JSON';
+      }
+    }
+    
+    // Validate value based on type
+    if (formData.value.trim()) {
+      switch (formData.value_type) {
+        case 'number':
+          if (isNaN(Number(formData.value))) {
+            newErrors.value = 'Value must be a valid number';
+          }
+          break;
+        case 'boolean':
+          if (!['true', 'false'].includes(formData.value.toLowerCase())) {
+            newErrors.value = 'Value must be "true" or "false"';
+          }
+          break;
+        case 'json':
+          try {
+            JSON.parse(formData.value);
+          } catch (e) {
+            newErrors.value = 'Value must be valid JSON';
+          }
+          break;
+      }
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const submitData = {
-      ...formData,
-      validation_rules: formData.validation_rules ? JSON.parse(formData.validation_rules) : null
-    };
+    if (!validateForm()) {
+      return;
+    }
     
-    onSave(submitData);
+    setSaving(true);
+    
+    try {
+      const submitData = {
+        ...formData,
+        validation_rules: formData.validation_rules ? JSON.parse(formData.validation_rules) : null
+      };
+      
+      await onSave(submitData);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -551,8 +790,11 @@ const SettingForm = ({ setting, onSave, onCancel }) => {
                 onChange={handleInputChange}
                 required
                 disabled={!!setting}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 disabled:bg-slate-100"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 disabled:bg-slate-100 ${
+                  errors.key ? 'border-red-300' : 'border-slate-300'
+                }`}
               />
+              {errors.key && <p className="mt-1 text-sm text-red-600">{errors.key}</p>}
             </div>
             
             <div>
@@ -603,16 +845,19 @@ const SettingForm = ({ setting, onSave, onCancel }) => {
             </div>
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Value</label>
-            <textarea
-              name="value"
-              value={formData.value}
-              onChange={handleInputChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Value</label>
+              <textarea
+                name="value"
+                value={formData.value}
+                onChange={handleInputChange}
+                rows={3}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 ${
+                  errors.value ? 'border-red-300' : 'border-slate-300'
+                }`}
+              />
+              {errors.value && <p className="mt-1 text-sm text-red-600">{errors.value}</p>}
+            </div>
           
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
@@ -633,8 +878,11 @@ const SettingForm = ({ setting, onSave, onCancel }) => {
               onChange={handleInputChange}
               rows={3}
               placeholder='{"min": 0, "max": 100, "pattern": "^[a-zA-Z]+$"}'
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 ${
+                errors.validation_rules ? 'border-red-300' : 'border-slate-300'
+              }`}
             />
+            {errors.validation_rules && <p className="mt-1 text-sm text-red-600">{errors.validation_rules}</p>}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -680,9 +928,13 @@ const SettingForm = ({ setting, onSave, onCancel }) => {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"
+              disabled={saving}
+              className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
-              {setting ? 'Update Setting' : 'Create Setting'}
+              {saving && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              )}
+              <span>{saving ? 'Saving...' : (setting ? 'Update Setting' : 'Create Setting')}</span>
             </button>
           </div>
         </form>

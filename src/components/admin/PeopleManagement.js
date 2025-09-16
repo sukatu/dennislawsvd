@@ -19,7 +19,18 @@ import {
   X,
   BarChart3,
   TrendingUp,
-  Users
+  Users,
+  DollarSign,
+  Percent,
+  BookOpen,
+  Calculator,
+  Clock,
+  RefreshCw,
+  Scale,
+  History,
+  Building2,
+  Star,
+  User
 } from 'lucide-react';
 
 // Person Form Component
@@ -513,6 +524,9 @@ const PeopleManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingPerson, setEditingPerson] = useState(null);
   const [analytics, setAnalytics] = useState(null);
+  const [personAnalytics, setPersonAnalytics] = useState(null);
+  const [personCaseStats, setPersonCaseStats] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   useEffect(() => {
     loadPeople();
@@ -530,7 +544,9 @@ const PeopleManagement = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (riskLevelFilter) params.append('risk_level', riskLevelFilter);
 
-      const response = await fetch(`http://localhost:8000/api/admin/people?${params}`);
+      const url = `http://localhost:8000/api/admin/people?${params}`;
+      
+      const response = await fetch(url);
       const data = await response.json();
 
       if (response.ok) {
@@ -569,9 +585,42 @@ const PeopleManagement = () => {
     setCurrentPage(1);
   };
 
-  const handleViewPerson = (person) => {
+  const handleViewPerson = async (person) => {
     setSelectedPerson(person);
     setShowPersonModal(true);
+    
+    // Load detailed analytics for this person
+    await loadPersonAnalytics(person.id);
+  };
+
+  const loadPersonAnalytics = async (personId) => {
+    try {
+      setAnalyticsLoading(true);
+      
+      // Load person analytics
+      const analyticsResponse = await fetch(`http://localhost:8000/api/person/${personId}/analytics`);
+      if (analyticsResponse.ok) {
+        const analyticsData = await analyticsResponse.json();
+        setPersonAnalytics(analyticsData);
+      } else {
+        setPersonAnalytics(null);
+      }
+      
+      // Load case statistics
+      const statsResponse = await fetch(`http://localhost:8000/api/person-case-statistics/person/${personId}`);
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        setPersonCaseStats(statsData);
+      } else {
+        setPersonCaseStats(null);
+      }
+    } catch (error) {
+      console.error('Error loading person analytics:', error);
+      setPersonAnalytics(null);
+      setPersonCaseStats(null);
+    } finally {
+      setAnalyticsLoading(false);
+    }
   };
 
   const handleDeletePerson = (person) => {
@@ -964,9 +1013,17 @@ const PeopleManagement = () => {
       {/* Person Detail Modal */}
       {showPersonModal && selectedPerson && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">Person Details</h3>
+          <div className="bg-white rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <User className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-900">{selectedPerson.full_name || 'N/A'}</h3>
+                  <p className="text-sm text-slate-500">{selectedPerson.occupation || 'N/A'}</p>
+                </div>
+              </div>
               <button
                 onClick={() => setShowPersonModal(false)}
                 className="text-slate-400 hover:text-slate-600"
@@ -976,61 +1033,263 @@ const PeopleManagement = () => {
             </div>
             
             <div className="space-y-6">
-              {/* Basic Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Full Name</h4>
-                  <p className="text-sm text-slate-900">{selectedPerson.full_name || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Occupation</h4>
-                  <p className="text-sm text-slate-900">{selectedPerson.occupation || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Email</h4>
-                  <p className="text-sm text-slate-900">{selectedPerson.email || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Phone</h4>
-                  <p className="text-sm text-slate-900">{selectedPerson.phone_number || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Nationality</h4>
-                  <p className="text-sm text-slate-900">{selectedPerson.nationality || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Gender</h4>
-                  <p className="text-sm text-slate-900">{selectedPerson.gender || 'N/A'}</p>
-                </div>
-              </div>
-
-              {/* Risk Assessment */}
-              <div className="bg-slate-50 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-slate-500 mb-3">Risk Assessment</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-xs text-slate-500">Risk Level</p>
-                    <div className="flex items-center space-x-2 mt-1">
-                      {getRiskIcon(selectedPerson.risk_level)}
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRiskBadgeColor(selectedPerson.risk_level)}`}>
-                        {selectedPerson.risk_level || 'N/A'}
-                      </span>
+              {/* Financial Risk Assessment */}
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                  <Shield className="h-5 w-5 text-blue-600" />
+                  Financial Risk Assessment
+                  {analyticsLoading && <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />}
+                </h3>
+                {analyticsLoading ? (
+                  <div className="text-center py-4">
+                    <div className="animate-pulse">
+                      <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                      <div className="h-2 bg-gray-200 rounded"></div>
                     </div>
                   </div>
+                ) : (
+                  <div className="text-center">
+                    {(() => {
+                      // Calculate risk score based on case statistics and financial factors
+                      let riskScore = selectedPerson.risk_score || 0;
+                      let riskLevel = selectedPerson.risk_level || 'Low';
+                      let riskFactors = [];
+                      
+                      if (personCaseStats) {
+                        const totalCases = personCaseStats.total_cases || 0;
+                        const unfavorableCases = personCaseStats.unfavorable_cases || 0;
+                        const mixedCases = personCaseStats.mixed_cases || 0;
+                        
+                        if (unfavorableCases > 0) {
+                          riskFactors.push(`${unfavorableCases} unfavorable case${unfavorableCases > 1 ? 's' : ''}`);
+                        }
+                        if (mixedCases > 0) {
+                          riskFactors.push(`${mixedCases} mixed outcome case${mixedCases > 1 ? 's' : ''}`);
+                        }
+                        if (totalCases > 10) {
+                          riskFactors.push('High case volume');
+                        } else if (totalCases > 5) {
+                          riskFactors.push('Moderate case volume');
+                        }
+                      }
+                      
+                      // Financial risk factors from analytics
+                      if (personAnalytics) {
+                        if (personAnalytics.financial_risk_level === 'Critical') {
+                          riskScore += 30;
+                          riskFactors.push('Critical financial risk');
+                        } else if (personAnalytics.financial_risk_level === 'High') {
+                          riskScore += 20;
+                          riskFactors.push('High financial risk');
+                        } else if (personAnalytics.financial_risk_level === 'Medium') {
+                          riskScore += 10;
+                          riskFactors.push('Moderate financial risk');
+                        }
+                        
+                        if (personAnalytics.total_monetary_amount > 1000000) {
+                          riskFactors.push('High monetary involvement');
+                        }
+                      }
+                      
+                      return (
+                        <>
+                          <div className={`text-2xl font-bold mb-2 ${
+                            riskLevel === 'Critical' ? 'text-red-600' :
+                            riskLevel === 'High' ? 'text-orange-600' :
+                            riskLevel === 'Medium' ? 'text-yellow-600' :
+                            'text-slate-600'
+                          }`}>
+                            {riskLevel} Financial Risk
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div
+                              className={`h-2 rounded-full transition-all duration-300 ${
+                                riskLevel === 'Critical' ? 'bg-red-500' :
+                                riskLevel === 'High' ? 'bg-orange-500' :
+                                riskLevel === 'Medium' ? 'bg-yellow-500' :
+                                'bg-green-500'
+                              }`}
+                              style={{ width: `${Math.min(riskScore, 100)}%` }}
+                            ></div>
+                          </div>
+                          <p className="text-xs text-slate-500 mb-3">Based on legal history, case outcomes & financial factors</p>
+                          
+                          {/* Risk Assessment Summary */}
+                          <div className="text-left bg-slate-50 rounded-lg p-3 mb-3">
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div className="flex justify-between">
+                                <span>Risk Score:</span>
+                                <span className="font-medium">{riskScore.toFixed(1)}/100</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Total Cases:</span>
+                                <span className="font-medium">{personCaseStats?.total_cases || 0}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {riskFactors.length > 0 && (
+                            <div className="text-left">
+                              <p className="text-xs text-slate-500 mb-2">Key Risk Factors:</p>
+                              <div className="flex flex-wrap gap-1">
+                                {riskFactors.map((factor, index) => (
+                                  <span key={index} className="inline-flex px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                                    {factor}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Stats */}
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                  <Clock className="h-5 w-5 text-blue-600" />
+                  Quick Stats
+                  {analyticsLoading && <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />}
+                </h3>
+                {analyticsLoading ? (
+                  <div className="space-y-3">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-3 bg-slate-50 rounded-lg">
+                      <div className="text-2xl font-bold text-slate-900">{personCaseStats?.total_cases || 0}</div>
+                      <div className="text-xs text-slate-500">Total Cases</div>
+                    </div>
+                    <div className="text-center p-3 bg-slate-50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">{personCaseStats?.resolved_cases || 0}</div>
+                      <div className="text-xs text-slate-500">Resolved</div>
+                    </div>
+                    <div className="text-center p-3 bg-slate-50 rounded-lg">
+                      <div className="text-2xl font-bold text-orange-600">{personCaseStats?.unresolved_cases || 0}</div>
+                      <div className="text-xs text-slate-500">Unresolved</div>
+                    </div>
+                    <div className="text-center p-3 bg-slate-50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">{personCaseStats?.favorable_cases || 0}</div>
+                      <div className="text-xs text-slate-500">Favorable</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Financial Risk Profile */}
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                  <DollarSign className="h-5 w-5 text-green-600" />
+                  Financial Risk Profile
+                  {analyticsLoading && <RefreshCw className="h-4 w-4 animate-spin text-green-600" />}
+                </h3>
+                {analyticsLoading ? (
+                  <div className="space-y-4">
+                    <div className="animate-pulse">
+                      <div className="h-16 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">
+                        ${personAnalytics?.total_monetary_amount?.toLocaleString() || '0'}
+                      </div>
+                      <div className="text-xs text-slate-500">Total Monetary Amount</div>
+                    </div>
+                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">
+                        ${personAnalytics?.average_case_value?.toLocaleString() || '0'}
+                      </div>
+                      <div className="text-xs text-slate-500">Average Case Value</div>
+                    </div>
+                    <div className="text-center p-4 bg-purple-50 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">
+                        {personAnalytics?.case_complexity_score?.toFixed(1) || '0'}/10
+                      </div>
+                      <div className="text-xs text-slate-500">Case Complexity</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Basic Information */}
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                  <User className="h-5 w-5 text-blue-600" />
+                  Personal Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <p className="text-xs text-slate-500">Risk Score</p>
-                    <p className="text-sm font-medium text-slate-900">{selectedPerson.risk_score?.toFixed(1) || 'N/A'}</p>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Full Name</h4>
+                    <p className="text-sm text-slate-900">{selectedPerson.full_name || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">Case Count</p>
-                    <p className="text-sm font-medium text-slate-900">{selectedPerson.case_count || 0}</p>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Occupation</h4>
+                    <p className="text-sm text-slate-900">{selectedPerson.occupation || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Email</h4>
+                    <p className="text-sm text-slate-900">{selectedPerson.email || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Phone</h4>
+                    <p className="text-sm text-slate-900">{selectedPerson.phone_number || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Nationality</h4>
+                    <p className="text-sm text-slate-900">{selectedPerson.nationality || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Gender</h4>
+                    <p className="text-sm text-slate-900">{selectedPerson.gender || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Education Level</h4>
+                    <p className="text-sm text-slate-900">{selectedPerson.education_level || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Marital Status</h4>
+                    <p className="text-sm text-slate-900">{selectedPerson.marital_status || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Languages</h4>
+                    <p className="text-sm text-slate-900">{selectedPerson.languages || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-2">Verified</h4>
+                    <p className="text-sm text-slate-900">
+                      {selectedPerson.is_verified ? (
+                        <span className="text-green-600 flex items-center gap-1">
+                          <CheckCircle className="h-4 w-4" />
+                          Yes
+                        </span>
+                      ) : (
+                        <span className="text-red-600 flex items-center gap-1">
+                          <XCircle className="h-4 w-4" />
+                          No
+                        </span>
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Location Information */}
-              <div>
-                <h4 className="text-sm font-medium text-slate-500 mb-2">Location</h4>
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                  <MapPin className="h-5 w-5 text-blue-600" />
+                  Location Information
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-slate-500">Address</p>
@@ -1045,32 +1304,6 @@ const PeopleManagement = () => {
                       }
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Additional Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Education Level</h4>
-                  <p className="text-sm text-slate-900">{selectedPerson.education_level || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Marital Status</h4>
-                  <p className="text-sm text-slate-900">{selectedPerson.marital_status || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Languages</h4>
-                  <p className="text-sm text-slate-900">{selectedPerson.languages || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">Verified</h4>
-                  <p className="text-sm text-slate-900">
-                    {selectedPerson.is_verified ? (
-                      <span className="text-green-600">Yes</span>
-                    ) : (
-                      <span className="text-red-600">No</span>
-                    )}
-                  </p>
                 </div>
               </div>
             </div>
