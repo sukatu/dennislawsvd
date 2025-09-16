@@ -66,11 +66,23 @@ const Login = () => {
         // Store auth state
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userEmail', data.user.email);
+        localStorage.setItem('userName', data.user.name || data.user.email.split('@')[0]);
         localStorage.setItem('accessToken', data.access_token);
         localStorage.setItem('userData', JSON.stringify(data.user));
+        localStorage.setItem('authProvider', 'email');
         
-        // Redirect to homepage
-        navigate('/');
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('authStateChanged'));
+        
+        // Check if there's a redirect URL stored
+        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        if (redirectUrl) {
+          localStorage.removeItem('redirectAfterLogin');
+          navigate(redirectUrl);
+        } else {
+          // Redirect to homepage
+          navigate('/');
+        }
       } else {
         setError(data.detail || 'Invalid email or password');
       }

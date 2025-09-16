@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Grid, List, Search, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, User, RotateCcw, Plus } from 'lucide-react';
+import AuthGuard from '../components/AuthGuard';
 
 const People = () => {
   const navigate = useNavigate();
@@ -726,7 +727,8 @@ const People = () => {
 
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <AuthGuard>
+      <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -1482,7 +1484,8 @@ const People = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </AuthGuard>
   );
 };
 

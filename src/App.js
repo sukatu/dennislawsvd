@@ -26,6 +26,7 @@ import CompanyDetail from './pages/CompanyDetail';
 import CompanyProfile from './pages/CompanyProfile';
 import Settings from './pages/Settings';
 import EnhancedSearchResults from './pages/EnhancedSearchResults';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
             <Route path="/company-details/:id" element={<CompanyDetail />} />
             <Route path="/company-profile/:id" element={<CompanyProfile />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </main>
         <Footer />

@@ -1,0 +1,620 @@
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+from sqlalchemy import func, desc, and_
+from typing import List, Optional
+from datetime import datetime, timedelta
+import json
+
+from database import get_db
+from models.user import User
+from models.reported_cases import ReportedCases
+from models.people import People
+from models.banks import Banks
+from models.insurance import Insurance
+from models.companies import Companies
+from models.subscription import Subscription, Payment
+from models.notification import Notification
+from models.security import SecurityEvent, ApiKey
+from schemas.admin import (
+    AdminStatsResponse,
+    UserListResponse,
+    UserDetailResponse,
+    UserCreateRequest,
+    UserUpdateRequest,
+    ApiKeyResponse,
+    ApiKeyCreateRequest,
+    CaseListResponse,
+    CaseDetailResponse,
+    PeopleListResponse,
+    BankListResponse,
+    InsuranceListResponse,
+    CompanyListResponse,
+    PaymentListResponse,
+    SubscriptionListResponse
+)
+
+# Import the new admin route modules
+from . import admin_people, admin_banks, admin_insurance, admin_companies, admin_payments
+
+router = APIRouter(prefix="/api/admin", tags=["admin"])
+
+# Helper function to check admin privileges
+def check_admin_privileges(user_id: int, db: Session):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or not (user.role == 'admin' or user.is_admin == True):
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    return user
+
+# Dashboard Statistics
+@router.get("/stats", response_model=AdminStatsResponse)
+async def get_dashboard_stats(db: Session = Depends(get_db)):
+    """Get overall dashboard statistics"""
+    try:
+        # Count total users
+        total_users = db.query(User).count()
+        
+        # Count total cases
+        total_cases = db.query(ReportedCases).count()
+        
+        # Count total people
+        total_people = db.query(People).count()
+        
+        # Count total banks
+        total_banks = db.query(Banks).count()
+        
+        # Count total insurance
+        total_insurance = db.query(Insurance).count()
+        
+        # Count total companies
+        total_companies = db.query(Companies).count()
+        
+        # Count total payments
+        total_payments = db.query(Payment).count()
+        
+        # Count active subscriptions
+        active_subscriptions = db.query(Subscription).filter(
+            Subscription.status == 'active'
+        ).count()
+        
+        # Recent activity (last 24 hours)
+        yesterday = datetime.now() - timedelta(days=1)
+        recent_users = db.query(User).filter(User.created_at >= yesterday).count()
+        recent_cases = db.query(ReportedCases).filter(ReportedCases.created_at >= yesterday).count()
+        
+        return AdminStatsResponse(
+            total_users=total_users,
+            total_cases=total_cases,
+            total_people=total_people,
+            total_banks=total_banks,
+            total_insurance=total_insurance,
+            total_companies=total_companies,
+            total_payments=total_payments,
+            active_subscriptions=active_subscriptions,
+            recent_users=recent_users,
+            recent_cases=recent_cases,
+            last_updated=datetime.now()
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching dashboard stats: {str(e)}")
+
+# User Management
+@router.get("/users", response_model=UserListResponse)
+async def get_users(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    search: Optional[str] = None,
+    role: Optional[str] = None,
+    status: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get paginated list of users with filtering"""
+    try:
+        query = db.query(User)
+        
+        # Apply filters
+        if search:
+            query = query.filter(
+                User.email.contains(search) | 
+                User.first_name.contains(search) | 
+                User.last_name.contains(search)
+            )
+        
+        if role:
+            query = query.filter(User.role == role)
+        
+        if status:
+            query = query.filter(User.status == status)
+        
+        # Get total count
+        total = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        users = query.offset(offset).limit(limit).all()
+        
+        return UserListResponse(
+            users=users,
+            total=total,
+            page=page,
+            limit=limit,
+            total_pages=(total + limit - 1) // limit
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching users: {str(e)}")
+
+@router.get("/users/{user_id}", response_model=UserDetailResponse)
+async def get_user(user_id: int, db: Session = Depends(get_db)):
+    """Get detailed user information"""
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return UserDetailResponse(
+            id=user.id,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            role=user.role,
+            status=user.status,
+            is_admin=user.is_admin,
+            created_at=user.created_at,
+            updated_at=user.updated_at,
+            last_login=user.last_login,
+            subscription=user.subscription,
+            notifications_count=len(user.notifications) if user.notifications else 0,
+            api_keys_count=len(user.api_keys) if user.api_keys else 0
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching user: {str(e)}")
+
+@router.post("/users", response_model=UserDetailResponse)
+async def create_user(user_data: UserCreateRequest, db: Session = Depends(get_db)):
+    """Create a new user"""
+    try:
+        # Check if user already exists
+        existing_user = db.query(User).filter(User.email == user_data.email).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="User with this email already exists")
+        
+        # Create new user
+        new_user = User(
+            email=user_data.email,
+            first_name=user_data.first_name,
+            last_name=user_data.last_name,
+            role=user_data.role or 'user',
+            status=user_data.status or 'active',
+            is_admin=user_data.is_admin or False,
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+        
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        
+        return UserDetailResponse(
+            id=new_user.id,
+            email=new_user.email,
+            first_name=new_user.first_name,
+            last_name=new_user.last_name,
+            role=new_user.role,
+            status=new_user.status,
+            is_admin=new_user.is_admin,
+            created_at=new_user.created_at,
+            updated_at=new_user.updated_at
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
+
+@router.put("/users/{user_id}", response_model=UserDetailResponse)
+async def update_user(user_id: int, user_data: UserUpdateRequest, db: Session = Depends(get_db)):
+    """Update user information"""
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Update user fields
+        if user_data.first_name is not None:
+            user.first_name = user_data.first_name
+        if user_data.last_name is not None:
+            user.last_name = user_data.last_name
+        if user_data.role is not None:
+            user.role = user_data.role
+        if user_data.status is not None:
+            user.status = user_data.status
+        if user_data.is_admin is not None:
+            user.is_admin = user_data.is_admin
+        
+        user.updated_at = datetime.now()
+        
+        db.commit()
+        db.refresh(user)
+        
+        return UserDetailResponse(
+            id=user.id,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            role=user.role,
+            status=user.status,
+            is_admin=user.is_admin,
+            created_at=user.created_at,
+            updated_at=user.updated_at,
+            last_login=user.last_login
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error updating user: {str(e)}")
+
+@router.delete("/users/{user_id}")
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    """Delete a user"""
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        db.delete(user)
+        db.commit()
+        
+        return {"message": "User deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error deleting user: {str(e)}")
+
+# API Key Management
+@router.get("/api-keys", response_model=List[ApiKeyResponse])
+async def get_api_keys(
+    user_id: Optional[int] = None,
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    """Get API keys with optional user filtering"""
+    try:
+        query = db.query(ApiKey)
+        
+        if user_id:
+            query = query.filter(ApiKey.user_id == user_id)
+        
+        offset = (page - 1) * limit
+        api_keys = query.offset(offset).limit(limit).all()
+        
+        return [
+            ApiKeyResponse(
+                id=key.id,
+                user_id=key.user_id,
+                name=key.name,
+                key_prefix=key.key_prefix,
+                is_active=key.is_active,
+                created_at=key.created_at,
+                last_used=key.last_used,
+                expires_at=key.expires_at
+            ) for key in api_keys
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching API keys: {str(e)}")
+
+@router.post("/api-keys", response_model=ApiKeyResponse)
+async def create_api_key(api_key_data: ApiKeyCreateRequest, db: Session = Depends(get_db)):
+    """Create a new API key for a user"""
+    try:
+        # Check if user exists
+        user = db.query(User).filter(User.id == api_key_data.user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Generate API key (simplified - in production, use proper key generation)
+        import secrets
+        import string
+        
+        key_prefix = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(8))
+        key_secret = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
+        full_key = f"sk-{key_prefix}.{key_secret}"
+        
+        new_api_key = ApiKey(
+            user_id=api_key_data.user_id,
+            name=api_key_data.name,
+            key_prefix=key_prefix,
+            key_hash=key_secret,  # In production, hash this
+            is_active=True,
+            created_at=datetime.now(),
+            expires_at=datetime.now() + timedelta(days=365) if api_key_data.expires_in_days else None
+        )
+        
+        db.add(new_api_key)
+        db.commit()
+        db.refresh(new_api_key)
+        
+        return ApiKeyResponse(
+            id=new_api_key.id,
+            user_id=new_api_key.user_id,
+            name=new_api_key.name,
+            key_prefix=new_api_key.key_prefix,
+            full_key=full_key,  # Only return full key on creation
+            is_active=new_api_key.is_active,
+            created_at=new_api_key.created_at,
+            expires_at=new_api_key.expires_at
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating API key: {str(e)}")
+
+# Case Management
+@router.get("/cases", response_model=CaseListResponse)
+async def get_cases(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    search: Optional[str] = None,
+    court_type: Optional[str] = None,
+    status: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get paginated list of cases with filtering"""
+    try:
+        query = db.query(ReportedCases)
+        
+        # Apply filters
+        if search:
+            query = query.filter(
+                ReportedCases.title.contains(search) |
+                ReportedCases.protagonist.contains(search) |
+                ReportedCases.antagonist.contains(search)
+            )
+        
+        if court_type:
+            query = query.filter(ReportedCases.court_type == court_type)
+        
+        if status:
+            query = query.filter(ReportedCases.status == status)
+        
+        # Get total count
+        total = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        cases = query.offset(offset).limit(limit).all()
+        
+        return CaseListResponse(
+            cases=cases,
+            total=total,
+            page=page,
+            limit=limit,
+            total_pages=(total + limit - 1) // limit
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching cases: {str(e)}")
+
+# People Management
+@router.get("/people", response_model=PeopleListResponse)
+async def get_people(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    search: Optional[str] = None,
+    risk_level: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get paginated list of people with filtering"""
+    try:
+        query = db.query(People)
+        
+        # Apply filters
+        if search:
+            query = query.filter(
+                People.full_name.contains(search) |
+                People.first_name.contains(search) |
+                People.last_name.contains(search)
+            )
+        
+        if risk_level:
+            query = query.filter(People.risk_level == risk_level)
+        
+        # Get total count
+        total = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        people = query.offset(offset).limit(limit).all()
+        
+        return PeopleListResponse(
+            people=people,
+            total=total,
+            page=page,
+            limit=limit,
+            total_pages=(total + limit - 1) // limit
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching people: {str(e)}")
+
+# Bank Management
+@router.get("/banks", response_model=BankListResponse)
+async def get_banks(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    search: Optional[str] = None,
+    bank_type: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get paginated list of banks with filtering"""
+    try:
+        query = db.query(Banks)
+        
+        # Apply filters
+        if search:
+            query = query.filter(Banks.name.contains(search))
+        
+        if bank_type:
+            query = query.filter(Banks.bank_type == bank_type)
+        
+        # Get total count
+        total = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        banks = query.offset(offset).limit(limit).all()
+        
+        return BankListResponse(
+            banks=banks,
+            total=total,
+            page=page,
+            limit=limit,
+            total_pages=(total + limit - 1) // limit
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching banks: {str(e)}")
+
+# Insurance Management
+@router.get("/insurance", response_model=InsuranceListResponse)
+async def get_insurance(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    search: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get paginated list of insurance companies with filtering"""
+    try:
+        query = db.query(Insurance)
+        
+        # Apply filters
+        if search:
+            query = query.filter(Insurance.name.contains(search))
+        
+        # Get total count
+        total = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        insurance = query.offset(offset).limit(limit).all()
+        
+        return InsuranceListResponse(
+            insurance=insurance,
+            total=total,
+            page=page,
+            limit=limit,
+            total_pages=(total + limit - 1) // limit
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching insurance: {str(e)}")
+
+# Company Management
+@router.get("/companies", response_model=CompanyListResponse)
+async def get_companies(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    search: Optional[str] = None,
+    company_type: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get paginated list of companies with filtering"""
+    try:
+        query = db.query(Companies)
+        
+        # Apply filters
+        if search:
+            query = query.filter(Companies.name.contains(search))
+        
+        if company_type:
+            query = query.filter(Companies.company_type == company_type)
+        
+        # Get total count
+        total = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        companies = query.offset(offset).limit(limit).all()
+        
+        return CompanyListResponse(
+            companies=companies,
+            total=total,
+            page=page,
+            limit=limit,
+            total_pages=(total + limit - 1) // limit
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching companies: {str(e)}")
+
+# Payment Management
+@router.get("/payments", response_model=PaymentListResponse)
+async def get_payments(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    status: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get paginated list of payments with filtering"""
+    try:
+        query = db.query(Payment)
+        
+        # Apply filters
+        if status:
+            query = query.filter(Payment.status == status)
+        
+        # Get total count
+        total = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        payments = query.offset(offset).limit(limit).all()
+        
+        return PaymentListResponse(
+            payments=payments,
+            total=total,
+            page=page,
+            limit=limit,
+            total_pages=(total + limit - 1) // limit
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payments: {str(e)}")
+
+# Subscription Management
+@router.get("/subscriptions", response_model=SubscriptionListResponse)
+async def get_subscriptions(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    status: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get paginated list of subscriptions with filtering"""
+    try:
+        query = db.query(Subscription)
+        
+        # Apply filters
+        if status:
+            query = query.filter(Subscription.status == status)
+        
+        # Get total count
+        total = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        subscriptions = query.offset(offset).limit(limit).all()
+        
+        return SubscriptionListResponse(
+            subscriptions=subscriptions,
+            total=total,
+            page=page,
+            limit=limit,
+            total_pages=(total + limit - 1) // limit
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching subscriptions: {str(e)}")
+
+# Include the new admin route modules
+router.include_router(admin_people.router, prefix="/people", tags=["admin-people"])
+router.include_router(admin_banks.router, prefix="/banks", tags=["admin-banks"])
+router.include_router(admin_insurance.router, prefix="/insurance", tags=["admin-insurance"])
+router.include_router(admin_companies.router, prefix="/companies", tags=["admin-companies"])
+router.include_router(admin_payments.router, prefix="/payments", tags=["admin-payments"])

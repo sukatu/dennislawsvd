@@ -1,0 +1,148 @@
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+from database import get_db
+from models.payment import Payment
+from models.subscription import Subscription
+from models.user import User
+from typing import List, Optional
+import math
+
+router = APIRouter()
+
+@router.get("/stats")
+async def get_payments_stats(db: Session = Depends(get_db)):
+    """Get comprehensive payment statistics for admin dashboard"""
+    try:
+        # Basic counts
+        total_payments = db.query(Payment).count()
+        
+        # Financial analysis
+        total_revenue = db.query(Payment.amount).filter(Payment.status == 'completed').all()
+        total_revenue = sum([payment[0] for payment in total_revenue]) if total_revenue else 0
+        
+        # Status breakdown
+        completed_payments = db.query(Payment).filter(Payment.status == 'completed').count()
+        pending_payments = db.query(Payment).filter(Payment.status == 'pending').count()
+        failed_payments = db.query(Payment).filter(Payment.status == 'failed').count()
+        cancelled_payments = db.query(Payment).filter(Payment.status == 'cancelled').count()
+        
+        # Active subscriptions
+        active_subscriptions = db.query(Subscription).filter(Subscription.status == 'ACTIVE').count()
+        
+        return {
+            "total_payments": total_payments,
+            "total_revenue": total_revenue,
+            "completed_payments": completed_payments,
+            "pending_payments": pending_payments,
+            "failed_payments": failed_payments,
+            "cancelled_payments": cancelled_payments,
+            "active_subscriptions": active_subscriptions,
+            "last_updated": db.query(Payment.created_at).order_by(Payment.created_at.desc()).first()[0].isoformat() if db.query(Payment.created_at).first() else None
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payments stats: {str(e)}")
+
+@router.get("/")
+async def get_payments(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    search: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Get paginated list of payments with optional filtering"""
+    try:
+        query = db.query(Payment)
+        
+        # Apply search filter
+        if search:
+            query = query.join(User).filter(
+                User.email.ilike(f"%{search}%") |
+                Payment.stripe_payment_intent_id.ilike(f"%{search}%")
+            )
+        
+        # Apply status filter
+        if status:
+            query = query.filter(Payment.status == status)
+        
+        # Get total count
+        total = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        payments = query.offset(offset).limit(limit).all()
+        
+        # Calculate total pages
+        total_pages = math.ceil(total / limit)
+        
+        # Add user email to each payment
+        payments_with_user = []
+        for payment in payments:
+            user = db.query(User).filter(User.id == payment.user_id).first()
+            payment_dict = {
+                "id": payment.id,
+                "user_id": payment.user_id,
+                "user_email": user.email if user else None,
+                "amount": payment.amount,
+                "currency": payment.currency,
+                "status": payment.status,
+                "stripe_payment_intent_id": payment.stripe_payment_intent_id,
+                "stripe_charge_id": payment.stripe_charge_id,
+                "payment_method": payment.payment_method,
+                "last_four": payment.last_four,
+                "billing_period_start": payment.billing_period_start,
+                "billing_period_end": payment.billing_period_end,
+                "created_at": payment.created_at,
+                "updated_at": payment.updated_at,
+                "paid_at": payment.paid_at
+            }
+            payments_with_user.append(payment_dict)
+        
+        return {
+            "payments": payments_with_user,
+            "total": total,
+            "page": page,
+            "limit": limit,
+            "total_pages": total_pages
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payments: {str(e)}")
+
+@router.get("/{payment_id}")
+async def get_payment(payment_id: int, db: Session = Depends(get_db)):
+    """Get detailed information about a specific payment"""
+    try:
+        payment = db.query(Payment).filter(Payment.id == payment_id).first()
+        if not payment:
+            raise HTTPException(status_code=404, detail="Payment not found")
+        
+        # Get user information
+        user = db.query(User).filter(User.id == payment.user_id).first()
+        
+        return {
+            "payment": payment,
+            "user": user
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payment: {str(e)}")
+
+@router.delete("/{payment_id}")
+async def delete_payment(payment_id: int, db: Session = Depends(get_db)):
+    """Delete a payment record"""
+    try:
+        payment = db.query(Payment).filter(Payment.id == payment_id).first()
+        if not payment:
+            raise HTTPException(status_code=404, detail="Payment not found")
+        
+        # Delete the payment
+        db.delete(payment)
+        db.commit()
+        
+        return {"message": "Payment deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error deleting payment: {str(e)}")

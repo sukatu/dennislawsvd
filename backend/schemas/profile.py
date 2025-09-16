@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 class ProfileUpdate(BaseModel):
@@ -48,8 +48,31 @@ class SubscriptionResponse(BaseModel):
     status: str
     expires_at: Optional[datetime]
     is_premium: bool
-    features: list[str]
-    usage: dict
+    features: List[str]
+    usage: Dict[str, Any]
+
+    class Config:
+        from_attributes = True
+
+class ProfileStatsResponse(BaseModel):
+    total_searches: int
+    searches_this_month: int
+    cases_viewed: int
+    api_calls: int
+    last_activity: Optional[datetime]
+    account_age_days: int
+    subscription_days_remaining: Optional[int]
+
+class AccountActivityResponse(BaseModel):
+    id: int
+    user_id: int
+    event_type: str
+    description: str
+    ip_address: Optional[str]
+    user_agent: Optional[str]
+    country: Optional[str]
+    city: Optional[str]
+    created_at: datetime
 
     class Config:
         from_attributes = True

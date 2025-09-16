@@ -17,3 +17,6 @@ from .insurance_case_statistics import InsuranceCaseStatistics
 from .legal_history import LegalHistory
 from .user import User
 from .request_details import RequestDetails
+from .subscription import Subscription, Payment, UsageRecord, SubscriptionStatus, SubscriptionPlan, PaymentStatus
+from .notification import Notification, NotificationPreference, NotificationType, NotificationStatus, NotificationPriority
+from .security import SecurityEvent, TwoFactorAuth, ApiKey, LoginSession, SecurityEventType

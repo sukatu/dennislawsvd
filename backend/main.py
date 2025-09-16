@@ -21,6 +21,10 @@ from routes import person_case_statistics
 from routes import person_analytics
 from routes import banking_summary
 from routes import request_details
+from routes import subscription
+from routes import notifications
+from routes import security
+from routes import admin
 from config import settings
 
 # Application lifespan
@@ -68,6 +72,10 @@ app.include_router(person_case_statistics.router, tags=["person_case_statistics"
 app.include_router(person_analytics.router, prefix="/api", tags=["person_analytics"])
 app.include_router(banking_summary.router, tags=["banking_summary"])
 app.include_router(request_details.router, tags=["request_details"])
+app.include_router(subscription.router, prefix="/api/subscription", tags=["subscription"])
+app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
+app.include_router(security.router, prefix="/api/security", tags=["security"])
+app.include_router(admin.router, tags=["admin"])
 
 # Root endpoint
 @app.get("/")

@@ -10,20 +10,42 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Check authentication status on component mount
+  // Check authentication status on component mount and listen for changes
   useEffect(() => {
-    const authStatus = localStorage.getItem('isAuthenticated');
-    const email = localStorage.getItem('userEmail');
-    const name = localStorage.getItem('userName');
-    const authProvider = localStorage.getItem('authProvider');
-    setIsAuthenticated(authStatus === 'true');
-    setUserEmail(email || '');
-    setUserName(name || '');
+    const checkAuthStatus = () => {
+      const authStatus = localStorage.getItem('isAuthenticated');
+      const email = localStorage.getItem('userEmail');
+      const name = localStorage.getItem('userName');
+      const authProvider = localStorage.getItem('authProvider');
+      setIsAuthenticated(authStatus === 'true');
+      setUserEmail(email || '');
+      setUserName(name || '');
+      
+      // Log authentication provider for debugging
+      if (authProvider) {
+        console.log('User authenticated via:', authProvider);
+      }
+    };
+
+    // Check initial auth status
+    checkAuthStatus();
+
+    // Listen for authentication changes
+    const handleAuthChange = () => {
+      checkAuthStatus();
+    };
+
+    // Add event listener for custom auth events
+    window.addEventListener('authStateChanged', handleAuthChange);
     
-    // Log authentication provider for debugging
-    if (authProvider) {
-      console.log('User authenticated via:', authProvider);
-    }
+    // Also listen for storage changes (in case localStorage is modified from another tab)
+    window.addEventListener('storage', handleAuthChange);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener('authStateChanged', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
   }, []);
 
   // Function to get user initials
@@ -55,11 +77,16 @@ const Header = () => {
     localStorage.removeItem('userName');
     localStorage.removeItem('userPicture');
     localStorage.removeItem('authProvider');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('userData');
     
     // If user was authenticated via Google, also sign out from Google
     if (window.google?.accounts?.id) {
       window.google.accounts.id.disableAutoSelect();
     }
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('authStateChanged'));
     
     setIsAuthenticated(false);
     setUserEmail('');

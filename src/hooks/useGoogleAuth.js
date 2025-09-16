@@ -52,6 +52,9 @@ const useGoogleAuth = () => {
             localStorage.setItem('userPicture', userInfo.picture);
             localStorage.setItem('authProvider', 'google');
             
+            // Dispatch custom event to notify other components
+            window.dispatchEvent(new CustomEvent('authStateChanged'));
+            
             onSuccess(userInfo);
           } catch (err) {
             console.error('Error processing Google response:', err);
@@ -88,7 +91,15 @@ const useGoogleAuth = () => {
   const handleGoogleSuccess = useCallback((userInfo) => {
     console.log('Google authentication successful:', userInfo);
     // You can add additional logic here, like sending user data to your backend
-    navigate('/');
+    
+    // Check if there's a redirect URL stored
+    const redirectUrl = localStorage.getItem('redirectAfterLogin');
+    if (redirectUrl) {
+      localStorage.removeItem('redirectAfterLogin');
+      navigate(redirectUrl);
+    } else {
+      navigate('/');
+    }
   }, [navigate]);
 
   // Handle Google Sign-In error

@@ -45,6 +45,7 @@ class User(Base):
     # User status and role
     role = Column(Enum(UserRole), default=UserRole.USER, nullable=False)
     status = Column(Enum(UserStatus), default=UserStatus.PENDING, nullable=False)
+    is_admin = Column(Boolean, default=False, nullable=False)
     
     # Profile information
     profile_picture = Column(String(500), nullable=True)
@@ -73,6 +74,13 @@ class User(Base):
     locked_until = Column(DateTime, nullable=True)
     
     # Relationships
+    subscription = relationship("Subscription", back_populates="user", uselist=False)
+    notifications = relationship("Notification", back_populates="user")
+    notification_preferences = relationship("NotificationPreference", back_populates="user", uselist=False)
+    security_events = relationship("SecurityEvent", back_populates="user")
+    two_factor_auth = relationship("TwoFactorAuth", back_populates="user", uselist=False)
+    api_keys = relationship("ApiKey", back_populates="user")
+    login_sessions = relationship("LoginSession", back_populates="user")
     # cases = relationship("Case", back_populates="user")
     # searches = relationship("Search", back_populates="user")
     
