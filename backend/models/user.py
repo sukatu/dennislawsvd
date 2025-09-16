@@ -75,6 +75,7 @@ class User(Base):
     
     # Relationships
     subscription = relationship("Subscription", back_populates="user", uselist=False)
+    payments = relationship("Payment", back_populates="user")
     notifications = relationship("Notification", back_populates="user")
     notification_preferences = relationship("NotificationPreference", back_populates="user", uselist=False)
     security_events = relationship("SecurityEvent", back_populates="user")

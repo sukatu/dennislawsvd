@@ -5,6 +5,7 @@ import { Menu, X, LogIn, UserPlus, LogOut, User, Settings } from 'lucide-react';
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userName, setUserName] = useState('');
   const location = useLocation();
@@ -14,10 +15,12 @@ const Header = () => {
   useEffect(() => {
     const checkAuthStatus = () => {
       const authStatus = localStorage.getItem('isAuthenticated');
+      const adminStatus = localStorage.getItem('isAdmin');
       const email = localStorage.getItem('userEmail');
       const name = localStorage.getItem('userName');
       const authProvider = localStorage.getItem('authProvider');
       setIsAuthenticated(authStatus === 'true');
+      setIsAdmin(adminStatus === 'true');
       setUserEmail(email || '');
       setUserName(name || '');
       
@@ -100,6 +103,7 @@ const Header = () => {
     { name: 'Banks', href: '/banks' },
     { name: 'Insurance', href: '/insurance' },
     { name: 'Companies', href: '/companies' },
+    ...(isAdmin ? [{ name: 'Admin Dashboard', href: '/admin' }] : []),
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];

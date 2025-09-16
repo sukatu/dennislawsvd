@@ -17,8 +17,373 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  X
+  X,
+  Save
 } from 'lucide-react';
+
+// Case Form Component
+const CaseForm = ({ caseData, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    suit_reference_number: '',
+    date: '',
+    presiding_judge: '',
+    protagonist: '',
+    antagonist: '',
+    court_type: '',
+    court_division: '',
+    status: '',
+    statutes_cited: '',
+    cases_cited: '',
+    lawyers: '',
+    commentary: '',
+    headnotes: '',
+    town: '',
+    region: '',
+    dl_citation_no: '',
+    file_url: '',
+    judgement: '',
+    year: '',
+    type: '',
+    firebase_url: '',
+    summernote: '',
+    detail_content: '',
+    decision: '',
+    citation: '',
+    file_name: '',
+    c_t: '',
+    judgement_by: '',
+    case_summary: '',
+    area_of_law: '',
+    keywords_phrases: '',
+    published: false,
+    dl_type: '',
+    academic_programme_id: '',
+    opinion_by: '',
+    conclusion: ''
+  });
+
+  useEffect(() => {
+    if (caseData) {
+      setFormData({
+        title: caseData.title || '',
+        suit_reference_number: caseData.suit_reference_number || '',
+        date: caseData.date ? caseData.date.split('T')[0] : '',
+        presiding_judge: caseData.presiding_judge || '',
+        protagonist: caseData.protagonist || '',
+        antagonist: caseData.antagonist || '',
+        court_type: caseData.court_type || '',
+        court_division: caseData.court_division || '',
+        status: caseData.status || '',
+        statutes_cited: caseData.statutes_cited || '',
+        cases_cited: caseData.cases_cited || '',
+        lawyers: caseData.lawyers || '',
+        commentary: caseData.commentary || '',
+        headnotes: caseData.headnotes || '',
+        town: caseData.town || '',
+        region: caseData.region || '',
+        dl_citation_no: caseData.dl_citation_no || '',
+        file_url: caseData.file_url || '',
+        judgement: caseData.judgement || '',
+        year: caseData.year || '',
+        type: caseData.type || '',
+        firebase_url: caseData.firebase_url || '',
+        summernote: caseData.summernote || '',
+        detail_content: caseData.detail_content || '',
+        decision: caseData.decision || '',
+        citation: caseData.citation || '',
+        file_name: caseData.file_name || '',
+        c_t: caseData.c_t || '',
+        judgement_by: caseData.judgement_by || '',
+        case_summary: caseData.case_summary || '',
+        area_of_law: caseData.area_of_law || '',
+        keywords_phrases: caseData.keywords_phrases || '',
+        published: caseData.published || false,
+        dl_type: caseData.dl_type || '',
+        academic_programme_id: caseData.academic_programme_id || '',
+        opinion_by: caseData.opinion_by || '',
+        conclusion: caseData.conclusion || ''
+      });
+    }
+  }, [caseData]);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Basic Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Basic Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Suit Reference Number</label>
+            <input
+              type="text"
+              name="suit_reference_number"
+              value={formData.suit_reference_number}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Presiding Judge</label>
+            <input
+              type="text"
+              name="presiding_judge"
+              value={formData.presiding_judge}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Protagonist</label>
+            <input
+              type="text"
+              name="protagonist"
+              value={formData.protagonist}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Antagonist</label>
+            <input
+              type="text"
+              name="antagonist"
+              value={formData.antagonist}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+
+        {/* Court Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Court Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Court Type</label>
+            <select
+              name="court_type"
+              value={formData.court_type}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            >
+              <option value="">Select Court Type</option>
+              <option value="supreme">Supreme Court</option>
+              <option value="appeal">Appeal Court</option>
+              <option value="high">High Court</option>
+              <option value="circuit">Circuit Court</option>
+              <option value="district">District Court</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Court Division</label>
+            <input
+              type="text"
+              name="court_division"
+              value={formData.court_division}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            >
+              <option value="">Select Status</option>
+              <option value="active">Active</option>
+              <option value="closed">Closed</option>
+              <option value="pending">Pending</option>
+              <option value="dismissed">Dismissed</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Town</label>
+            <input
+              type="text"
+              name="town"
+              value={formData.town}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Region</label>
+            <input
+              type="text"
+              name="region"
+              value={formData.region}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Year</label>
+            <input
+              type="number"
+              name="year"
+              value={formData.year}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Information */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Additional Information</h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Statutes Cited</label>
+            <textarea
+              name="statutes_cited"
+              value={formData.statutes_cited}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Cases Cited</label>
+            <textarea
+              name="cases_cited"
+              value={formData.cases_cited}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Lawyers</label>
+            <textarea
+              name="lawyers"
+              value={formData.lawyers}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Commentary</label>
+            <textarea
+              name="commentary"
+              value={formData.commentary}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Case Summary</label>
+          <textarea
+            name="case_summary"
+            value={formData.case_summary}
+            onChange={handleInputChange}
+            rows={4}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Keywords/Phrases</label>
+          <textarea
+            name="keywords_phrases"
+            value={formData.keywords_phrases}
+            onChange={handleInputChange}
+            rows={2}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            name="published"
+            checked={formData.published}
+            onChange={handleInputChange}
+            className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+          />
+          <label className="ml-2 block text-sm text-slate-700">
+            Published
+          </label>
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="flex justify-end space-x-3 pt-4 border-t">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors flex items-center gap-2"
+        >
+          <Save className="h-4 w-4" />
+          {caseData ? 'Update Case' : 'Create Case'}
+        </button>
+      </div>
+    </form>
+  );
+};
 
 const CaseManagement = () => {
   const [cases, setCases] = useState([]);
@@ -32,10 +397,30 @@ const CaseManagement = () => {
   const [selectedCase, setSelectedCase] = useState(null);
   const [showCaseModal, setShowCaseModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingCase, setEditingCase] = useState(null);
+  const [caseStats, setCaseStats] = useState({
+    totalCases: 0,
+    activeCases: 0,
+    closedCases: 0,
+    pendingCases: 0,
+    dismissedCases: 0,
+    recentCases: 0,
+    courtTypeDistribution: {},
+    statusDistribution: {},
+    yearDistribution: {},
+    regionDistribution: {}
+  });
 
   useEffect(() => {
     loadCases();
+    loadCaseStats();
   }, [currentPage, searchTerm, courtTypeFilter, statusFilter]);
+
+  useEffect(() => {
+    loadCaseStats();
+  }, []);
 
   const loadCases = async () => {
     try {
@@ -63,6 +448,21 @@ const CaseManagement = () => {
       console.error('Error loading cases:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCaseStats = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/admin/cases/stats');
+      const data = await response.json();
+
+      if (response.ok) {
+        setCaseStats(data);
+      } else {
+        console.error('Error loading case stats:', data.detail);
+      }
+    } catch (error) {
+      console.error('Error loading case stats:', error);
     }
   };
 
@@ -109,6 +509,46 @@ const CaseManagement = () => {
     }
   };
 
+  const handleCreateCase = () => {
+    setEditingCase(null);
+    setShowCreateModal(true);
+  };
+
+  const handleEditCase = (caseItem) => {
+    setEditingCase(caseItem);
+    setShowEditModal(true);
+  };
+
+  const handleSaveCase = async (caseData) => {
+    try {
+      const url = editingCase 
+        ? `http://localhost:8000/api/admin/cases/${editingCase.id}`
+        : 'http://localhost:8000/api/admin/cases';
+      
+      const method = editingCase ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(caseData)
+      });
+
+      if (response.ok) {
+        setShowCreateModal(false);
+        setShowEditModal(false);
+        setEditingCase(null);
+        loadCases();
+      } else {
+        const data = await response.json();
+        console.error('Error saving case:', data.detail);
+      }
+    } catch (error) {
+      console.error('Error saving case:', error);
+    }
+  };
+
   const getCourtTypeBadgeColor = (courtType) => {
     switch (courtType?.toLowerCase()) {
       case 'supreme': return 'bg-purple-100 text-purple-800';
@@ -152,7 +592,198 @@ const CaseManagement = () => {
           <h2 className="text-2xl font-bold text-slate-900">Case Management</h2>
           <p className="text-slate-600">Manage cases, metadata, analytics and statistics</p>
         </div>
+        <button
+          onClick={handleCreateCase}
+          className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+        >
+          <FileText className="h-4 w-4" />
+          Create Case
+        </button>
       </div>
+
+      {/* Case Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {/* Total Cases */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FileText className="h-6 w-6 text-blue-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-slate-600">Total Cases</p>
+              <p className="text-2xl font-bold text-slate-900">{caseStats.totalCases.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Cases */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <CheckCircle className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-slate-600">Active Cases</p>
+              <p className="text-2xl font-bold text-slate-900">{caseStats.activeCases.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Cases */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-amber-100 rounded-lg">
+              <Clock className="h-6 w-6 text-amber-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-slate-600">Recent (30 days)</p>
+              <p className="text-2xl font-bold text-slate-900">{caseStats.recentCases.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending Cases */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <AlertCircle className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-slate-600">Pending Cases</p>
+              <p className="text-2xl font-bold text-slate-900">{caseStats.pendingCases.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {/* Closed Cases */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <X className="h-6 w-6 text-gray-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-slate-600">Closed Cases</p>
+              <p className="text-2xl font-bold text-slate-900">{caseStats.closedCases.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Dismissed Cases */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-red-100 rounded-lg">
+              <X className="h-6 w-6 text-red-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-slate-600">Dismissed Cases</p>
+              <p className="text-2xl font-bold text-slate-900">{caseStats.dismissedCases.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Court Types Count */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Scale className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-slate-600">Court Types</p>
+              <p className="text-2xl font-bold text-slate-900">{Object.keys(caseStats.courtTypeDistribution).length}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Regions Count */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-indigo-100 rounded-lg">
+              <MapPin className="h-6 w-6 text-indigo-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-slate-600">Regions</p>
+              <p className="text-2xl font-bold text-slate-900">{Object.keys(caseStats.regionDistribution).length}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Case Distribution Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Court Type Distribution */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Cases by Court Type</h3>
+          <div className="space-y-3">
+            {Object.entries(caseStats.courtTypeDistribution).map(([courtType, count]) => {
+              const percentage = caseStats.totalCases > 0 ? (count / caseStats.totalCases) * 100 : 0;
+              return (
+                <div key={courtType} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-sky-500 mr-3"></div>
+                    <span className="text-sm font-medium text-slate-700">{courtType}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-sm text-slate-600 mr-2">{count.toLocaleString()}</span>
+                    <span className="text-xs text-slate-500">({percentage.toFixed(1)}%)</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Status Distribution */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Cases by Status</h3>
+          <div className="space-y-3">
+            {Object.entries(caseStats.statusDistribution).map(([status, count]) => {
+              const percentage = caseStats.totalCases > 0 ? (count / caseStats.totalCases) * 100 : 0;
+              const statusColors = {
+                active: 'bg-green-500',
+                closed: 'bg-gray-500',
+                pending: 'bg-yellow-500',
+                dismissed: 'bg-red-500'
+              };
+              return (
+                <div key={status} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full ${statusColors[status] || 'bg-sky-500'} mr-3`}></div>
+                    <span className="text-sm font-medium text-slate-700 capitalize">{status}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-sm text-slate-600 mr-2">{count.toLocaleString()}</span>
+                    <span className="text-xs text-slate-500">({percentage.toFixed(1)}%)</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Year Distribution */}
+      {Object.keys(caseStats.yearDistribution).length > 0 && (
+        <div className="bg-white p-6 rounded-lg shadow mb-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Cases by Year (Last 10 Years)</h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {Object.entries(caseStats.yearDistribution)
+              .sort(([a], [b]) => parseInt(b) - parseInt(a))
+              .map(([year, count]) => {
+                const percentage = caseStats.totalCases > 0 ? (count / caseStats.totalCases) * 100 : 0;
+                return (
+                  <div key={year} className="text-center">
+                    <div className="text-2xl font-bold text-slate-900">{count.toLocaleString()}</div>
+                    <div className="text-sm text-slate-600">{year}</div>
+                    <div className="text-xs text-slate-500">({percentage.toFixed(1)}%)</div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-lg shadow">
@@ -278,6 +909,13 @@ const CaseManagement = () => {
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEditCase(caseItem)}
+                            className="text-amber-600 hover:text-amber-900 p-1"
+                            title="Edit Case"
+                          >
+                            <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteCase(caseItem)}
@@ -504,6 +1142,39 @@ const CaseManagement = () => {
                 Delete Case
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create/Edit Case Modal */}
+      {(showCreateModal || showEditModal) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">
+                {editingCase ? 'Edit Case' : 'Create New Case'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setShowEditModal(false);
+                  setEditingCase(null);
+                }}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <CaseForm
+              caseData={editingCase}
+              onSave={handleSaveCase}
+              onCancel={() => {
+                setShowCreateModal(false);
+                setShowEditModal(false);
+                setEditingCase(null);
+              }}
+            />
           </div>
         </div>
       )}

@@ -22,6 +22,482 @@ import {
   Users
 } from 'lucide-react';
 
+// Person Form Component
+const PersonForm = ({ personData, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    full_name: '',
+    previous_names: '',
+    date_of_birth: '',
+    date_of_death: '',
+    id_number: '',
+    phone_number: '',
+    email: '',
+    address: '',
+    city: '',
+    region: '',
+    country: '',
+    postal_code: '',
+    risk_level: '',
+    risk_score: '',
+    case_count: '',
+    case_types: '',
+    court_records: '',
+    occupation: '',
+    employer: '',
+    organization: '',
+    job_title: '',
+    marital_status: '',
+    spouse_name: '',
+    children_count: '',
+    emergency_contact: '',
+    emergency_phone: '',
+    nationality: '',
+    gender: '',
+    education_level: '',
+    languages: '',
+    is_verified: false,
+    verification_notes: '',
+    notes: ''
+  });
+
+  useEffect(() => {
+    if (personData) {
+      setFormData({
+        first_name: personData.first_name || '',
+        last_name: personData.last_name || '',
+        full_name: personData.full_name || '',
+        previous_names: personData.previous_names || '',
+        date_of_birth: personData.date_of_birth ? personData.date_of_birth.split('T')[0] : '',
+        date_of_death: personData.date_of_death ? personData.date_of_death.split('T')[0] : '',
+        id_number: personData.id_number || '',
+        phone_number: personData.phone_number || '',
+        email: personData.email || '',
+        address: personData.address || '',
+        city: personData.city || '',
+        region: personData.region || '',
+        country: personData.country || '',
+        postal_code: personData.postal_code || '',
+        risk_level: personData.risk_level || '',
+        risk_score: personData.risk_score || '',
+        case_count: personData.case_count || '',
+        case_types: personData.case_types || '',
+        court_records: personData.court_records || '',
+        occupation: personData.occupation || '',
+        employer: personData.employer || '',
+        organization: personData.organization || '',
+        job_title: personData.job_title || '',
+        marital_status: personData.marital_status || '',
+        spouse_name: personData.spouse_name || '',
+        children_count: personData.children_count || '',
+        emergency_contact: personData.emergency_contact || '',
+        emergency_phone: personData.emergency_phone || '',
+        nationality: personData.nationality || '',
+        gender: personData.gender || '',
+        education_level: personData.education_level || '',
+        languages: personData.languages || '',
+        is_verified: personData.is_verified || false,
+        verification_notes: personData.verification_notes || '',
+        notes: personData.notes || ''
+      });
+    }
+  }, [personData]);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Basic Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Basic Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">First Name *</label>
+            <input
+              type="text"
+              name="first_name"
+              value={formData.first_name}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Last Name *</label>
+            <input
+              type="text"
+              name="last_name"
+              value={formData.last_name}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+            <input
+              type="text"
+              name="full_name"
+              value={formData.full_name}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Previous Names</label>
+            <input
+              type="text"
+              name="previous_names"
+              value={formData.previous_names}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Date of Birth</label>
+            <input
+              type="date"
+              name="date_of_birth"
+              value={formData.date_of_birth}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Gender</label>
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            >
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div className="space-y-4">
+          <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Contact Information</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
+            <input
+              type="tel"
+              name="phone_number"
+              value={formData.phone_number}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
+            <textarea
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+            <input
+              type="text"
+              name="city"
+              value={formData.city}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Region</label>
+            <input
+              type="text"
+              name="region"
+              value={formData.region}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+            <input
+              type="text"
+              name="country"
+              value={formData.country}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Risk Assessment */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Risk Assessment</h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Risk Level</label>
+            <select
+              name="risk_level"
+              value={formData.risk_level}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            >
+              <option value="">Select Risk Level</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="very high">Very High</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Risk Score</label>
+            <input
+              type="number"
+              name="risk_score"
+              value={formData.risk_score}
+              onChange={handleInputChange}
+              min="0"
+              max="100"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Case Count</label>
+            <input
+              type="number"
+              name="case_count"
+              value={formData.case_count}
+              onChange={handleInputChange}
+              min="0"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Case Types</label>
+            <input
+              type="text"
+              name="case_types"
+              value={formData.case_types}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Court Records</label>
+          <textarea
+            name="court_records"
+            value={formData.court_records}
+            onChange={handleInputChange}
+            rows={3}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+      </div>
+
+      {/* Professional Information */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Professional Information</h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Occupation</label>
+            <input
+              type="text"
+              name="occupation"
+              value={formData.occupation}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Employer</label>
+            <input
+              type="text"
+              name="employer"
+              value={formData.employer}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Organization</label>
+            <input
+              type="text"
+              name="organization"
+              value={formData.organization}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Job Title</label>
+            <input
+              type="text"
+              name="job_title"
+              value={formData.job_title}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Information */}
+      <div className="space-y-4">
+        <h4 className="text-md font-semibold text-slate-900 border-b pb-2">Additional Information</h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Nationality</label>
+            <input
+              type="text"
+              name="nationality"
+              value={formData.nationality}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Education Level</label>
+            <select
+              name="education_level"
+              value={formData.education_level}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            >
+              <option value="">Select Education Level</option>
+              <option value="primary">Primary</option>
+              <option value="secondary">Secondary</option>
+              <option value="diploma">Diploma</option>
+              <option value="bachelor">Bachelor's Degree</option>
+              <option value="master">Master's Degree</option>
+              <option value="phd">PhD</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Languages</label>
+            <input
+              type="text"
+              name="languages"
+              value={formData.languages}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Marital Status</label>
+            <select
+              name="marital_status"
+              value={formData.marital_status}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            >
+              <option value="">Select Marital Status</option>
+              <option value="single">Single</option>
+              <option value="married">Married</option>
+              <option value="divorced">Divorced</option>
+              <option value="widowed">Widowed</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Notes</label>
+          <textarea
+            name="notes"
+            value={formData.notes}
+            onChange={handleInputChange}
+            rows={4}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            name="is_verified"
+            checked={formData.is_verified}
+            onChange={handleInputChange}
+            className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-300 rounded"
+          />
+          <label className="ml-2 block text-sm text-slate-700">
+            Verified
+          </label>
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="flex justify-end space-x-3 pt-4 border-t">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors flex items-center gap-2"
+        >
+          <UserCheck className="h-4 w-4" />
+          {personData ? 'Update Person' : 'Create Person'}
+        </button>
+      </div>
+    </form>
+  );
+};
+
 const PeopleManagement = () => {
   const [people, setPeople] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +509,9 @@ const PeopleManagement = () => {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [showPersonModal, setShowPersonModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingPerson, setEditingPerson] = useState(null);
   const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
@@ -119,6 +598,47 @@ const PeopleManagement = () => {
     }
   };
 
+  const handleCreatePerson = () => {
+    setEditingPerson(null);
+    setShowCreateModal(true);
+  };
+
+  const handleEditPerson = (person) => {
+    setEditingPerson(person);
+    setShowEditModal(true);
+  };
+
+  const handleSavePerson = async (personData) => {
+    try {
+      const url = editingPerson 
+        ? `http://localhost:8000/api/admin/people/${editingPerson.id}`
+        : 'http://localhost:8000/api/admin/people';
+      
+      const method = editingPerson ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(personData)
+      });
+
+      if (response.ok) {
+        setShowCreateModal(false);
+        setShowEditModal(false);
+        setEditingPerson(null);
+        loadPeople();
+        loadAnalytics();
+      } else {
+        const data = await response.json();
+        console.error('Error saving person:', data.detail);
+      }
+    } catch (error) {
+      console.error('Error saving person:', error);
+    }
+  };
+
   const getRiskBadgeColor = (riskLevel) => {
     switch (riskLevel?.toLowerCase()) {
       case 'very high': return 'bg-red-100 text-red-800';
@@ -161,6 +681,13 @@ const PeopleManagement = () => {
           <h2 className="text-2xl font-bold text-slate-900">People Management</h2>
           <p className="text-slate-600">Manage people records and analytics</p>
         </div>
+        <button
+          onClick={handleCreatePerson}
+          className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+        >
+          <UserCheck className="h-4 w-4" />
+          Create Person
+        </button>
       </div>
 
       {/* Analytics Cards */}
@@ -360,6 +887,13 @@ const PeopleManagement = () => {
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEditPerson(person)}
+                            className="text-amber-600 hover:text-amber-900 p-1"
+                            title="Edit Person"
+                          >
+                            <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeletePerson(person)}
@@ -577,6 +1111,39 @@ const PeopleManagement = () => {
                 Delete Person
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create/Edit Person Modal */}
+      {(showCreateModal || showEditModal) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">
+                {editingPerson ? 'Edit Person' : 'Create New Person'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setShowEditModal(false);
+                  setEditingPerson(null);
+                }}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <PersonForm
+              personData={editingPerson}
+              onSave={handleSavePerson}
+              onCancel={() => {
+                setShowCreateModal(false);
+                setShowEditModal(false);
+                setEditingPerson(null);
+              }}
+            />
           </div>
         </div>
       )}

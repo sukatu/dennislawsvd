@@ -12,7 +12,8 @@ from models.people import People
 from models.banks import Banks
 from models.insurance import Insurance
 from models.companies import Companies
-from models.subscription import Subscription, Payment
+from models.subscription import Subscription
+from models.payment import Payment
 from models.notification import Notification
 from models.security import SecurityEvent, ApiKey
 from schemas.admin import (
@@ -24,7 +25,10 @@ from schemas.admin import (
     ApiKeyResponse,
     ApiKeyCreateRequest,
     CaseListResponse,
+    CaseResponse,
     CaseDetailResponse,
+    CaseCreateRequest,
+    CaseUpdateRequest,
     PeopleListResponse,
     BankListResponse,
     InsuranceListResponse,
@@ -388,8 +392,34 @@ async def get_cases(
         offset = (page - 1) * limit
         cases = query.offset(offset).limit(limit).all()
         
+        # Convert cases to proper format
+        formatted_cases = []
+        status_mapping = {
+            1: 'active',
+            0: 'closed',
+            2: 'pending',
+            3: 'dismissed'
+        }
+        
+        for case in cases:
+            case_dict = {
+                "id": case.id,
+                "title": case.title,
+                "suit_reference_number": case.suit_reference_number,
+                "date": str(case.date) if case.date else None,
+                "presiding_judge": case.presiding_judge,
+                "protagonist": case.protagonist,
+                "antagonist": case.antagonist,
+                "court_type": case.court_type,
+                "court_division": case.court_division,
+                "status": status_mapping.get(case.status) if case.status is not None else None,
+                "created_at": case.created_at,
+                "updated_at": case.updated_at
+            }
+            formatted_cases.append(case_dict)
+        
         return CaseListResponse(
-            cases=cases,
+            cases=formatted_cases,
             total=total,
             page=page,
             limit=limit,
@@ -398,83 +428,205 @@ async def get_cases(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching cases: {str(e)}")
 
-# People Management
-@router.get("/people", response_model=PeopleListResponse)
-async def get_people(
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
-    search: Optional[str] = None,
-    risk_level: Optional[str] = None,
-    db: Session = Depends(get_db)
-):
-    """Get paginated list of people with filtering"""
+@router.get("/cases/stats", response_model=dict)
+async def get_case_stats(db: Session = Depends(get_db)):
+    """Get comprehensive case statistics for admin dashboard"""
     try:
-        query = db.query(People)
+        # Basic counts
+        total_cases = db.query(ReportedCases).count()
         
-        # Apply filters
-        if search:
-            query = query.filter(
-                People.full_name.contains(search) |
-                People.first_name.contains(search) |
-                People.last_name.contains(search)
-            )
+        # Status distribution
+        status_mapping = {
+            1: 'active',
+            0: 'closed',
+            2: 'pending',
+            3: 'dismissed'
+        }
         
-        if risk_level:
-            query = query.filter(People.risk_level == risk_level)
+        active_cases = db.query(ReportedCases).filter(ReportedCases.status == 1).count()
+        closed_cases = db.query(ReportedCases).filter(ReportedCases.status == 0).count()
+        pending_cases = db.query(ReportedCases).filter(ReportedCases.status == 2).count()
+        dismissed_cases = db.query(ReportedCases).filter(ReportedCases.status == 3).count()
         
-        # Get total count
-        total = query.count()
+        # Recent cases (last 30 days)
+        from datetime import datetime, timedelta
+        thirty_days_ago = datetime.now() - timedelta(days=30)
+        recent_cases = db.query(ReportedCases).filter(ReportedCases.created_at >= thirty_days_ago).count()
         
-        # Apply pagination
-        offset = (page - 1) * limit
-        people = query.offset(offset).limit(limit).all()
+        # Court type distribution
+        court_type_dist = {}
+        court_types = db.query(ReportedCases.court_type, func.count(ReportedCases.id)).group_by(ReportedCases.court_type).all()
+        for court_type, count in court_types:
+            if court_type:
+                court_type_dist[court_type] = count
         
-        return PeopleListResponse(
-            people=people,
-            total=total,
-            page=page,
-            limit=limit,
-            total_pages=(total + limit - 1) // limit
-        )
+        # Status distribution
+        status_dist = {}
+        status_counts = db.query(ReportedCases.status, func.count(ReportedCases.id)).group_by(ReportedCases.status).all()
+        for status, count in status_counts:
+            if status is not None:
+                status_name = status_mapping.get(status, f'status_{status}')
+                status_dist[status_name] = count
+        
+        # Year distribution (last 10 years)
+        year_dist = {}
+        current_year = datetime.now().year
+        for year in range(current_year - 9, current_year + 1):
+            year_count = db.query(ReportedCases).filter(ReportedCases.year == year).count()
+            if year_count > 0:
+                year_dist[str(year)] = year_count
+        
+        # Region distribution
+        region_dist = {}
+        regions = db.query(ReportedCases.region, func.count(ReportedCases.id)).group_by(ReportedCases.region).all()
+        for region, count in regions:
+            if region:
+                region_dist[region] = count
+        
+        return {
+            "totalCases": total_cases,
+            "activeCases": active_cases,
+            "closedCases": closed_cases,
+            "pendingCases": pending_cases,
+            "dismissedCases": dismissed_cases,
+            "recentCases": recent_cases,
+            "courtTypeDistribution": court_type_dist,
+            "statusDistribution": status_dist,
+            "yearDistribution": year_dist,
+            "regionDistribution": region_dist
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching people: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching case stats: {str(e)}")
 
-# Bank Management
-@router.get("/banks", response_model=BankListResponse)
-async def get_banks(
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
-    search: Optional[str] = None,
-    bank_type: Optional[str] = None,
-    db: Session = Depends(get_db)
-):
-    """Get paginated list of banks with filtering"""
+@router.get("/cases/{case_id}", response_model=CaseDetailResponse)
+async def get_case(case_id: int, db: Session = Depends(get_db)):
+    """Get a specific case by ID"""
     try:
-        query = db.query(Banks)
+        case = db.query(ReportedCases).filter(ReportedCases.id == case_id).first()
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
         
-        # Apply filters
-        if search:
-            query = query.filter(Banks.name.contains(search))
+        # Convert status integer to string for response
+        status_mapping = {
+            1: 'active',
+            0: 'closed',
+            2: 'pending',
+            3: 'dismissed'
+        }
         
-        if bank_type:
-            query = query.filter(Banks.bank_type == bank_type)
+        # Create a dict with converted status
+        case_dict = case.__dict__.copy()
+        if case_dict.get('status') is not None:
+            case_dict['status'] = status_mapping.get(case_dict['status'])
         
-        # Get total count
-        total = query.count()
-        
-        # Apply pagination
-        offset = (page - 1) * limit
-        banks = query.offset(offset).limit(limit).all()
-        
-        return BankListResponse(
-            banks=banks,
-            total=total,
-            page=page,
-            limit=limit,
-            total_pages=(total + limit - 1) // limit
-        )
+        return case_dict
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching banks: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching case: {str(e)}")
+
+@router.post("/cases", response_model=CaseDetailResponse)
+async def create_case(case_data: CaseCreateRequest, db: Session = Depends(get_db)):
+    """Create a new case"""
+    try:
+        # Convert case data to dict and handle status conversion
+        case_dict = case_data.dict()
+        
+        # Convert status string to integer if needed
+        if case_dict.get('status'):
+            status_mapping = {
+                'active': 1,
+                'closed': 0,
+                'pending': 2,
+                'dismissed': 3
+            }
+            case_dict['status'] = status_mapping.get(case_dict['status'], 1)
+        
+        new_case = ReportedCases(**case_dict)
+        db.add(new_case)
+        db.commit()
+        db.refresh(new_case)
+        
+        # Convert status back to string for response
+        status_mapping = {
+            1: 'active',
+            0: 'closed',
+            2: 'pending',
+            3: 'dismissed'
+        }
+        
+        case_dict = new_case.__dict__.copy()
+        if case_dict.get('status') is not None:
+            case_dict['status'] = status_mapping.get(case_dict['status'])
+        
+        return case_dict
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating case: {str(e)}")
+
+@router.put("/cases/{case_id}", response_model=CaseDetailResponse)
+async def update_case(case_id: int, case_data: CaseUpdateRequest, db: Session = Depends(get_db)):
+    """Update a case"""
+    try:
+        case = db.query(ReportedCases).filter(ReportedCases.id == case_id).first()
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Update only provided fields
+        update_data = case_data.dict(exclude_unset=True)
+        
+        # Convert status string to integer if needed
+        if 'status' in update_data and update_data['status']:
+            status_mapping = {
+                'active': 1,
+                'closed': 0,
+                'pending': 2,
+                'dismissed': 3
+            }
+            update_data['status'] = status_mapping.get(update_data['status'], 1)
+        
+        for field, value in update_data.items():
+            setattr(case, field, value)
+        
+        case.updated_at = datetime.now()
+        db.commit()
+        db.refresh(case)
+        
+        # Convert status back to string for response
+        status_mapping = {
+            1: 'active',
+            0: 'closed',
+            2: 'pending',
+            3: 'dismissed'
+        }
+        
+        case_dict = case.__dict__.copy()
+        if case_dict.get('status') is not None:
+            case_dict['status'] = status_mapping.get(case_dict['status'])
+        
+        return case_dict
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error updating case: {str(e)}")
+
+@router.delete("/cases/{case_id}")
+async def delete_case(case_id: int, db: Session = Depends(get_db)):
+    """Delete a case"""
+    try:
+        case = db.query(ReportedCases).filter(ReportedCases.id == case_id).first()
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        db.delete(case)
+        db.commit()
+        return {"message": "Case deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error deleting case: {str(e)}")
 
 # Insurance Management
 @router.get("/insurance", response_model=InsuranceListResponse)

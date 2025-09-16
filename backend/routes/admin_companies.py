@@ -17,15 +17,44 @@ async def get_companies_stats(db: Session = Depends(get_db)):
         total_companies = db.query(Companies).count()
         
         # Financial analysis
-        total_revenue = db.query(Companies.annual_revenue).filter(Companies.annual_revenue.isnot(None)).all()
-        total_revenue = sum([revenue[0] for revenue in total_revenue]) if total_revenue else 0
+        total_revenue = 0
+        revenue_data = db.query(Companies.annual_revenue).filter(Companies.annual_revenue.isnot(None)).all()
+        for revenue in revenue_data:
+            try:
+                if revenue[0]:
+                    # Convert to string, remove commas and other characters, then convert to float
+                    clean_revenue = str(revenue[0]).replace(',', '').replace('$', '').replace(' ', '')
+                    if clean_revenue.replace('.', '').replace('-', '').isdigit():
+                        total_revenue += float(clean_revenue)
+            except (ValueError, TypeError):
+                continue
         
-        total_employees = db.query(Companies.employee_count).filter(Companies.employee_count.isnot(None)).all()
-        total_employees = sum([employees[0] for employees in total_employees]) if total_employees else 0
+        total_employees = 0
+        employee_data = db.query(Companies.employee_count).filter(Companies.employee_count.isnot(None)).all()
+        for employees in employee_data:
+            try:
+                if employees[0]:
+                    # Convert to string, remove commas, then convert to int
+                    clean_employees = str(employees[0]).replace(',', '').replace(' ', '')
+                    if clean_employees.isdigit():
+                        total_employees += int(clean_employees)
+            except (ValueError, TypeError):
+                continue
         
         # Average rating
-        avg_rating = db.query(Companies.rating).filter(Companies.rating.isnot(None)).all()
-        avg_rating = sum([rating[0] for rating in avg_rating]) / len(avg_rating) if avg_rating else 0
+        avg_rating = 0
+        rating_data = db.query(Companies.rating).filter(Companies.rating.isnot(None)).all()
+        if rating_data:
+            valid_ratings = []
+            for rating in rating_data:
+                try:
+                    if rating[0] is not None:
+                        clean_rating = str(rating[0]).replace(',', '').replace(' ', '')
+                        if clean_rating.replace('.', '').isdigit():
+                            valid_ratings.append(float(clean_rating))
+                except (ValueError, TypeError):
+                    continue
+            avg_rating = sum(valid_ratings) / len(valid_ratings) if valid_ratings else 0
         
         # Active companies
         active_companies = db.query(Companies).filter(Companies.is_active == True).count()

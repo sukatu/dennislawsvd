@@ -72,11 +72,40 @@ async def get_banks(
         offset = (page - 1) * limit
         banks = query.offset(offset).limit(limit).all()
         
+        # Convert JSON arrays to strings for API response
+        formatted_banks = []
+        for bank in banks:
+            bank_dict = bank.__dict__.copy()
+            
+            # Convert JSON arrays to comma-separated strings
+            if bank_dict.get('previous_names') and isinstance(bank_dict['previous_names'], list):
+                bank_dict['previous_names'] = ', '.join(bank_dict['previous_names']) if bank_dict['previous_names'] else ''
+            elif bank_dict.get('previous_names') is None or bank_dict.get('previous_names') == []:
+                bank_dict['previous_names'] = ''
+                
+            if bank_dict.get('services'):
+                if isinstance(bank_dict['services'], list):
+                    bank_dict['services'] = ', '.join(bank_dict['services']) if bank_dict['services'] else ''
+                elif isinstance(bank_dict['services'], str) and bank_dict['services'].startswith('['):
+                    # Handle JSON string format
+                    import json
+                    try:
+                        services_list = json.loads(bank_dict['services'])
+                        bank_dict['services'] = ', '.join(services_list) if services_list else ''
+                    except:
+                        bank_dict['services'] = bank_dict['services']  # Keep as is if parsing fails
+            elif bank_dict.get('services') is None or bank_dict.get('services') == []:
+                bank_dict['services'] = ''
+            
+            # Remove SQLAlchemy internal attributes
+            bank_dict.pop('_sa_instance_state', None)
+            formatted_banks.append(bank_dict)
+        
         # Calculate total pages
         total_pages = math.ceil(total / limit)
         
         return {
-            "banks": banks,
+            "banks": formatted_banks,
             "total": total,
             "page": page,
             "limit": limit,
@@ -97,8 +126,34 @@ async def get_bank(bank_id: int, db: Session = Depends(get_db)):
         analytics = db.query(BankAnalytics).filter(BankAnalytics.bank_id == bank_id).first()
         case_stats = db.query(BankCaseStatistics).filter(BankCaseStatistics.bank_id == bank_id).first()
         
+        # Convert bank data for API response
+        bank_dict = bank.__dict__.copy()
+        
+        # Convert JSON arrays to comma-separated strings
+        if bank_dict.get('previous_names') and isinstance(bank_dict['previous_names'], list):
+            bank_dict['previous_names'] = ', '.join(bank_dict['previous_names']) if bank_dict['previous_names'] else ''
+        elif bank_dict.get('previous_names') is None or bank_dict.get('previous_names') == []:
+            bank_dict['previous_names'] = ''
+            
+        if bank_dict.get('services'):
+            if isinstance(bank_dict['services'], list):
+                bank_dict['services'] = ', '.join(bank_dict['services']) if bank_dict['services'] else ''
+            elif isinstance(bank_dict['services'], str) and bank_dict['services'].startswith('['):
+                # Handle JSON string format
+                import json
+                try:
+                    services_list = json.loads(bank_dict['services'])
+                    bank_dict['services'] = ', '.join(services_list) if services_list else ''
+                except:
+                    bank_dict['services'] = bank_dict['services']  # Keep as is if parsing fails
+        elif bank_dict.get('services') is None or bank_dict.get('services') == []:
+            bank_dict['services'] = ''
+        
+        # Remove SQLAlchemy internal attributes
+        bank_dict.pop('_sa_instance_state', None)
+        
         return {
-            "bank": bank,
+            "bank": bank_dict,
             "analytics": analytics,
             "case_statistics": case_stats
         }

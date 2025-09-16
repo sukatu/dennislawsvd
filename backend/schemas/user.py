@@ -61,6 +61,7 @@ class UserResponse(UserBase):
     is_verified: bool
     role: UserRole
     status: UserStatus
+    is_admin: bool
     profile_picture: Optional[str]
     subscription_plan: Optional[str]
     is_premium: bool

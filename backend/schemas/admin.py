@@ -116,7 +116,7 @@ class CaseResponse(BaseResponse):
     id: int
     title: str
     suit_reference_number: Optional[str] = None
-    date: Optional[datetime] = None
+    date: Optional[str] = None  # Changed to string to handle various date formats
     presiding_judge: Optional[str] = None
     protagonist: Optional[str] = None
     antagonist: Optional[str] = None
@@ -159,8 +159,86 @@ class CaseDetailResponse(CaseResponse):
     ai_court_orders: Optional[str] = None
     ai_financial_impact: Optional[str] = None
     ai_detailed_outcome: Optional[str] = None
-    ai_summary_generated_at: Optional[datetime] = None
+    ai_summary_generated_at: Optional[str] = None  # Changed to string
     ai_summary_version: Optional[str] = None
+
+class CaseCreateRequest(BaseModel):
+    title: str
+    suit_reference_number: Optional[str] = None
+    date: Optional[datetime] = None
+    presiding_judge: Optional[str] = None
+    protagonist: Optional[str] = None
+    antagonist: Optional[str] = None
+    court_type: Optional[str] = None
+    court_division: Optional[str] = None
+    status: Optional[str] = None
+    statutes_cited: Optional[str] = None
+    cases_cited: Optional[str] = None
+    lawyers: Optional[str] = None
+    commentary: Optional[str] = None
+    headnotes: Optional[str] = None
+    town: Optional[str] = None
+    region: Optional[str] = None
+    dl_citation_no: Optional[str] = None
+    file_url: Optional[str] = None
+    judgement: Optional[str] = None
+    year: Optional[int] = None
+    type: Optional[str] = None
+    firebase_url: Optional[str] = None
+    summernote: Optional[str] = None
+    detail_content: Optional[str] = None
+    decision: Optional[str] = None
+    citation: Optional[str] = None
+    file_name: Optional[str] = None
+    c_t: Optional[str] = None
+    judgement_by: Optional[str] = None
+    case_summary: Optional[str] = None
+    area_of_law: Optional[str] = None
+    keywords_phrases: Optional[str] = None
+    published: Optional[bool] = None
+    dl_type: Optional[str] = None
+    academic_programme_id: Optional[int] = None
+    opinion_by: Optional[str] = None
+    conclusion: Optional[str] = None
+
+class CaseUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    suit_reference_number: Optional[str] = None
+    date: Optional[datetime] = None
+    presiding_judge: Optional[str] = None
+    protagonist: Optional[str] = None
+    antagonist: Optional[str] = None
+    court_type: Optional[str] = None
+    court_division: Optional[str] = None
+    status: Optional[str] = None
+    statutes_cited: Optional[str] = None
+    cases_cited: Optional[str] = None
+    lawyers: Optional[str] = None
+    commentary: Optional[str] = None
+    headnotes: Optional[str] = None
+    town: Optional[str] = None
+    region: Optional[str] = None
+    dl_citation_no: Optional[str] = None
+    file_url: Optional[str] = None
+    judgement: Optional[str] = None
+    year: Optional[int] = None
+    type: Optional[str] = None
+    firebase_url: Optional[str] = None
+    summernote: Optional[str] = None
+    detail_content: Optional[str] = None
+    decision: Optional[str] = None
+    citation: Optional[str] = None
+    file_name: Optional[str] = None
+    c_t: Optional[str] = None
+    judgement_by: Optional[str] = None
+    case_summary: Optional[str] = None
+    area_of_law: Optional[str] = None
+    keywords_phrases: Optional[str] = None
+    published: Optional[bool] = None
+    dl_type: Optional[str] = None
+    academic_programme_id: Optional[int] = None
+    opinion_by: Optional[str] = None
+    conclusion: Optional[str] = None
 
 class CaseListResponse(BaseModel):
     cases: List[CaseResponse]

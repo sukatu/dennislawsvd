@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from database import get_db
 from models.user import User
-from models.subscription import Subscription, Payment, UsageRecord, SubscriptionStatus, SubscriptionPlan
+from models.subscription import Subscription, UsageRecord, SubscriptionStatus, SubscriptionPlan
+from models.payment import Payment
 from schemas.subscription import (
     SubscriptionResponse, PaymentResponse, UsageRecordResponse, 
     SubscriptionUsageResponse, SubscriptionPlanResponse, PlanFeature

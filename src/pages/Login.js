@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogIn, Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { LogIn, Lock, Mail, Eye, EyeOff, Shield } from 'lucide-react';
 import useGoogleAuth from '../hooks/useGoogleAuth';
 
 const Login = () => {
@@ -11,6 +11,7 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(false);
   const [error, setError] = useState('');
   
   // Google Auth hook
@@ -91,6 +92,51 @@ const Login = () => {
       console.error('Login error:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAdminLogin = async () => {
+    setIsAdminLoading(true);
+    setError('');
+
+    try {
+      // Call the backend API for admin login
+      const response = await fetch('http://localhost:8000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: 'admin@dennislaw.com', // Default admin email
+          password: 'admin123' // Default admin password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store auth state
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userEmail', data.user.email);
+        localStorage.setItem('userName', data.user.name || data.user.email.split('@')[0]);
+        localStorage.setItem('accessToken', data.access_token);
+        localStorage.setItem('userData', JSON.stringify(data.user));
+        localStorage.setItem('authProvider', 'email');
+        localStorage.setItem('isAdmin', data.user.is_admin ? 'true' : 'false');
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('authStateChanged'));
+        
+        // Redirect directly to admin dashboard
+        navigate('/admin');
+      } else {
+        setError('Admin login failed. Please check admin credentials.');
+      }
+    } catch (err) {
+      setError('Admin login failed. Please try again.');
+      console.error('Admin login error:', err);
+    } finally {
+      setIsAdminLoading(false);
     }
   };
 
@@ -222,6 +268,39 @@ const Login = () => {
               </button>
             </div>
           </form>
+
+          {/* Admin Login Section */}
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-slate-500">Admin Access</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={handleAdminLogin}
+                disabled={isAdminLoading}
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isAdminLoading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Signing in as Admin...
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Login as Admin
+                  </div>
+                )}
+              </button>
+            </div>
+          </div>
 
           {/* Google Sign-In Section */}
           <div className="mt-6">
