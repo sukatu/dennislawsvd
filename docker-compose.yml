@@ -33,7 +33,7 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
       CORS_ORIGINS: https://${DOMAIN_NAME},http://localhost:3000
       REACT_APP_GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
-      DEBUG: False
+      DEBUG: "False"
     ports:
       - "8000:8000"
     depends_on:
