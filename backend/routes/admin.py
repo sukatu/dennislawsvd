@@ -19,6 +19,8 @@ from models.payment import Payment
 from models.notification import Notification
 from models.security import SecurityEvent, ApiKey
 from models.settings import Settings
+from models.logs import AccessLog, ActivityLog, AuditLog, ErrorLog, SecurityLog, LogLevel, ActivityType
+from services.logging_service import LoggingService
 from services.case_metadata_service import CaseMetadataService
 from services.simple_case_processing_service import SimpleCaseProcessingService
 from services.document_processing_service import DocumentProcessingService
@@ -969,6 +971,340 @@ async def get_google_maps_api_key(db: Session = Depends(get_db)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching Google Maps API key: {str(e)}")
+
+# Logging Management
+@router.get("/logs/access")
+async def get_access_logs(
+    user_id: Optional[int] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Get access logs with filtering"""
+    try:
+        logging_service = LoggingService(db)
+        
+        start_dt = None
+        end_dt = None
+        if start_date:
+            start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        if end_date:
+            end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        
+        logs = logging_service.get_access_logs(
+            user_id=user_id,
+            limit=limit,
+            offset=offset,
+            start_date=start_dt,
+            end_date=end_dt
+        )
+        
+        return {
+            "logs": [
+                {
+                    "id": log.id,
+                    "user_id": log.user_id,
+                    "session_id": log.session_id,
+                    "ip_address": log.ip_address,
+                    "user_agent": log.user_agent,
+                    "method": log.method,
+                    "url": log.url,
+                    "endpoint": log.endpoint,
+                    "status_code": log.status_code,
+                    "response_time": log.response_time,
+                    "request_size": log.request_size,
+                    "response_size": log.response_size,
+                    "referer": log.referer,
+                    "country": log.country,
+                    "city": log.city,
+                    "device_type": log.device_type,
+                    "browser": log.browser,
+                    "os": log.os,
+                    "created_at": log.created_at.isoformat()
+                } for log in logs
+            ],
+            "total": len(logs),
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching access logs: {str(e)}")
+
+@router.get("/logs/activity")
+async def get_activity_logs(
+    user_id: Optional[int] = Query(None),
+    activity_type: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Get activity logs with filtering"""
+    try:
+        logging_service = LoggingService(db)
+        
+        activity_type_enum = None
+        if activity_type:
+            try:
+                activity_type_enum = ActivityType(activity_type.upper())
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid activity type")
+        
+        start_dt = None
+        end_dt = None
+        if start_date:
+            start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        if end_date:
+            end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        
+        logs = logging_service.get_activity_logs(
+            user_id=user_id,
+            activity_type=activity_type_enum,
+            limit=limit,
+            offset=offset,
+            start_date=start_dt,
+            end_date=end_dt
+        )
+        
+        return {
+            "logs": [
+                {
+                    "id": log.id,
+                    "user_id": log.user_id,
+                    "session_id": log.session_id,
+                    "activity_type": log.activity_type.value,
+                    "action": log.action,
+                    "description": log.description,
+                    "resource_type": log.resource_type,
+                    "resource_id": log.resource_id,
+                    "old_values": log.old_values,
+                    "new_values": log.new_values,
+                    "ip_address": log.ip_address,
+                    "user_agent": log.user_agent,
+                    "log_metadata": log.log_metadata,
+                    "severity": log.severity.value,
+                    "created_at": log.created_at.isoformat()
+                } for log in logs
+            ],
+            "total": len(logs),
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching activity logs: {str(e)}")
+
+@router.get("/logs/audit")
+async def get_audit_logs(
+    user_id: Optional[int] = Query(None),
+    table_name: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Get audit logs with filtering"""
+    try:
+        logging_service = LoggingService(db)
+        
+        start_dt = None
+        end_dt = None
+        if start_date:
+            start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        if end_date:
+            end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        
+        logs = logging_service.get_audit_logs(
+            user_id=user_id,
+            table_name=table_name,
+            limit=limit,
+            offset=offset,
+            start_date=start_dt,
+            end_date=end_dt
+        )
+        
+        return {
+            "logs": [
+                {
+                    "id": log.id,
+                    "user_id": log.user_id,
+                    "session_id": log.session_id,
+                    "table_name": log.table_name,
+                    "record_id": log.record_id,
+                    "action": log.action,
+                    "field_name": log.field_name,
+                    "old_value": log.old_value,
+                    "new_value": log.new_value,
+                    "ip_address": log.ip_address,
+                    "user_agent": log.user_agent,
+                    "created_at": log.created_at.isoformat()
+                } for log in logs
+            ],
+            "total": len(logs),
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching audit logs: {str(e)}")
+
+@router.get("/logs/errors")
+async def get_error_logs(
+    user_id: Optional[int] = Query(None),
+    severity: Optional[str] = Query(None),
+    resolved: Optional[bool] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Get error logs with filtering"""
+    try:
+        logging_service = LoggingService(db)
+        
+        severity_enum = None
+        if severity:
+            try:
+                severity_enum = LogLevel(severity.upper())
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid severity level")
+        
+        start_dt = None
+        end_dt = None
+        if start_date:
+            start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        if end_date:
+            end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        
+        logs = logging_service.get_error_logs(
+            user_id=user_id,
+            severity=severity_enum,
+            resolved=resolved,
+            limit=limit,
+            offset=offset,
+            start_date=start_dt,
+            end_date=end_dt
+        )
+        
+        return {
+            "logs": [
+                {
+                    "id": log.id,
+                    "user_id": log.user_id,
+                    "session_id": log.session_id,
+                    "error_type": log.error_type,
+                    "error_message": log.error_message,
+                    "stack_trace": log.stack_trace,
+                    "url": log.url,
+                    "method": log.method,
+                    "status_code": log.status_code,
+                    "ip_address": log.ip_address,
+                    "user_agent": log.user_agent,
+                    "log_metadata": log.log_metadata,
+                    "severity": log.severity.value,
+                    "resolved": log.resolved,
+                    "resolved_at": log.resolved_at.isoformat() if log.resolved_at else None,
+                    "resolved_by": log.resolved_by,
+                    "created_at": log.created_at.isoformat()
+                } for log in logs
+            ],
+            "total": len(logs),
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching error logs: {str(e)}")
+
+@router.get("/logs/security")
+async def get_security_logs(
+    user_id: Optional[int] = Query(None),
+    event_type: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    blocked: Optional[bool] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Get security logs with filtering"""
+    try:
+        logging_service = LoggingService(db)
+        
+        severity_enum = None
+        if severity:
+            try:
+                severity_enum = LogLevel(severity.upper())
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid severity level")
+        
+        start_dt = None
+        end_dt = None
+        if start_date:
+            start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        if end_date:
+            end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        
+        logs = logging_service.get_security_logs(
+            user_id=user_id,
+            event_type=event_type,
+            severity=severity_enum,
+            blocked=blocked,
+            limit=limit,
+            offset=offset,
+            start_date=start_dt,
+            end_date=end_dt
+        )
+        
+        return {
+            "logs": [
+                {
+                    "id": log.id,
+                    "user_id": log.user_id,
+                    "session_id": log.session_id,
+                    "event_type": log.event_type,
+                    "description": log.description,
+                    "severity": log.severity.value,
+                    "ip_address": log.ip_address,
+                    "user_agent": log.user_agent,
+                    "country": log.country,
+                    "city": log.city,
+                    "log_metadata": log.log_metadata,
+                    "blocked": log.blocked,
+                    "created_at": log.created_at.isoformat()
+                } for log in logs
+            ],
+            "total": len(logs),
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching security logs: {str(e)}")
+
+@router.get("/logs/stats")
+async def get_log_stats(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Get logging statistics"""
+    try:
+        logging_service = LoggingService(db)
+        
+        start_dt = None
+        end_dt = None
+        if start_date:
+            start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        if end_date:
+            end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        
+        stats = logging_service.get_log_stats(start_dt, end_dt)
+        return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching log stats: {str(e)}")
 
 # Include the new admin route modules
 router.include_router(admin_people.router, prefix="/people", tags=["admin-people"])

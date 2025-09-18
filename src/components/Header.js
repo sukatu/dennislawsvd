@@ -564,21 +564,13 @@ const Header = () => {
                       {/* Menu Items */}
                       <div className="py-2">
                         <Link
-                          to="/profile"
+                          to="/settings"
                           className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
-                          <User className="h-4 w-4" />
-                          Profile
+                          <Settings className="h-4 w-4" />
+                          Settings
                         </Link>
-              <Link
-                to="/settings"
-                          className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                          onClick={() => setIsUserMenuOpen(false)}
-              >
-                <Settings className="h-4 w-4" />
-                Settings
-              </Link>
                         <div className="border-t border-slate-200 dark:border-slate-700 my-2"></div>
               <button
                 onClick={handleLogout}

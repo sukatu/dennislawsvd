@@ -89,6 +89,12 @@ class User(Base):
     api_keys = relationship("ApiKey", back_populates="user")
     login_sessions = relationship("LoginSession", back_populates="user")
     user_roles = relationship("UserRole", foreign_keys="UserRole.user_id", back_populates="user")
+    # Logging relationships
+    access_logs = relationship("AccessLog", back_populates="user")
+    activity_logs = relationship("ActivityLog", back_populates="user")
+    audit_logs = relationship("AuditLog", back_populates="user")
+    error_logs = relationship("ErrorLog", foreign_keys="ErrorLog.user_id", back_populates="user")
+    security_logs = relationship("SecurityLog", back_populates="user")
     # cases = relationship("Case", back_populates="user")
     # searches = relationship("Search", back_populates="user")
     

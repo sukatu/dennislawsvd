@@ -64,6 +64,8 @@ import SubscriptionRequests from '../components/admin/SubscriptionRequests';
 import TenantManagement from '../components/admin/TenantManagement';
 import CourtManagement from '../components/admin/CourtManagement';
 import ProfileManagement from '../components/admin/ProfileManagement';
+import LogsViewer from '../components/LogsViewer';
+import { apiGet } from '../utils/api';
 
 ChartJS.register(
   CategoryScale,
@@ -175,27 +177,16 @@ const AdminDashboard = () => {
 
   const loadDashboardStats = async () => {
     try {
-      // Load statistics from various endpoints
-      const [adminRes, usersRes, casesRes, peopleRes, banksRes, insuranceRes, companiesRes, paymentsRes] = await Promise.all([
-        fetch('http://localhost:8000/api/admin/stats'),
-        fetch('http://localhost:8000/api/admin/users/stats'),
-        fetch('http://localhost:8000/api/admin/cases/stats'),
-        fetch('http://localhost:8000/api/admin/people/stats'),
-        fetch('http://localhost:8000/api/admin/banks/stats'),
-        fetch('http://localhost:8000/api/admin/insurance/stats'),
-        fetch('http://localhost:8000/api/admin/companies/stats'),
-        fetch('http://localhost:8000/api/admin/payments/stats')
-      ]);
-
+      // Load statistics from various endpoints using authenticated API
       const [adminData, usersData, casesData, peopleData, banksData, insuranceData, companiesData, paymentsData] = await Promise.all([
-        adminRes.json(),
-        usersRes.json(),
-        casesRes.json(),
-        peopleRes.json(),
-        banksRes.json(),
-        insuranceRes.json(),
-        companiesRes.json(),
-        paymentsRes.json()
+        apiGet('/api/admin/stats'),
+        apiGet('/api/admin/users/stats'),
+        apiGet('/api/admin/cases/stats'),
+        apiGet('/api/admin/people/stats'),
+        apiGet('/api/admin/banks/stats'),
+        apiGet('/api/admin/insurance/stats'),
+        apiGet('/api/admin/companies/stats'),
+        apiGet('/api/admin/payments/stats')
       ]);
 
       // Calculate additional metrics
@@ -354,6 +345,7 @@ const AdminDashboard = () => {
     { id: 'subscription-requests', name: 'Subscription Requests', icon: Clock },
     { id: 'tenants', name: 'Organizations', icon: Globe },
     { id: 'courts', name: 'Courts', icon: MapPin },
+    { id: 'logs', name: 'System Logs', icon: Activity },
     { id: 'roles', name: 'Roles & Permissions', icon: Shield },
     { id: 'settings', name: 'Settings', icon: Settings }
   ];
@@ -386,6 +378,8 @@ const AdminDashboard = () => {
         return <TenantManagement />;
       case 'courts':
         return <CourtManagement />;
+      case 'logs':
+        return <LogsViewer />;
       case 'roles':
         return <RolesPermissionsManagement />;
       case 'settings':
