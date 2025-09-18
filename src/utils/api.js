@@ -2,7 +2,7 @@
  * API utility functions for making authenticated requests
  */
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 /**
  * Get the stored access token from localStorage
@@ -71,8 +71,14 @@ export const apiRequest = async (endpoint, options = {}) => {
 /**
  * Make a GET request
  */
-export const apiGet = (endpoint, options = {}) => {
-  return apiRequest(endpoint, { method: 'GET', ...options });
+export const apiGet = async (endpoint, options = {}) => {
+  const { response, data } = await apiRequest(endpoint, { method: 'GET', ...options });
+  
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+  
+  return data;
 };
 
 /**

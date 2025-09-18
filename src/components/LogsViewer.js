@@ -63,6 +63,7 @@ const LogsViewer = () => {
       });
 
       const data = await apiGet(`/api/admin/logs/${activeTab}?${params}`);
+      
       setLogs(data.logs || []);
     } catch (error) {
       console.error('Error loading logs:', error);

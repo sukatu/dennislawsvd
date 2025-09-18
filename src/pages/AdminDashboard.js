@@ -145,7 +145,8 @@ const AdminDashboard = () => {
           const user = JSON.parse(userData);
           setUserInfo(user);
           // Check if user is admin (you can modify this logic based on your user model)
-          setIsAdmin(user.role === 'admin' || user.is_admin === true);
+          const isAdminUser = user.role === 'admin' || user.is_admin === true;
+          setIsAdmin(isAdminUser);
         } catch (error) {
           console.error('Error parsing user data:', error);
         }
