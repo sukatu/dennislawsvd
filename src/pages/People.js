@@ -573,6 +573,7 @@ const People = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Search results:', data);
+        console.log('Number of people found:', data.people?.length || 0);
         
         const transformedResults = (data.people || []).map(person => ({
           id: person.id,
@@ -585,6 +586,7 @@ const People = () => {
           location: person.region || 'N/A'
         }));
 
+        console.log('Transformed search results:', transformedResults);
         setFilteredResults(transformedResults);
         setTotalResults(data.total || 0);
         setTotalPages(data.total_pages || 0);
@@ -1174,11 +1176,108 @@ const People = () => {
 
           {/* Results Grid/List */}
           <div className="p-6">
-            {filteredResults.length === 0 && !selectedLetter ? (
+            {filteredResults.length === 0 && !selectedLetter && !searchQuery ? (
               <div className="text-center py-12">
                 <User className="h-12 w-12 text-slate-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-slate-900 mb-2">No people found</h3>
                 <p className="text-slate-500">Try adjusting your search criteria or filters</p>
+              </div>
+            ) : searchQuery && filteredResults.length === 0 ? (
+              <div className="text-center py-12">
+                <User className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No search results found</h3>
+                <p className="text-slate-500">No people found for "{searchQuery}". Try a different search term.</p>
+              </div>
+            ) : searchQuery ? (
+              // Show search results
+              <div className="space-y-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-blue-800">
+                        Search results for "{searchQuery}"
+                      </span>
+                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                        {filteredResults.length} {filteredResults.length === 1 ? 'person' : 'people'} found
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                {filteredResults.length > 0 ? (
+                  <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+                    {filteredResults.map((person) => (
+                      <div
+                        key={person.id}
+                        className={`bg-white border border-slate-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer ${
+                          viewMode === 'list' ? 'flex items-center p-4' : 'p-6'
+                        }`}
+                        onClick={() => navigate(`/person-profile/${person.id}?source=search`)}
+                      >
+                        {viewMode === 'grid' ? (
+                          <>
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center">
+                                  <User className="h-6 w-6 text-slate-600" />
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-slate-900">{person.name}</h3>
+                                  <p className="text-sm text-slate-500">ID: {person.idNumber}</p>
+                                </div>
+                              </div>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ring-1 ${getRiskColor(person.riskLevel)}`}>
+                                {person.riskLevel} Risk
+                              </span>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-slate-500">Cases:</span>
+                                <span className="text-slate-900">{person.cases}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-slate-500">Location:</span>
+                                <span className="text-slate-900">{person.location}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-slate-500">Risk Score:</span>
+                                <span className="text-slate-900">{person.riskScore}</span>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center mr-4">
+                              <User className="h-6 w-6 text-slate-600" />
+                            </div>
+                            <div className="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4">
+                              <div>
+                                <h3 className="font-semibold text-slate-900">{person.name}</h3>
+                                <p className="text-sm text-slate-500">ID: {person.idNumber}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-slate-500">Cases</p>
+                                <p className="text-slate-900">{person.cases}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-slate-500">Location</p>
+                                <p className="text-slate-900">{person.location}</p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm text-slate-500">Risk Level</p>
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ring-1 ${getRiskColor(person.riskLevel)}`}>
+                                    {person.riskLevel}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             ) : selectedLetter ? (
               // Show filtered results for selected letter
