@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -25,46 +26,52 @@ import Companies from './pages/Companies';
 import CompanyDetail from './pages/CompanyDetail';
 import CompanyProfile from './pages/CompanyProfile';
 import Settings from './pages/Settings';
+import Notifications from './pages/Notifications';
 import EnhancedSearchResults from './pages/EnhancedSearchResults';
 import AdminDashboard from './pages/AdminDashboard';
+import Subscribe from './pages/Subscribe';
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-slate-50 text-slate-900">
-        <Header />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/people-results" element={<PeopleResults />} />
-            <Route path="/people" element={<People />} />
-            <Route path="/person-profile/:id" element={<PersonProfile />} />
-            <Route path="/case-detail" element={<CaseDetail />} />
-            <Route path="/case-details/:caseId" element={<CaseDetails />} />
-            <Route path="/case-search" element={<CaseSearchResults />} />
-            <Route path="/enhanced-search" element={<EnhancedSearchResults />} />
-            <Route path="/results" element={<Results />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/banks" element={<Banks />} />
-            <Route path="/bank-detail/:id" element={<BankDetail />} />
-            <Route path="/insurance" element={<Insurance />} />
-            <Route path="/insurance-detail" element={<InsuranceDetail />} />
-            <Route path="/insurance-profile/:id" element={<InsuranceProfile />} />
-            <Route path="/companies" element={<Companies />} />
-            <Route path="/company-details/:id" element={<CompanyDetail />} />
-            <Route path="/company-profile/:id" element={<CompanyProfile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+          <Header />
+          <main>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/people-results" element={<PeopleResults />} />
+              <Route path="/people" element={<People />} />
+              <Route path="/person-profile/:id" element={<PersonProfile />} />
+              <Route path="/case-detail" element={<CaseDetail />} />
+              <Route path="/case-details/:caseId" element={<CaseDetails />} />
+              <Route path="/case-search" element={<CaseSearchResults />} />
+              <Route path="/enhanced-search" element={<EnhancedSearchResults />} />
+              <Route path="/results" element={<Results />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/banks" element={<Banks />} />
+              <Route path="/bank-detail/:id" element={<BankDetail />} />
+              <Route path="/insurance" element={<Insurance />} />
+              <Route path="/insurance-detail" element={<InsuranceDetail />} />
+              <Route path="/insurance-profile/:id" element={<InsuranceProfile />} />
+              <Route path="/companies" element={<Companies />} />
+              <Route path="/company-details/:id" element={<CompanyDetail />} />
+              <Route path="/company-profile/:id" element={<CompanyProfile />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/subscribe" element={<Subscribe />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc, and_
 from typing import List, Optional
 from datetime import datetime, timedelta
 import json
+import os
+import uuid
 
 from database import get_db
 from models.user import User
@@ -18,6 +20,7 @@ from models.notification import Notification
 from models.security import SecurityEvent, ApiKey
 from services.case_metadata_service import CaseMetadataService
 from services.simple_case_processing_service import SimpleCaseProcessingService
+from services.document_processing_service import DocumentProcessingService
 from schemas.admin import (
     AdminStatsResponse,
     UserListResponse,
@@ -671,6 +674,140 @@ async def delete_case(case_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error deleting case: {str(e)}")
+
+@router.post("/cases/upload")
+async def upload_case(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Upload a case document and create a case record with AI analysis"""
+    try:
+        # Validate file type
+        allowed_types = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+        if file.content_type not in allowed_types:
+            raise HTTPException(status_code=400, detail="File type not supported. Please upload PDF or Word documents.")
+        
+        # Validate file size (10MB max)
+        file_size = 0
+        content = await file.read()
+        file_size = len(content)
+        if file_size > 10 * 1024 * 1024:  # 10MB
+            raise HTTPException(status_code=400, detail="File size too large. Maximum size is 10MB.")
+        
+        # Create uploads directory if it doesn't exist
+        upload_dir = "uploads/cases"
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Generate unique filename
+        file_extension = os.path.splitext(file.filename)[1]
+        unique_filename = f"{uuid.uuid4()}{file_extension}"
+        file_path = os.path.join(upload_dir, unique_filename)
+        
+        # Save file
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)
+        
+        # Process document with AI
+        document_processor = DocumentProcessingService()
+        try:
+            # Extract and analyze document content
+            extracted_data = document_processor.process_document(file_path, file.filename)
+            
+            # Create case record with extracted data
+            case_data = {
+                "title": extracted_data.get('title', f"Uploaded Case - {file.filename}"),
+                "suit_reference_number": extracted_data.get('suit_reference_number', f"UPLOAD-{uuid.uuid4().hex[:8].upper()}"),
+                "date": extracted_data.get('date', datetime.now().date()),
+                "file_url": file_path,
+                "status": 1,  # 1 = pending, 2 = active, 3 = closed, 4 = dismissed
+                "court_type": extracted_data.get('court_type', 'Unknown'),
+                "court_division": extracted_data.get('court_division', 'Unknown'),
+                "protagonist": extracted_data.get('protagonist', 'Unknown'),
+                "antagonist": extracted_data.get('antagonist', 'Unknown'),
+                "presiding_judge": extracted_data.get('presiding_judge', 'Unknown'),
+                "statutes_cited": extracted_data.get('statutes_cited', ''),
+                "cases_cited": extracted_data.get('cases_cited', ''),
+                "lawyers": extracted_data.get('lawyers', ''),
+                "commentary": extracted_data.get('commentary', f"Case uploaded from file: {file.filename}"),
+                "headnotes": extracted_data.get('headnotes', ''),
+                "town": extracted_data.get('town', 'Unknown'),
+                "region": extracted_data.get('region', 'Unknown'),
+                "dl_citation_no": "",
+                "judgement": extracted_data.get('judgement', ''),
+                "year": extracted_data.get('year', datetime.now().year),
+                "type": "document_upload",
+                "firebase_url": "",
+                "summernote": extracted_data.get('case_summary', ''),
+                "case_summary": extracted_data.get('case_summary', ''),
+                "area_of_law": extracted_data.get('area_of_law', ''),
+                "keywords_phrases": extracted_data.get('keywords_phrases', ''),
+                "conclusion": extracted_data.get('conclusion', ''),
+                "created_at": datetime.now(),
+                "updated_at": datetime.now()
+            }
+            
+        except Exception as e:
+            # Fallback to basic case data if document processing fails
+            print(f"Document processing failed: {e}, using fallback data")
+            case_data = {
+                "title": f"Uploaded Case - {file.filename}",
+                "suit_reference_number": f"UPLOAD-{uuid.uuid4().hex[:8].upper()}",
+                "date": datetime.now().date(),
+                "file_url": file_path,
+                "status": 1,
+                "court_type": "Unknown",
+                "court_division": "Unknown",
+                "protagonist": "Unknown",
+                "antagonist": "Unknown",
+                "presiding_judge": "Unknown",
+                "statutes_cited": "",
+                "cases_cited": "",
+                "lawyers": "",
+                "commentary": f"Case uploaded from file: {file.filename}",
+                "headnotes": "",
+                "town": "Unknown",
+                "region": "Unknown",
+                "dl_citation_no": "",
+                "judgement": "",
+                "year": datetime.now().year,
+                "type": "document_upload",
+                "firebase_url": "",
+                "summernote": "",
+                "created_at": datetime.now(),
+                "updated_at": datetime.now()
+            }
+        
+        # Create case in database
+        case = ReportedCases(**case_data)
+        db.add(case)
+        db.commit()
+        db.refresh(case)
+        
+        # Process the case with AI services for additional analysis
+        try:
+            processor = SimpleCaseProcessingService(db)
+            processor.process_case_with_analytics(case.id)
+        except Exception as e:
+            # Log error but don't fail the upload
+            print(f"Error processing uploaded case {case.id}: {str(e)}")
+        
+        return {
+            "message": "Case uploaded and analyzed successfully",
+            "case_id": case.id,
+            "filename": file.filename,
+            "file_path": file_path,
+            "extracted_data": {
+                "title": case_data.get('title'),
+                "suit_reference_number": case_data.get('suit_reference_number'),
+                "parties": f"{case_data.get('protagonist')} vs {case_data.get('antagonist')}",
+                "court": case_data.get('court_type'),
+                "judge": case_data.get('presiding_judge'),
+                "area_of_law": case_data.get('area_of_law')
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error uploading case: {str(e)}")
 
 # Company Management - COMMENTED OUT (using admin_companies.py instead)
 # @router.get("/companies", response_model=CompanyListResponse)

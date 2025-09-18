@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Enum, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from database import Base
@@ -47,6 +47,10 @@ class User(Base):
     status = Column(Enum(UserStatus), default=UserStatus.PENDING, nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False)
     
+    # Multi-tenant support
+    tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=True, index=True)
+    is_tenant_admin = Column(Boolean, default=False, nullable=False)
+    
     # Profile information
     profile_picture = Column(String(500), nullable=True)
     bio = Column(Text, nullable=True)
@@ -74,6 +78,8 @@ class User(Base):
     locked_until = Column(DateTime, nullable=True)
     
     # Relationships
+    tenant = relationship("Tenant", foreign_keys=[tenant_id], back_populates="users")
+    admin_tenants = relationship("Tenant", foreign_keys="Tenant.admin_user_id", back_populates="admin_user")
     subscription = relationship("Subscription", back_populates="user", uselist=False)
     payments = relationship("Payment", back_populates="user")
     notifications = relationship("Notification", back_populates="user")
@@ -82,6 +88,7 @@ class User(Base):
     two_factor_auth = relationship("TwoFactorAuth", back_populates="user", uselist=False)
     api_keys = relationship("ApiKey", back_populates="user")
     login_sessions = relationship("LoginSession", back_populates="user")
+    user_roles = relationship("UserRole", foreign_keys="UserRole.user_id", back_populates="user")
     # cases = relationship("Case", back_populates="user")
     # searches = relationship("Search", back_populates="user")
     

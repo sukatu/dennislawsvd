@@ -19,7 +19,7 @@ class PeopleBase(BaseModel):
     country: Optional[str] = Field(None, max_length=100)
     postal_code: Optional[str] = Field(None, max_length=20)
     risk_level: Optional[str] = Field(None, max_length=20)
-    risk_score: Optional[float] = Field(None, ge=0, le=100)
+    risk_score: Optional[float] = Field(None, ge=0, le=200)
     case_count: Optional[int] = Field(None, ge=0)
     case_types: Optional[List[str]] = None
     court_records: Optional[List[Dict[str, Any]]] = None
@@ -89,7 +89,7 @@ class PeopleUpdate(BaseModel):
     country: Optional[str] = Field(None, max_length=100)
     postal_code: Optional[str] = Field(None, max_length=20)
     risk_level: Optional[str] = Field(None, max_length=20)
-    risk_score: Optional[float] = Field(None, ge=0, le=100)
+    risk_score: Optional[float] = Field(None, ge=0, le=200)
     case_count: Optional[int] = Field(None, ge=0)
     case_types: Optional[List[str]] = None
     court_records: Optional[List[Dict[str, Any]]] = None

@@ -563,16 +563,9 @@ const People = () => {
     if (!searchQuery.trim()) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-
       setIsLoading(true);
       const response = await fetch(`http://localhost:8000/api/people/search?query=${encodeURIComponent(searchQuery)}&page=${currentPage}&limit=${itemsPerPage}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -610,29 +603,19 @@ const People = () => {
     const authStatus = localStorage.getItem('isAuthenticated') === 'true';
     const token = localStorage.getItem('accessToken');
     
-    setIsAuthenticated(authStatus && !!token);
+    // Allow search without authentication since API works without auth
+    setIsAuthenticated(true);
     
-    if (!authStatus || !token) {
-      console.log('User not authenticated. Please login to use search functionality.');
-    } else {
-      console.log('User authenticated, search functionality available');
-    }
+    console.log('Search functionality available');
   }, []);
 
   // Load all people when component mounts
   useEffect(() => {
     const loadAllPeople = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-          console.error('No authentication token found');
-          return;
-        }
-
         setIsLoading(true);
         const response = await fetch(`http://localhost:8000/api/people/search?page=${currentPage}&limit=${itemsPerPage}`, {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
@@ -821,14 +804,13 @@ const People = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                   <input
                     type="text"
-                      placeholder={isAuthenticated ? "Search for people, banks, or insurance companies..." : "Please login to search..."}
+                      placeholder="Search for people, banks, or insurance companies..."
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
                       setShowSuggestions(e.target.value.length > 0);
                     }}
-                      disabled={!isAuthenticated}
-                      className={`w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 ${!isAuthenticated ? 'bg-slate-100 cursor-not-allowed' : ''}`}
+                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
                 </div>
                 

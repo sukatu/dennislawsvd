@@ -215,6 +215,30 @@ class AIService:
             }
     
     @staticmethod
+    def generate_text(prompt: str, db: Session = None) -> str:
+        """
+        Generate text using OpenAI GPT
+        """
+        try:
+            client = get_openai_client(db)
+            
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a legal AI assistant specialized in analyzing legal documents and extracting structured information."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=2000,
+                temperature=0.3
+            )
+            
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            print(f"Error generating text: {e}")
+            return ""
+
+    @staticmethod
     def generate_legal_keywords(case_data: Dict[str, Any], db: Session = None) -> str:
         """
         Generate relevant legal keywords and phrases for the case

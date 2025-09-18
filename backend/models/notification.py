@@ -1,95 +1,115 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Enum, ForeignKey, JSON
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from database import Base
 import enum
+from database import Base
 
 class NotificationType(str, enum.Enum):
-    SYSTEM = "system"
-    SUBSCRIPTION = "subscription"
-    SECURITY = "security"
-    SEARCH = "search"
-    CASE_UPDATE = "case_update"
-    PAYMENT = "payment"
-    GENERAL = "general"
-
-class NotificationStatus(str, enum.Enum):
-    UNREAD = "unread"
-    READ = "read"
-    ARCHIVED = "archived"
+    SYSTEM = "SYSTEM"
+    SUBSCRIPTION = "SUBSCRIPTION"
+    SECURITY = "SECURITY"
+    SEARCH = "SEARCH"
+    CASE_UPDATE = "CASE_UPDATE"
+    PAYMENT = "PAYMENT"
+    GENERAL = "GENERAL"
 
 class NotificationPriority(str, enum.Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    URGENT = "urgent"
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    URGENT = "URGENT"
+
+class NotificationStatus(str, enum.Enum):
+    UNREAD = "UNREAD"
+    READ = "READ"
+    ARCHIVED = "ARCHIVED"
 
 class Notification(Base):
     __tablename__ = "notifications"
-    
+
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    
+    # User who receives the notification
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     
     # Notification content
     title = Column(String(255), nullable=False)
     message = Column(Text, nullable=False)
-    type = Column(Enum(NotificationType), nullable=False, default=NotificationType.GENERAL)
-    priority = Column(Enum(NotificationPriority), nullable=False, default=NotificationPriority.MEDIUM)
+    type = Column(Enum(NotificationType), default=NotificationType.GENERAL, nullable=False)
+    priority = Column(Enum(NotificationPriority), default=NotificationPriority.MEDIUM, nullable=False)
+    status = Column(Enum(NotificationStatus), default=NotificationStatus.UNREAD, nullable=False)
     
-    # Status and delivery
-    status = Column(Enum(NotificationStatus), nullable=False, default=NotificationStatus.UNREAD)
+    # Optional metadata
+    category = Column(String(100), nullable=True)  # e.g., 'subscription', 'cases', 'billing'
+    action_url = Column(String(500), nullable=True)  # URL to navigate to when clicked
+    notification_data = Column(JSON, nullable=True)  # Additional data as JSON
+    
+    # Email/SMS/Push flags
     is_email_sent = Column(Boolean, default=False, nullable=False)
     is_sms_sent = Column(Boolean, default=False, nullable=False)
     is_push_sent = Column(Boolean, default=False, nullable=False)
     
-    # Action and metadata
-    action_url = Column(String(500), nullable=True)  # URL to navigate to when clicked
-    action_text = Column(String(100), nullable=True)  # Text for action button
-    notification_metadata = Column(JSON, nullable=True)  # Additional data
+    # Additional fields
+    action_text = Column(String(100), nullable=True)
+    notification_metadata = Column(JSON, nullable=True)
     
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     read_at = Column(DateTime(timezone=True), nullable=True)
     archived_at = Column(DateTime(timezone=True), nullable=True)
+    expires_at = Column(DateTime(timezone=True), nullable=True)  # Optional expiration
     
     # Relationships
     user = relationship("User", back_populates="notifications")
+    
+    def __repr__(self):
+        return f"<Notification(id={self.id}, user_id={self.user_id}, title='{self.title}')>"
+    
+    @property
+    def is_read(self):
+        return self.status == NotificationStatus.READ
+    
+    @property
+    def is_expired(self):
+        return self.expires_at and self.expires_at < func.now()
+    
+    def mark_as_read(self):
+        self.status = NotificationStatus.READ
+        self.read_at = func.now()
+    
+    def mark_as_unread(self):
+        self.status = NotificationStatus.UNREAD
+        self.read_at = None
+    
+    def archive(self):
+        self.status = NotificationStatus.ARCHIVED
 
 class NotificationPreference(Base):
     __tablename__ = "notification_preferences"
-    
+
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True, unique=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True, index=True)
     
-    # Email preferences
-    email_enabled = Column(Boolean, default=True, nullable=False)
-    email_system = Column(Boolean, default=True, nullable=False)
-    email_subscription = Column(Boolean, default=True, nullable=False)
-    email_security = Column(Boolean, default=True, nullable=False)
-    email_search = Column(Boolean, default=False, nullable=False)
-    email_case_updates = Column(Boolean, default=False, nullable=False)
-    email_payments = Column(Boolean, default=True, nullable=False)
+    # Email notifications
+    email_notifications = Column(Boolean, default=True, nullable=False)
+    email_success = Column(Boolean, default=True, nullable=False)
+    email_info = Column(Boolean, default=True, nullable=False)
+    email_warning = Column(Boolean, default=True, nullable=False)
+    email_error = Column(Boolean, default=True, nullable=False)
     
-    # SMS preferences
-    sms_enabled = Column(Boolean, default=False, nullable=False)
-    sms_system = Column(Boolean, default=True, nullable=False)
-    sms_subscription = Column(Boolean, default=True, nullable=False)
-    sms_security = Column(Boolean, default=True, nullable=False)
-    sms_payments = Column(Boolean, default=True, nullable=False)
+    # In-app notifications
+    in_app_notifications = Column(Boolean, default=True, nullable=False)
+    in_app_success = Column(Boolean, default=True, nullable=False)
+    in_app_info = Column(Boolean, default=True, nullable=False)
+    in_app_warning = Column(Boolean, default=True, nullable=False)
+    in_app_error = Column(Boolean, default=True, nullable=False)
     
-    # Push preferences
-    push_enabled = Column(Boolean, default=True, nullable=False)
-    push_system = Column(Boolean, default=True, nullable=False)
-    push_subscription = Column(Boolean, default=True, nullable=False)
-    push_security = Column(Boolean, default=True, nullable=False)
-    push_search = Column(Boolean, default=False, nullable=False)
-    push_case_updates = Column(Boolean, default=False, nullable=False)
-    push_payments = Column(Boolean, default=True, nullable=False)
-    
-    # Frequency settings
-    digest_frequency = Column(String(20), default="daily", nullable=False)  # daily, weekly, never
-    quiet_hours_start = Column(String(5), nullable=True)  # HH:MM format
-    quiet_hours_end = Column(String(5), nullable=True)   # HH:MM format
+    # Category preferences
+    subscription_notifications = Column(Boolean, default=True, nullable=False)
+    case_notifications = Column(Boolean, default=True, nullable=False)
+    billing_notifications = Column(Boolean, default=True, nullable=False)
+    system_notifications = Column(Boolean, default=True, nullable=False)
+    security_notifications = Column(Boolean, default=True, nullable=False)
     
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -97,3 +117,6 @@ class NotificationPreference(Base):
     
     # Relationships
     user = relationship("User", back_populates="notification_preferences")
+    
+    def __repr__(self):
+        return f"<NotificationPreference(user_id={self.user_id})>"

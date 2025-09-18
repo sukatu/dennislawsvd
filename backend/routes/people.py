@@ -37,9 +37,9 @@ async def search_people(
     gender: Optional[str] = Query(None, description="Gender filter"),
     nationality: Optional[str] = Query(None, description="Nationality filter"),
     is_verified: Optional[bool] = Query(None, description="Verification status filter"),
-    status: Optional[str] = Query(None, description="Status filter"),
-    min_risk_score: Optional[float] = Query(None, ge=0, le=100, description="Minimum risk score"),
-    max_risk_score: Optional[float] = Query(None, ge=0, le=100, description="Maximum risk score"),
+    person_status: Optional[str] = Query(None, description="Status filter"),
+    min_risk_score: Optional[float] = Query(None, ge=0, le=200, description="Minimum risk score"),
+    max_risk_score: Optional[float] = Query(None, ge=0, le=200, description="Maximum risk score"),
     min_case_count: Optional[int] = Query(None, ge=0, description="Minimum case count"),
     max_case_count: Optional[int] = Query(None, ge=0, description="Maximum case count"),
     sort_by: str = Query("full_name", description="Sort field"),
@@ -108,8 +108,8 @@ async def search_people(
             filters.append(func.lower(People.nationality).like(f"%{nationality.lower()}%"))
         if is_verified is not None:
             filters.append(People.is_verified == is_verified)
-        if status:
-            filters.append(People.status == status)
+        if person_status:
+            filters.append(People.status == person_status)
         if min_risk_score is not None:
             filters.append(People.risk_score >= min_risk_score)
         if max_risk_score is not None:

@@ -25,6 +25,7 @@ from routes import subscription
 from routes import notifications
 from routes import security
 from routes import admin
+from routes import tenant
 from config import settings
 
 # Application lifespan
@@ -76,6 +77,7 @@ app.include_router(subscription.router, prefix="/api/subscription", tags=["subsc
 app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
 app.include_router(security.router, prefix="/api/security", tags=["security"])
 app.include_router(admin.router, tags=["admin"])
+app.include_router(tenant.router, prefix="/api/tenant", tags=["tenant"])
 
 # Root endpoint
 @app.get("/")

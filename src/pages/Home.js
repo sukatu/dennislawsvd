@@ -171,21 +171,22 @@ const Home = () => {
   ];
 
   return (
-    <div>
+    <div className="bg-white dark:bg-slate-900 transition-colors duration-200">
       {/* Hero Section */}
-      <section className="bg-white">
+      <section className="bg-white dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-6">
               Search People Names
             </h1>
-            <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
+            
+            <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto">
               Search our comprehensive database of people by name. Get instant access to detailed profiles, legal history, and case information.
             </p>
             
             {/* Authentication Notice */}
             {!isAuthenticated && (
-              <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4 max-w-2xl mx-auto">
+              <div className="mb-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 max-w-2xl mx-auto">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
@@ -193,11 +194,11 @@ const Home = () => {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-amber-800">
+                    <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
                       Authentication Required
                     </h3>
-                    <div className="mt-2 text-sm text-amber-700">
-                      <p>Please <a href="/login" className="font-medium underline text-amber-800 hover:text-amber-900">login</a> to use the search functionality.</p>
+                    <div className="mt-2 text-sm text-amber-700 dark:text-amber-300">
+                      <p>Please <a href="/login" className="font-medium underline text-amber-800 dark:text-amber-200 hover:text-amber-900 dark:hover:text-amber-100">login</a> to use the search functionality.</p>
                     </div>
                   </div>
                 </div>
@@ -216,14 +217,14 @@ const Home = () => {
                       onChange={handleInputChange}
                       onFocus={() => searchQuery.length > 0 && setShowSuggestions(true)}
                       disabled={!isAuthenticated}
-                      className={`w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500 ${!isAuthenticated ? 'bg-slate-100 cursor-not-allowed' : ''}`}
+                      className={`w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-3 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500 ${!isAuthenticated ? 'bg-slate-100 dark:bg-slate-700 cursor-not-allowed' : ''}`}
                     />
                     
                     {/* Suggestions Dropdown */}
                     {showSuggestions && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                         {isLoadingSuggestions ? (
-                          <div className="px-4 py-3 text-sm text-slate-500 text-center">
+                          <div className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 text-center">
                             Loading suggestions...
                           </div>
                         ) : suggestions.length > 0 ? (
@@ -232,24 +233,24 @@ const Home = () => {
                               key={index}
                               type="button"
                               onClick={() => handleSuggestionClick(suggestion)}
-                              className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 last:border-b-0 transition-colors"
+                              className="w-full text-left px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-600 last:border-b-0 transition-colors"
                             >
                               <div className="flex items-center gap-3">
                                 <Users className="h-4 w-4 text-blue-500" />
                                 <div className="flex-1">
                                   <div className="font-medium">{suggestion.text || suggestion.name}</div>
                                   {suggestion.category && (
-                                    <div className="text-xs text-slate-500">{suggestion.category}</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">{suggestion.category}</div>
                                   )}
                                   {suggestion.city && (
-                                    <div className="text-xs text-slate-500">{suggestion.city} • {suggestion.occupation}</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">{suggestion.city} • {suggestion.occupation}</div>
                                   )}
                                 </div>
                               </div>
                             </button>
                           ))
                         ) : searchQuery.length > 1 ? (
-                          <div className="px-4 py-3 text-sm text-slate-500 text-center">
+                          <div className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 text-center">
                             No suggestions found
                           </div>
                         ) : null}
@@ -269,16 +270,16 @@ const Home = () => {
             {/* Quick Stats */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 max-w-2xl mx-auto">
               <div className="text-center">
-                <div className="text-2xl font-bold text-slate-900">464</div>
-                <div className="text-sm text-slate-600">Courts Connected</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white">464</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Courts Connected</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-slate-900">16</div>
-                <div className="text-sm text-slate-600">Regions Covered</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white">16</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Regions Covered</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-slate-900">Daily</div>
-                <div className="text-sm text-slate-600">Updated</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white">Daily</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Updated</div>
               </div>
             </div>
           </div>
@@ -286,21 +287,21 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="bg-slate-50">
+      <section className="bg-slate-50 dark:bg-slate-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900">Why Choose Dennislaw SVD?</h2>
-            <p className="mt-2 text-slate-600">Advanced features designed for legal professionals and researchers</p>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Why Choose Dennislaw SVD?</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Advanced features designed for legal professionals and researchers</p>
           </div>
           
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                <div className="h-12 w-12 rounded-lg bg-sky-100 flex items-center justify-center mb-4">
+              <div key={index} className="bg-white dark:bg-slate-700 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors duration-200">
+                <div className="h-12 w-12 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center mb-4">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">{feature.title}</h3>
-                <p className="text-slate-600">{feature.description}</p>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{feature.title}</h3>
+                <p className="text-slate-600 dark:text-slate-300">{feature.description}</p>
               </div>
             ))}
           </div>

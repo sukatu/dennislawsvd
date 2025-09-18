@@ -19,7 +19,9 @@ import {
   XCircle,
   Clock,
   X,
-  Save
+  Save,
+  Upload,
+  File
 } from 'lucide-react';
 
 // Case Form Component
@@ -410,8 +412,12 @@ const CaseManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingCase, setEditingCase] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [extractedData, setExtractedData] = useState(null);
   const [notification, setNotification] = useState(null);
   const [caseStats, setCaseStats] = useState({
     totalCases: 0,
@@ -525,6 +531,84 @@ const CaseManagement = () => {
   const handleCreateCase = () => {
     setEditingCase(null);
     setShowCreateModal(true);
+  };
+
+  const handleUploadCase = () => {
+    setUploadedFile(null);
+    setExtractedData(null);
+    setShowUploadModal(true);
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Check file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        setNotification({
+          type: 'error',
+          message: 'Please upload a PDF or Word document (.pdf, .doc, .docx)'
+        });
+        return;
+      }
+      
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setNotification({
+          type: 'error',
+          message: 'File size must be less than 10MB'
+        });
+        return;
+      }
+      
+      setUploadedFile(file);
+    }
+  };
+
+  const handleUploadSubmit = async () => {
+    if (!uploadedFile) {
+      setNotification({
+        type: 'error',
+        message: 'Please select a file to upload'
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
+      
+      const response = await fetch('http://localhost:8000/api/admin/cases/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setExtractedData(result.extracted_data);
+        setNotification({
+          type: 'success',
+          message: `Case uploaded and analyzed successfully! Case ID: ${result.case_id}`
+        });
+        // Don't close modal immediately, show extracted data first
+        loadCases(); // Refresh the cases list
+      } else {
+        const error = await response.json();
+        setNotification({
+          type: 'error',
+          message: error.detail || 'Failed to upload case'
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading case:', error);
+      setNotification({
+        type: 'error',
+        message: 'Failed to upload case'
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleEditCase = (caseItem) => {
@@ -648,13 +732,13 @@ const CaseManagement = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-white dark:bg-slate-900 min-h-screen transition-colors duration-200">
       {/* Notification */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
           notification.type === 'success' 
-            ? 'bg-green-100 border border-green-400 text-green-700' 
-            : 'bg-red-100 border border-red-400 text-red-700'
+            ? 'bg-green-100 dark:bg-green-900/20 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-300' 
+            : 'bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300'
         }`}>
           <div className="flex items-center">
             {notification.type === 'success' ? (
@@ -676,68 +760,77 @@ const CaseManagement = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Case Management</h2>
-          <p className="text-slate-600">Manage cases, metadata, analytics and statistics</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Case Management</h2>
+          <p className="text-slate-600 dark:text-slate-300">Manage cases, metadata, analytics and statistics</p>
         </div>
-        <button
-          onClick={handleCreateCase}
-          className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-        >
-          <FileText className="h-4 w-4" />
-          Create Case
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleCreateCase}
+            className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <FileText className="h-4 w-4" />
+            Create Case
+          </button>
+          <button
+            onClick={handleUploadCase}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <Upload className="h-4 w-4" />
+            Upload Case
+          </button>
+        </div>
       </div>
 
       {/* Case Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {/* Total Cases */}
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border border-slate-200 dark:border-slate-700 transition-colors duration-200">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FileText className="h-6 w-6 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-slate-600">Total Cases</p>
-              <p className="text-2xl font-bold text-slate-900">{caseStats.totalCases.toLocaleString()}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Cases</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{caseStats.totalCases.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
         {/* Active Cases */}
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border border-slate-200 dark:border-slate-700 transition-colors duration-200">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <CheckCircle className="h-6 w-6 text-green-600" />
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-slate-600">Active Cases</p>
-              <p className="text-2xl font-bold text-slate-900">{caseStats.activeCases.toLocaleString()}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Active Cases</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{caseStats.activeCases.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
         {/* Recent Cases */}
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border border-slate-200 dark:border-slate-700 transition-colors duration-200">
           <div className="flex items-center">
-            <div className="p-2 bg-amber-100 rounded-lg">
-              <Clock className="h-6 w-6 text-amber-600" />
+            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+              <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-slate-600">Recent (30 days)</p>
-              <p className="text-2xl font-bold text-slate-900">{caseStats.recentCases.toLocaleString()}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Recent (30 days)</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{caseStats.recentCases.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
         {/* Pending Cases */}
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border border-slate-200 dark:border-slate-700 transition-colors duration-200">
           <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <AlertCircle className="h-6 w-6 text-yellow-600" />
+            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+              <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-slate-600">Pending Cases</p>
-              <p className="text-2xl font-bold text-slate-900">{caseStats.pendingCases.toLocaleString()}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Pending Cases</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{caseStats.pendingCases.toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -1263,6 +1356,152 @@ const CaseManagement = () => {
               }}
               saving={saving}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Upload Case Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Upload Case Document
+              </h3>
+              <button
+                onClick={() => {
+                  setShowUploadModal(false);
+                  setUploadedFile(null);
+                  setExtractedData(null);
+                }}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Select Document
+                </label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 transition-colors">
+                  <div className="space-y-1 text-center">
+                    <Upload className="mx-auto h-12 w-12 text-slate-400" />
+                    <div className="flex text-sm text-slate-600">
+                      <label
+                        htmlFor="file-upload"
+                        className="relative cursor-pointer bg-white rounded-md font-medium text-sky-600 hover:text-sky-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-sky-500"
+                      >
+                        <span>Upload a file</span>
+                        <input
+                          id="file-upload"
+                          name="file-upload"
+                          type="file"
+                          className="sr-only"
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleFileUpload}
+                        />
+                      </label>
+                      <p className="pl-1">or drag and drop</p>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      PDF, DOC, DOCX up to 10MB
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {uploadedFile && (
+                <div className="flex items-center p-3 bg-slate-50 rounded-lg">
+                  <File className="h-5 w-5 text-slate-400 mr-3" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 truncate">
+                      {uploadedFile.name}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {extractedData && (
+                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <h4 className="text-sm font-medium text-green-800 mb-3">📊 Extracted Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="font-medium text-slate-700">Title:</span>
+                      <p className="text-slate-600 truncate">{extractedData.title || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-slate-700">Suit Number:</span>
+                      <p className="text-slate-600">{extractedData.suit_reference_number || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-slate-700">Parties:</span>
+                      <p className="text-slate-600 truncate">{extractedData.parties || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-slate-700">Court:</span>
+                      <p className="text-slate-600">{extractedData.court || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-slate-700">Judge:</span>
+                      <p className="text-slate-600 truncate">{extractedData.judge || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-slate-700">Area of Law:</span>
+                      <p className="text-slate-600">{extractedData.area_of_law || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  onClick={() => {
+                    setShowUploadModal(false);
+                    setUploadedFile(null);
+                    setExtractedData(null);
+                  }}
+                  className="px-4 py-2 text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                >
+                  {extractedData ? 'Close' : 'Cancel'}
+                </button>
+                {!extractedData ? (
+                  <button
+                    onClick={handleUploadSubmit}
+                    disabled={!uploadedFile || uploading}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                  >
+                    {uploading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4" />
+                        Upload Case
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setShowUploadModal(false);
+                      setUploadedFile(null);
+                      setExtractedData(null);
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    Done
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -1,33 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogIn, UserPlus, LogOut, User, Settings } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus, LogOut, User, Settings, ChevronDown, Bell, Search, Clock, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userName, setUserName] = useState('');
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
 
   // Check authentication status on component mount and listen for changes
   useEffect(() => {
     const checkAuthStatus = () => {
-      const authStatus = localStorage.getItem('isAuthenticated');
+    const authStatus = localStorage.getItem('isAuthenticated');
       const adminStatus = localStorage.getItem('isAdmin');
-      const email = localStorage.getItem('userEmail');
-      const name = localStorage.getItem('userName');
-      const authProvider = localStorage.getItem('authProvider');
-      setIsAuthenticated(authStatus === 'true');
+    const email = localStorage.getItem('userEmail');
+    const name = localStorage.getItem('userName');
+    const authProvider = localStorage.getItem('authProvider');
+    setIsAuthenticated(authStatus === 'true');
       setIsAdmin(adminStatus === 'true');
-      setUserEmail(email || '');
-      setUserName(name || '');
-      
-      // Log authentication provider for debugging
-      if (authProvider) {
-        console.log('User authenticated via:', authProvider);
-      }
+    setUserEmail(email || '');
+    setUserName(name || '');
+    
+    // Log authentication provider for debugging
+    if (authProvider) {
+      console.log('User authenticated via:', authProvider);
+    }
     };
 
     // Check initial auth status
@@ -50,6 +55,66 @@ const Header = () => {
       window.removeEventListener('storage', handleAuthChange);
     };
   }, []);
+
+  // Sample notifications data
+  useEffect(() => {
+    const sampleNotifications = [
+      {
+        id: 1,
+        type: 'success',
+        title: 'Subscription Approved',
+        message: 'Your Professional plan subscription has been approved and activated.',
+        time: '2 minutes ago',
+        read: false,
+        icon: CheckCircle
+      },
+      {
+        id: 2,
+        type: 'info',
+        title: 'New Case Added',
+        message: 'A new case "Smith vs. Johnson" has been added to your watchlist.',
+        time: '1 hour ago',
+        read: false,
+        icon: Info
+      },
+      {
+        id: 3,
+        type: 'warning',
+        title: 'Payment Due',
+        message: 'Your subscription payment is due in 3 days. Please update your payment method.',
+        time: '2 hours ago',
+        read: true,
+        icon: AlertCircle
+      },
+      {
+        id: 4,
+        type: 'info',
+        title: 'System Update',
+        message: 'We\'ve released new features including AI-powered case analysis.',
+        time: '1 day ago',
+        read: true,
+        icon: Info
+      }
+    ];
+    
+    setNotifications(sampleNotifications);
+    setUnreadCount(sampleNotifications.filter(n => !n.read).length);
+  }, []);
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isUserMenuOpen && !event.target.closest('.user-menu')) {
+        setIsUserMenuOpen(false);
+      }
+      if (isNotificationsOpen && !event.target.closest('.notifications-menu')) {
+        setIsNotificationsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isUserMenuOpen, isNotificationsOpen]);
 
   // Function to get user initials
   const getUserInitials = () => {
@@ -94,7 +159,68 @@ const Header = () => {
     setIsAuthenticated(false);
     setUserEmail('');
     setUserName('');
+    setIsUserMenuOpen(false);
     navigate('/');
+  };
+
+  const markNotificationAsRead = (notificationId) => {
+    setNotifications(prev => 
+      prev.map(notification => 
+        notification.id === notificationId 
+          ? { ...notification, read: true }
+          : notification
+      )
+    );
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(prev => 
+      prev.map(notification => ({ ...notification, read: true }))
+    );
+    setUnreadCount(0);
+  };
+
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case 'SUBSCRIPTION':
+        return CheckCircle;
+      case 'PAYMENT':
+        return AlertCircle;
+      case 'SYSTEM':
+        return Info;
+      case 'CASE_UPDATE':
+        return Info;
+      case 'SECURITY':
+        return AlertCircle;
+      case 'SEARCH':
+        return Info;
+      case 'GENERAL':
+        return Info;
+      default:
+        return Info;
+    }
+  };
+
+  const getNotificationColor = (type) => {
+    switch (type) {
+      case 'SUBSCRIPTION':
+        return 'text-green-600 dark:text-green-400';
+      case 'PAYMENT':
+        return 'text-yellow-600 dark:text-yellow-400';
+      case 'SYSTEM':
+        return 'text-blue-600 dark:text-blue-400';
+      case 'CASE_UPDATE':
+        return 'text-purple-600 dark:text-purple-400';
+      case 'SECURITY':
+        return 'text-red-600 dark:text-red-400';
+      case 'SEARCH':
+        return 'text-indigo-600 dark:text-indigo-400';
+      case 'GENERAL':
+        return 'text-gray-600 dark:text-gray-400';
+      default:
+        return 'text-blue-600 dark:text-blue-400';
+    }
   };
 
   const navigation = [
@@ -103,28 +229,40 @@ const Header = () => {
     { name: 'Banks', href: '/banks' },
     { name: 'Insurance', href: '/insurance' },
     { name: 'Companies', href: '/companies' },
-    ...(isAdmin ? [{ name: 'Admin Dashboard', href: '/admin' }] : []),
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Subscribe', href: '/subscribe' },
+    ...(isAdmin ? [{ name: 'Admin', href: '/admin' }] : []),
   ];
 
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="w-full bg-slate-900 text-white">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
-          <span className="font-semibold">Dennislaw SVD</span>
+    <header className="sticky top-0 z-50 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 shadow-sm">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="h-8 w-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                <span className="text-white font-bold text-sm">D</span>
+              </div>
+              <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white dark:border-slate-900"></div>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-slate-900 dark:text-white text-lg leading-none">Dennislaw</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">SVD</span>
+            </div>
         </Link>
         
-        <nav className="hidden md:flex items-center gap-6 text-sm/6 text-slate-200">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1">
           {navigation.map((item) => (
             <Link
               key={item.name}
               to={item.href}
-              className={`hover:text-white transition-colors ${
-                isActive(item.href) ? 'text-white' : 'text-slate-200'
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  isActive(item.href)
+                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
               {item.name}
@@ -132,78 +270,230 @@ const Header = () => {
           ))}
         </nav>
 
-        {/* Authentication Buttons */}
-        <div className="hidden md:flex items-center gap-3">
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-3">
+            {/* Search Button */}
+            <button className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+              <Search className="h-5 w-5" />
+            </button>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Authentication Section */}
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                  {getUserInitials()}
+                {/* Notifications */}
+                <div className="relative notifications-menu">
+                  <button 
+                    onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                    className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  >
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Notifications Dropdown */}
+                  {isNotificationsOpen && (
+                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 z-50">
+                      {/* Header */}
+                      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                        <h3 className="font-semibold text-slate-900 dark:text-white">Notifications</h3>
+                        {unreadCount > 0 && (
+                          <button
+                            onClick={markAllAsRead}
+                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                          >
+                            Mark all as read
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Notifications List */}
+                      <div className="max-h-96 overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <div className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                            <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                            <p>No notifications</p>
+                          </div>
+                        ) : (
+                          notifications.map((notification) => {
+                            const IconComponent = getNotificationIcon(notification.type);
+                            const colorClass = getNotificationColor(notification.type);
+                            
+                            return (
+                              <div
+                                key={notification.id}
+                                onClick={() => markNotificationAsRead(notification.id)}
+                                className={`px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0 ${
+                                  !notification.read ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''
+                                }`}
+                              >
+                                <div className="flex items-start gap-3">
+                                  <div className={`flex-shrink-0 ${colorClass}`}>
+                                    <IconComponent className="h-5 w-5" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between">
+                                      <p className={`text-sm font-medium ${
+                                        !notification.read 
+                                          ? 'text-slate-900 dark:text-white' 
+                                          : 'text-slate-700 dark:text-slate-300'
+                                      }`}>
+                                        {notification.title}
+                                      </p>
+                                      {!notification.read && (
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                                      )}
+                                    </div>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">
+                                      {notification.message}
+                                    </p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-500 mt-1 flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      {notification.time}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+
+                      {/* Footer */}
+                      {notifications.length > 0 && (
+                        <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700">
+                          <Link
+                            to="/notifications"
+                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                            onClick={() => setIsNotificationsOpen(false)}
+                          >
+                            View all notifications
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <span className="hidden lg:inline text-sm text-slate-200">
+
+                {/* User Menu */}
+                <div className="relative user-menu">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-lg">
+                      {getUserInitials()}
+                    </div>
+                    <div className="hidden sm:block text-left">
+                      <div className="text-sm font-medium text-slate-900 dark:text-white">
                   {userName || userEmail.split('@')[0]}
-                </span>
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">
+                        {userEmail}
+                      </div>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-slate-500 dark:text-slate-400 transition-transform ${
+                      isUserMenuOpen ? 'rotate-180' : ''
+                    }`} />
+                  </button>
+
+                  {/* User Dropdown Menu */}
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 py-2 z-50">
+                      {/* User Info */}
+                      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                            {getUserInitials()}
+                          </div>
+                          <div>
+                            <div className="font-medium text-slate-900 dark:text-white">
+                              {userName || 'User'}
+                            </div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">
+                              {userEmail}
+                            </div>
+                          </div>
+                        </div>
               </div>
+
+                      {/* Menu Items */}
+                      <div className="py-2">
+                        <Link
+                          to="/profile"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <User className="h-4 w-4" />
+                          Profile
+                        </Link>
               <Link
                 to="/settings"
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-200 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                          onClick={() => setIsUserMenuOpen(false)}
               >
                 <Settings className="h-4 w-4" />
                 Settings
               </Link>
+                        <div className="border-t border-slate-200 dark:border-slate-700 my-2"></div>
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-200 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full text-left"
               >
                 <LogOut className="h-4 w-4" />
-                Logout
+                          Sign Out
               </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-200 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
-                <LogIn className="h-4 w-4" />
-                Login
+                  Sign In
               </Link>
               <Link
                 to="/signup"
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm hover:shadow-md"
               >
-                <UserPlus className="h-4 w-4" />
-                Register
+                  Get Started
               </Link>
             </div>
           )}
-        </div>
         
+            {/* Mobile Menu Button */}
         <button
-          className="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/10"
-          aria-label="Open menu"
+              className="lg:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          {isMobileMenuOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
+          </div>
+        </div>
       </div>
       
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-slate-800 border-t border-slate-700">
-          <div className="px-4 py-2 space-y-1">
+        <div className="lg:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+          <div className="px-4 py-4 space-y-1">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                   isActive(item.href)
-                    ? 'text-white bg-slate-700'
-                    : 'text-slate-200 hover:text-white hover:bg-slate-700'
+                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -211,56 +501,25 @@ const Header = () => {
               </Link>
             ))}
             
-            {/* Mobile Authentication Buttons */}
-            <div className="border-t border-slate-700 pt-2 mt-2">
-              {isAuthenticated ? (
-                <div className="space-y-1">
-                  <div className="px-3 py-2 text-sm text-slate-300 flex items-center gap-2">
-                    <div className="w-6 h-6 bg-sky-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                      {getUserInitials()}
-                    </div>
-                    {userName || userEmail.split('@')[0]}
-                  </div>
-                  <Link
-                    to="/settings"
-                    className="block px-3 py-2 rounded-md text-sm font-medium text-slate-200 hover:text-white hover:bg-slate-700 transition-colors flex items-center gap-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Settings className="h-4 w-4" />
-                    Settings
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-slate-200 hover:text-white hover:bg-slate-700 transition-colors flex items-center gap-2"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-1">
+            {/* Mobile Authentication */}
+            {!isAuthenticated && (
+              <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4 space-y-2">
                   <Link
                     to="/login"
-                    className="block px-3 py-2 rounded-md text-sm font-medium text-slate-200 hover:text-white hover:bg-slate-700 transition-colors flex items-center gap-2"
+                  className="block px-4 py-3 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <LogIn className="h-4 w-4" />
-                    Login
+                  Sign In
                   </Link>
                   <Link
                     to="/signup"
-                    className="block px-3 py-2 rounded-md text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 transition-colors flex items-center gap-2"
+                  className="block px-4 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-center"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <UserPlus className="h-4 w-4" />
-                    Register
+                  Get Started
                   </Link>
                 </div>
               )}
-            </div>
           </div>
         </div>
       )}
