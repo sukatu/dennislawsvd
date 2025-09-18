@@ -26,6 +26,7 @@ from routes import notifications
 from routes import security
 from routes import admin
 from routes import tenant
+from routes import courts
 from config import settings
 
 # Application lifespan
@@ -78,6 +79,7 @@ app.include_router(notifications.router, prefix="/api/notifications", tags=["not
 app.include_router(security.router, prefix="/api/security", tags=["security"])
 app.include_router(admin.router, tags=["admin"])
 app.include_router(tenant.router, prefix="/api/tenant", tags=["tenant"])
+app.include_router(courts.router, prefix="/api/courts", tags=["courts"])
 
 # Root endpoint
 @app.get("/")

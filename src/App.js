@@ -30,6 +30,7 @@ import Notifications from './pages/Notifications';
 import EnhancedSearchResults from './pages/EnhancedSearchResults';
 import AdminDashboard from './pages/AdminDashboard';
 import Subscribe from './pages/Subscribe';
+import JusticeLocator from './pages/JusticeLocator';
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/subscribe" element={<Subscribe />} />
+              <Route path="/justice-locator" element={<JusticeLocator />} />
             </Routes>
           </main>
           <Footer />

@@ -62,6 +62,7 @@ import SettingsManagement from '../components/admin/SettingsManagement';
 import RolesPermissionsManagement from '../components/admin/RolesPermissionsManagement';
 import SubscriptionRequests from '../components/admin/SubscriptionRequests';
 import TenantManagement from '../components/admin/TenantManagement';
+import CourtManagement from '../components/admin/CourtManagement';
 
 ChartJS.register(
   CategoryScale,
@@ -344,6 +345,7 @@ const AdminDashboard = () => {
     { id: 'payments', name: 'Payments', icon: CreditCard },
     { id: 'subscription-requests', name: 'Subscription Requests', icon: Clock },
     { id: 'tenants', name: 'Organizations', icon: Globe },
+    { id: 'courts', name: 'Justice Locator', icon: MapPin },
     { id: 'roles', name: 'Roles & Permissions', icon: Shield },
     { id: 'settings', name: 'Settings', icon: Settings }
   ];
@@ -372,6 +374,8 @@ const AdminDashboard = () => {
         return <SubscriptionRequests />;
       case 'tenants':
         return <TenantManagement />;
+      case 'courts':
+        return <CourtManagement />;
       case 'roles':
         return <RolesPermissionsManagement />;
       case 'settings':

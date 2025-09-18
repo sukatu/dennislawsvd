@@ -229,6 +229,7 @@ const Header = () => {
     { name: 'Banks', href: '/banks' },
     { name: 'Insurance', href: '/insurance' },
     { name: 'Companies', href: '/companies' },
+    { name: 'Justice Locator', href: '/justice-locator' },
     { name: 'Subscribe', href: '/subscribe' },
     ...(isAdmin ? [{ name: 'Admin', href: '/admin' }] : []),
   ];
