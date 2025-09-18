@@ -17,7 +17,11 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     
     # CORS Configuration
-    cors_origins: list = ["http://localhost:3000", "https://case-search-frontend.onrender.com"]
+    cors_origins: list = [
+        "http://localhost:3000", 
+        "https://case-search-frontend.ondigitalocean.app",
+        "https://your-domain.com"
+    ]
     
     # Google OAuth
     google_client_id: Optional[str] = None
