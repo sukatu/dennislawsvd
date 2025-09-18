@@ -50,8 +50,8 @@ class AccessLog(Base):
     os = Column(String(100), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
-    # Relationships
-    user = relationship("User", back_populates="access_logs")
+    # Relationships - temporarily disabled to avoid circular import issues
+    # user = relationship("User", back_populates="access_logs")
 
 class ActivityLog(Base):
     __tablename__ = "activity_logs"
@@ -72,8 +72,8 @@ class ActivityLog(Base):
     severity = Column(Enum(LogLevel), default=LogLevel.INFO, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
-    # Relationships
-    user = relationship("User", back_populates="activity_logs")
+    # Relationships - temporarily disabled to avoid circular import issues
+    # user = relationship("User", back_populates="activity_logs")
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"
@@ -91,8 +91,8 @@ class AuditLog(Base):
     user_agent = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
-    # Relationships
-    user = relationship("User", back_populates="audit_logs")
+    # Relationships - temporarily disabled to avoid circular import issues
+    # user = relationship("User", back_populates="audit_logs")
 
 class ErrorLog(Base):
     __tablename__ = "error_logs"
@@ -115,9 +115,9 @@ class ErrorLog(Base):
     resolved_by = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
-    # Relationships
-    user = relationship("User", foreign_keys=[user_id], back_populates="error_logs")
-    resolver = relationship("User", foreign_keys=[resolved_by])
+    # Relationships - temporarily disabled to avoid circular import issues
+    # user = relationship("User", foreign_keys=[user_id], back_populates="error_logs")
+    # resolver = relationship("User", foreign_keys=[resolved_by])
 
 class SecurityLog(Base):
     __tablename__ = "security_logs"
@@ -136,5 +136,5 @@ class SecurityLog(Base):
     blocked = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
-    # Relationships
-    user = relationship("User", back_populates="security_logs")
+    # Relationships - temporarily disabled to avoid circular import issues
+    # user = relationship("User", back_populates="security_logs")

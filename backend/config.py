@@ -4,6 +4,7 @@ import os
 
 class Settings(BaseSettings):
     # Database Configuration
+    render_database_url: Optional[str] = None
     mysql_host: str = "localhost"
     mysql_port: int = 3306
     mysql_user: str = "root"
@@ -14,6 +15,9 @@ class Settings(BaseSettings):
     secret_key: str = "your-secret-key-change-this-in-production"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
+    
+    # CORS Configuration
+    cors_origins: list = ["http://localhost:3000", "https://case-search-frontend.onrender.com"]
     
     # Google OAuth
     google_client_id: Optional[str] = None
@@ -41,6 +45,8 @@ class Settings(BaseSettings):
     
     @property
     def database_url(self) -> str:
+        if self.render_database_url:
+            return self.render_database_url
         from urllib.parse import quote_plus
         password = quote_plus(self.mysql_password)
         return f"mysql+pymysql://{self.mysql_user}:{password}@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}"

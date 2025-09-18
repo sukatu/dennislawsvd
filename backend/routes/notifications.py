@@ -89,10 +89,13 @@ async def get_notification_stats(
         archived = query.filter(Notification.status == NotificationStatus.ARCHIVED).count()
         
         # Count by type
-        success = query.filter(Notification.type == NotificationType.SUCCESS).count()
-        info = query.filter(Notification.type == NotificationType.INFO).count()
-        warning = query.filter(Notification.type == NotificationType.WARNING).count()
-        error = query.filter(Notification.type == NotificationType.ERROR).count()
+        system = query.filter(Notification.type == NotificationType.SYSTEM).count()
+        subscription = query.filter(Notification.type == NotificationType.SUBSCRIPTION).count()
+        security = query.filter(Notification.type == NotificationType.SECURITY).count()
+        search = query.filter(Notification.type == NotificationType.SEARCH).count()
+        case_update = query.filter(Notification.type == NotificationType.CASE_UPDATE).count()
+        payment = query.filter(Notification.type == NotificationType.PAYMENT).count()
+        general = query.filter(Notification.type == NotificationType.GENERAL).count()
         
         # Recent notifications (last 7 days)
         week_ago = datetime.utcnow() - timedelta(days=7)
@@ -104,10 +107,13 @@ async def get_notification_stats(
             read=read,
             archived=archived,
             by_type={
-                "success": success,
-                "info": info,
-                "warning": warning,
-                "error": error
+                "system": system,
+                "subscription": subscription,
+                "security": security,
+                "search": search,
+                "case_update": case_update,
+                "payment": payment,
+                "general": general
             },
             recent=recent
         )

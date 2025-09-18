@@ -154,6 +154,29 @@ async def get_users(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching users: {str(e)}")
 
+@router.get("/users/stats")
+async def get_users_stats(db: Session = Depends(get_db)):
+    """Get user statistics for admin dashboard"""
+    try:
+        total_users = db.query(User).count()
+        active_users = db.query(User).filter(User.is_active == True).count()
+        admin_users = db.query(User).filter(User.role == "admin").count()
+        regular_users = db.query(User).filter(User.role == "user").count()
+        
+        # Recent registrations (last 30 days)
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        recent_registrations = db.query(User).filter(User.created_at >= thirty_days_ago).count()
+        
+        return {
+            "total_users": total_users,
+            "active_users": active_users,
+            "admin_users": admin_users,
+            "regular_users": regular_users,
+            "recent_registrations": recent_registrations
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching user stats: {str(e)}")
+
 @router.get("/users/{user_id}", response_model=UserDetailResponse)
 async def get_user(user_id: int, db: Session = Depends(get_db)):
     """Get detailed user information"""
@@ -1305,6 +1328,92 @@ async def get_log_stats(
         return stats
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching log stats: {str(e)}")
+
+# Additional stats endpoints for dashboard
+@router.get("/people/stats")
+async def get_people_stats(db: Session = Depends(get_db)):
+    """Get people statistics for admin dashboard"""
+    try:
+        from models.people import People
+        total_people = db.query(People).count()
+        
+        # Recent additions (last 30 days)
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        recent_additions = db.query(People).filter(People.created_at >= thirty_days_ago).count()
+        
+        return {
+            "total_people": total_people,
+            "recent_additions": recent_additions
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching people stats: {str(e)}")
+
+@router.get("/banks/stats")
+async def get_banks_stats(db: Session = Depends(get_db)):
+    """Get banks statistics for admin dashboard"""
+    try:
+        from models.banks import Banks
+        total_banks = db.query(Banks).count()
+        active_banks = db.query(Banks).filter(Banks.is_active == True).count()
+        
+        return {
+            "total_banks": total_banks,
+            "active_banks": active_banks
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching banks stats: {str(e)}")
+
+@router.get("/insurance/stats")
+async def get_insurance_stats(db: Session = Depends(get_db)):
+    """Get insurance statistics for admin dashboard"""
+    try:
+        from models.insurance import Insurance
+        total_insurance = db.query(Insurance).count()
+        active_insurance = db.query(Insurance).filter(Insurance.is_active == True).count()
+        
+        return {
+            "total_insurance": total_insurance,
+            "active_insurance": active_insurance
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching insurance stats: {str(e)}")
+
+@router.get("/companies/stats")
+async def get_companies_stats(db: Session = Depends(get_db)):
+    """Get companies statistics for admin dashboard"""
+    try:
+        from models.companies import Companies
+        total_companies = db.query(Companies).count()
+        active_companies = db.query(Companies).filter(Companies.is_active == True).count()
+        
+        return {
+            "total_companies": total_companies,
+            "active_companies": active_companies
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching companies stats: {str(e)}")
+
+@router.get("/payments/stats")
+async def get_payments_stats(db: Session = Depends(get_db)):
+    """Get payments statistics for admin dashboard"""
+    try:
+        from models.payment import Payment
+        total_payments = db.query(Payment).count()
+        completed_payments = db.query(Payment).filter(Payment.status == "completed").count()
+        pending_payments = db.query(Payment).filter(Payment.status == "pending").count()
+        
+        # Calculate total revenue
+        completed_payment_amounts = db.query(Payment.amount).filter(Payment.status == "completed").all()
+        total_revenue = sum([float(amount[0]) for amount in completed_payment_amounts if amount[0]])
+        
+        return {
+            "total_payments": total_payments,
+            "completed_payments": completed_payments,
+            "pending_payments": pending_payments,
+            "total_revenue": total_revenue
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payments stats: {str(e)}")
 
 # Include the new admin route modules
 router.include_router(admin_people.router, prefix="/people", tags=["admin-people"])
