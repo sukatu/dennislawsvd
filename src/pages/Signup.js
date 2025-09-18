@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus, Lock, Check } from 'lucide-react';
-import useGoogleAuth from '../hooks/useGoogleAuth';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -16,23 +15,7 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   
-  // Google Auth hook
-  const {
-    isGoogleLoaded,
-    isLoading: isGoogleLoading,
-    error: googleError,
-    initializeGoogleSignIn,
-    handleGoogleSuccess,
-    handleGoogleError,
-    setError: setGoogleError
-  } = useGoogleAuth();
 
-  // Initialize Google Sign-In when component mounts
-  useEffect(() => {
-    if (isGoogleLoaded) {
-      initializeGoogleSignIn('google-signup-button', handleGoogleSuccess, handleGoogleError);
-    }
-  }, [isGoogleLoaded, initializeGoogleSignIn, handleGoogleSuccess, handleGoogleError]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +24,6 @@ const Signup = () => {
       [name]: value
     }));
     // Clear errors when user starts typing
-    if (googleError) setGoogleError('');
     if (error) setError('');
   };
 
@@ -153,11 +135,6 @@ const Signup = () => {
               
               {!showSuccess ? (
                 <div>
-                  {googleError && (
-                    <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
-                      <p className="text-sm text-red-600">{googleError}</p>
-                    </div>
-                  )}
                   
                   <form onSubmit={handleSubmit} className="space-y-6">
                   {error && (
@@ -254,27 +231,6 @@ const Signup = () => {
                   </button>
                 </form>
 
-                {/* Google Sign-In Section */}
-                <div className="mt-6">
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-slate-300" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-slate-500">Or continue with</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-6">
-                    {isGoogleLoaded ? (
-                      <div id="google-signup-button"></div>
-                    ) : (
-                      <div className="w-full py-2 px-4 border border-slate-300 rounded-md text-center text-slate-500">
-                        Loading Google Sign-In...
-                      </div>
-                    )}
-                  </div>
-                </div>
                 </div>
               ) : (
                 <div className="text-center">

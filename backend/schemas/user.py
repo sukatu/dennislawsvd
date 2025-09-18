@@ -71,6 +71,7 @@ class UserResponse(UserBase):
     
     class Config:
         from_attributes = True
+        use_enum_values = True
 
 # User login schema
 class UserLogin(BaseModel):

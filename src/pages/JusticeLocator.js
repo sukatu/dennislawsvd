@@ -211,19 +211,28 @@ const JusticeLocator = () => {
 
   // Load Google Maps script
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-    console.log('Google Maps API Key:', apiKey ? 'Present' : 'Missing');
-    
-    if (!apiKey || apiKey === 'YOUR_API_KEY') {
-      console.warn('Google Maps API key not configured. Map functionality will be limited.');
-      setMapsAvailable(false);
-      // Load data without map
-      loadCourts();
-      loadFilterOptions();
-      return;
-    }
+    const loadGoogleMapsAPI = async () => {
+      try {
+        // Fetch API key from backend
+        const response = await fetch('http://localhost:8000/api/admin/google-maps-api-key');
+        if (!response.ok) {
+          throw new Error('Failed to fetch Google Maps API key');
+        }
+        
+        const data = await response.json();
+        const apiKey = data.api_key;
+        console.log('Google Maps API Key:', apiKey ? 'Present' : 'Missing');
+        
+        if (!apiKey) {
+          console.warn('Google Maps API key not configured. Map functionality will be limited.');
+          setMapsAvailable(false);
+          // Load data without map
+          loadCourts();
+          loadFilterOptions();
+          return;
+        }
 
-    const loadGoogleMaps = () => {
+        const loadGoogleMaps = () => {
       if (!window.google) {
         console.log('Loading Google Maps API...');
         
@@ -282,20 +291,31 @@ const JusticeLocator = () => {
       }
     };
 
-    // Try to load Google Maps
-    loadGoogleMaps();
-
-    // Fallback: try again after 2 seconds if not loaded
-    const fallbackTimer = setTimeout(() => {
-      if (!window.google || !window.google.maps) {
-        console.log('Fallback: Retrying Google Maps API load...');
+        // Try to load Google Maps
         loadGoogleMaps();
-      }
-    }, 2000);
 
-    return () => {
-      clearTimeout(fallbackTimer);
+        // Fallback: try again after 2 seconds if not loaded
+        const fallbackTimer = setTimeout(() => {
+          if (!window.google || !window.google.maps) {
+            console.log('Fallback: Retrying Google Maps API load...');
+            loadGoogleMaps();
+          }
+        }, 2000);
+
+        return () => {
+          clearTimeout(fallbackTimer);
+        };
+      } catch (error) {
+        console.error('Error loading Google Maps API:', error);
+        setMapsAvailable(false);
+        // Load data without map
+        loadCourts();
+        loadFilterOptions();
+      }
     };
+
+    // Load the Google Maps API
+    loadGoogleMapsAPI();
   }, []);
 
   // Filter courts based on search and filters
@@ -406,7 +426,7 @@ const JusticeLocator = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Justice Locator</h1>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Courts</h1>
           <p className="text-slate-600">Find courts and legal institutions across Ghana</p>
         </div>
 

@@ -11,6 +11,7 @@ const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userName, setUserName] = useState('');
+  const [userProfilePicture, setUserProfilePicture] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
@@ -24,10 +25,15 @@ const Header = () => {
     const email = localStorage.getItem('userEmail');
     const name = localStorage.getItem('userName');
     const authProvider = localStorage.getItem('authProvider');
+    
+    // Get user data from localStorage
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    
     setIsAuthenticated(authStatus === 'true');
       setIsAdmin(adminStatus === 'true');
     setUserEmail(email || '');
     setUserName(name || '');
+    setUserProfilePicture(userData.profile_picture || '');
     
     // Log authentication provider for debugging
     if (authProvider) {
@@ -43,8 +49,15 @@ const Header = () => {
       checkAuthStatus();
     };
 
+    // Listen for profile updates
+    const handleProfileUpdate = () => {
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      setUserProfilePicture(userData.profile_picture || '');
+    };
+
     // Add event listener for custom auth events
     window.addEventListener('authStateChanged', handleAuthChange);
+    window.addEventListener('profileUpdated', handleProfileUpdate);
     
     // Also listen for storage changes (in case localStorage is modified from another tab)
     window.addEventListener('storage', handleAuthChange);
@@ -52,54 +65,81 @@ const Header = () => {
     // Cleanup event listeners
     return () => {
       window.removeEventListener('authStateChanged', handleAuthChange);
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
       window.removeEventListener('storage', handleAuthChange);
     };
   }, []);
 
-  // Sample notifications data
-  useEffect(() => {
-    const sampleNotifications = [
-      {
-        id: 1,
-        type: 'success',
-        title: 'Subscription Approved',
-        message: 'Your Professional plan subscription has been approved and activated.',
-        time: '2 minutes ago',
-        read: false,
-        icon: CheckCircle
-      },
-      {
-        id: 2,
-        type: 'info',
-        title: 'New Case Added',
-        message: 'A new case "Smith vs. Johnson" has been added to your watchlist.',
-        time: '1 hour ago',
-        read: false,
-        icon: Info
-      },
-      {
-        id: 3,
-        type: 'warning',
-        title: 'Payment Due',
-        message: 'Your subscription payment is due in 3 days. Please update your payment method.',
-        time: '2 hours ago',
-        read: true,
-        icon: AlertCircle
-      },
-      {
-        id: 4,
-        type: 'info',
-        title: 'System Update',
-        message: 'We\'ve released new features including AI-powered case analysis.',
-        time: '1 day ago',
-        read: true,
-        icon: Info
-      }
-    ];
+  // Load notifications from API
+  const loadNotifications = async () => {
+    if (!isAuthenticated) return;
     
-    setNotifications(sampleNotifications);
-    setUnreadCount(sampleNotifications.filter(n => !n.read).length);
-  }, []);
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:8000/api/notifications/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const stats = await response.json();
+        setUnreadCount(stats.unread || 0);
+      }
+    } catch (error) {
+      console.error('Error loading notification stats:', error);
+    }
+  };
+
+  // Load notifications list
+  const loadNotificationsList = async () => {
+    if (!isAuthenticated) return;
+    
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:8000/api/notifications/?limit=10', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data.notifications || []);
+        setUnreadCount(data.notifications?.filter(n => n.status === 'unread').length || 0);
+      }
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    }
+  };
+
+  // Load notifications when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadNotifications();
+      loadNotificationsList();
+    } else {
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  }, [isAuthenticated]);
+
+  // Refresh notifications every 30 seconds
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const interval = setInterval(() => {
+      loadNotifications();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -138,6 +178,7 @@ const Header = () => {
     return 'U';
   };
 
+
   const handleLogout = () => {
     // Clear all authentication data
     localStorage.removeItem('isAuthenticated');
@@ -159,26 +200,80 @@ const Header = () => {
     setIsAuthenticated(false);
     setUserEmail('');
     setUserName('');
+    setUserProfilePicture('');
     setIsUserMenuOpen(false);
     navigate('/');
   };
 
-  const markNotificationAsRead = (notificationId) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === notificationId 
-          ? { ...notification, read: true }
-          : notification
-      )
-    );
-    setUnreadCount(prev => Math.max(0, prev - 1));
+  const markNotificationAsRead = async (notificationId) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      const response = await fetch(`http://localhost:8000/api/notifications/${notificationId}/read`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        // Update local state immediately for better UX
+        setNotifications(prev => 
+          prev.map(notification => 
+            notification.id === notificationId 
+              ? { ...notification, status: 'read' }
+              : notification
+          )
+        );
+        setUnreadCount(prev => Math.max(0, prev - 1));
+        
+        // Refresh notifications to ensure consistency
+        setTimeout(() => {
+          loadNotifications();
+          loadNotificationsList();
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notification => ({ ...notification, read: true }))
-    );
-    setUnreadCount(0);
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      const userId = userData.id;
+      
+      if (!userId) return;
+
+      const response = await fetch(`http://localhost:8000/api/notifications/mark-all-read?user_id=${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        // Update local state immediately
+        setNotifications(prev => 
+          prev.map(notification => ({ ...notification, status: 'read' }))
+        );
+        setUnreadCount(0);
+        
+        // Refresh notifications to ensure consistency
+        setTimeout(() => {
+          loadNotifications();
+          loadNotificationsList();
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+    }
   };
 
   const getNotificationIcon = (type) => {
@@ -223,13 +318,35 @@ const Header = () => {
     }
   };
 
+  const formatNotificationTime = (createdAt) => {
+    if (!createdAt) return 'Unknown time';
+    
+    const now = new Date();
+    const notificationTime = new Date(createdAt);
+    const diffInMinutes = Math.floor((now - notificationTime) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    
+    return notificationTime.toLocaleDateString();
+  };
+
   const navigation = [
     { name: 'Home', href: '/' },
+    { name: 'About', href: '/about' },
+    { name: 'Services', href: '/services' },
+    { name: 'Contact', href: '/contact' },
     { name: 'People', href: '/people' },
     { name: 'Banks', href: '/banks' },
     { name: 'Insurance', href: '/insurance' },
     { name: 'Companies', href: '/companies' },
-    { name: 'Justice Locator', href: '/justice-locator' },
+    { name: 'Courts', href: '/justice-locator' },
     { name: 'Subscribe', href: '/subscribe' },
     ...(isAdmin ? [{ name: 'Admin', href: '/admin' }] : []),
   ];
@@ -239,7 +356,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 shadow-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
@@ -255,12 +372,12 @@ const Header = () => {
         </Link>
         
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-2 flex-1 justify-center max-w-4xl">
           {navigation.map((item) => (
             <Link
               key={item.name}
               to={item.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                   isActive(item.href)
                     ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -331,7 +448,7 @@ const Header = () => {
                                 key={notification.id}
                                 onClick={() => markNotificationAsRead(notification.id)}
                                 className={`px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0 ${
-                                  !notification.read ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''
+                                  notification.status === 'unread' ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''
                                 }`}
                               >
                                 <div className="flex items-start gap-3">
@@ -341,13 +458,13 @@ const Header = () => {
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between">
                                       <p className={`text-sm font-medium ${
-                                        !notification.read 
+                                        notification.status === 'unread'
                                           ? 'text-slate-900 dark:text-white' 
                                           : 'text-slate-700 dark:text-slate-300'
                                       }`}>
                                         {notification.title}
                                       </p>
-                                      {!notification.read && (
+                                      {notification.status === 'unread' && (
                                         <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
                                       )}
                                     </div>
@@ -356,7 +473,7 @@ const Header = () => {
                                     </p>
                                     <p className="text-xs text-slate-500 dark:text-slate-500 mt-1 flex items-center gap-1">
                                       <Clock className="h-3 w-3" />
-                                      {notification.time}
+                                      {formatNotificationTime(notification.created_at)}
                                     </p>
                                   </div>
                                 </div>
@@ -369,13 +486,21 @@ const Header = () => {
                       {/* Footer */}
                       {notifications.length > 0 && (
                         <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700">
-                          <Link
-                            to="/notifications"
-                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
-                            onClick={() => setIsNotificationsOpen(false)}
-                          >
-                            View all notifications
-                          </Link>
+                          <div className="flex items-center justify-between">
+                            <button
+                              onClick={markAllAsRead}
+                              className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium"
+                            >
+                              Mark all as read
+                            </button>
+                            <Link
+                              to="/notifications"
+                              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                              onClick={() => setIsNotificationsOpen(false)}
+                            >
+                              View all notifications
+                            </Link>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -388,7 +513,19 @@ const Header = () => {
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-lg">
+                    {userProfilePicture ? (
+                      <img
+                        src={userProfilePicture.startsWith('http') ? userProfilePicture : `http://localhost:8000${userProfilePicture}`}
+                        alt={userName || 'User'}
+                        className="w-8 h-8 rounded-full object-cover border-2 border-slate-200 dark:border-slate-600 shadow-lg"
+                        onError={(e) => {
+                          // Fallback to initials if image fails to load
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div className={`w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-lg ${userProfilePicture ? 'hidden' : 'flex'}`}>
                       {getUserInitials()}
                     </div>
                     <div className="hidden sm:block text-left">
@@ -459,13 +596,13 @@ const Header = () => {
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                  className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors whitespace-nowrap"
               >
-                  Sign In
+                Login
               </Link>
               <Link
                 to="/signup"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm hover:shadow-md"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
               >
                   Get Started
               </Link>
@@ -507,14 +644,14 @@ const Header = () => {
               <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4 space-y-2">
                   <Link
                     to="/login"
-                  className="block px-4 py-3 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  className="block px-4 py-3 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors whitespace-nowrap"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                  Sign In
+                    Login
                   </Link>
                   <Link
                     to="/signup"
-                  className="block px-4 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-center"
+                  className="block px-4 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-center whitespace-nowrap"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                   Get Started

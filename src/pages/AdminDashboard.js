@@ -63,6 +63,7 @@ import RolesPermissionsManagement from '../components/admin/RolesPermissionsMana
 import SubscriptionRequests from '../components/admin/SubscriptionRequests';
 import TenantManagement from '../components/admin/TenantManagement';
 import CourtManagement from '../components/admin/CourtManagement';
+import ProfileManagement from '../components/admin/ProfileManagement';
 
 ChartJS.register(
   CategoryScale,
@@ -80,6 +81,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
@@ -283,6 +285,11 @@ const AdminDashboard = () => {
     }
   };
 
+  // Toggle sidebar collapse
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userEmail');
@@ -335,7 +342,8 @@ const AdminDashboard = () => {
 
   const navigationItems = [
     { id: 'overview', name: 'Overview', icon: BarChart3 },
-    { id: 'users', name: 'Users', icon: Users },
+    { id: 'profile', name: 'Profile', icon: Users },
+    { id: 'users', name: 'Users', icon: UserCheck },
     { id: 'api-keys', name: 'API Keys', icon: Key },
     { id: 'cases', name: 'Cases', icon: FileText },
     { id: 'people', name: 'People', icon: UserCheck },
@@ -345,7 +353,7 @@ const AdminDashboard = () => {
     { id: 'payments', name: 'Payments', icon: CreditCard },
     { id: 'subscription-requests', name: 'Subscription Requests', icon: Clock },
     { id: 'tenants', name: 'Organizations', icon: Globe },
-    { id: 'courts', name: 'Justice Locator', icon: MapPin },
+    { id: 'courts', name: 'Courts', icon: MapPin },
     { id: 'roles', name: 'Roles & Permissions', icon: Shield },
     { id: 'settings', name: 'Settings', icon: Settings }
   ];
@@ -354,6 +362,8 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case 'overview':
         return <OverviewTab stats={stats} onRefresh={handleRefresh} isRefreshing={isRefreshing} />;
+      case 'profile':
+        return <ProfileManagement />;
       case 'users':
         return <UserManagement />;
       case 'api-keys':
@@ -396,15 +406,17 @@ const AdminDashboard = () => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+      <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-lg transform transition-all duration-300 ease-in-out lg:translate-x-0 ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      } ${isSidebarCollapsed ? 'w-16' : 'w-64'}`}>
         <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200">
           <div className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-full bg-sky-500 flex items-center justify-center">
               <Settings className="h-4 w-4 text-white" />
             </div>
-            <span className="font-semibold text-slate-900">Admin Panel</span>
+            {!isSidebarCollapsed && (
+              <span className="font-semibold text-slate-900">Admin Panel</span>
+            )}
           </div>
           <button
             onClick={() => setIsSidebarOpen(false)}
@@ -429,40 +441,44 @@ const AdminDashboard = () => {
                     ? 'bg-sky-100 text-sky-700'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
+                title={isSidebarCollapsed ? item.name : ''}
               >
-                <Icon className="h-5 w-5 mr-3" />
-                {item.name}
+                <Icon className={`h-5 w-5 ${isSidebarCollapsed ? '' : 'mr-3'}`} />
+                {!isSidebarCollapsed && item.name}
               </button>
             );
           })}
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200">
-          <div className="flex items-center space-x-3 mb-3">
+          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'space-x-3'} mb-3`}>
             <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center">
               <span className="text-sm font-medium text-slate-600">
                 {userInfo?.name?.charAt(0) || userInfo?.email?.charAt(0) || 'A'}
               </span>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 truncate">
-                {userInfo?.name || userInfo?.email || 'Admin User'}
-              </p>
-              <p className="text-xs text-slate-500">Administrator</p>
-            </div>
+            {!isSidebarCollapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-900 truncate">
+                  {userInfo?.name || userInfo?.email || 'Admin User'}
+                </p>
+                <p className="text-xs text-slate-500">Administrator</p>
+              </div>
+            )}
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+            className={`w-full flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors ${isSidebarCollapsed ? 'justify-center' : ''}`}
+            title={isSidebarCollapsed ? 'Logout' : ''}
           >
-            <LogOut className="h-4 w-4 mr-3" />
-            Logout
+            <LogOut className={`h-4 w-4 ${isSidebarCollapsed ? '' : 'mr-3'}`} />
+            {!isSidebarCollapsed && 'Logout'}
           </button>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="lg:ml-64">
+      <div className={`transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
         {/* Top bar */}
         <div className="bg-white shadow-sm border-b border-slate-200">
           <div className="flex items-center justify-between h-16 px-4">
@@ -470,6 +486,13 @@ const AdminDashboard = () => {
               <button
                 onClick={() => setIsSidebarOpen(true)}
                 className="lg:hidden p-2 rounded-md hover:bg-slate-100"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+              <button
+                onClick={toggleSidebar}
+                className="hidden lg:block p-2 rounded-md hover:bg-slate-100 transition-colors"
+                title={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
               >
                 <Menu className="h-5 w-5" />
               </button>

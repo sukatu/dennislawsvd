@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     # OpenAI Configuration
     openai_api_key: Optional[str] = None
     
+    # Google Maps Configuration
+    react_app_google_maps_api_key: Optional[str] = None
+    
     # Application Configuration
     debug: bool = True
     host: str = "0.0.0.0"

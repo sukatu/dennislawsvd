@@ -18,6 +18,7 @@ from models.subscription import Subscription
 from models.payment import Payment
 from models.notification import Notification
 from models.security import SecurityEvent, ApiKey
+from models.settings import Settings
 from services.case_metadata_service import CaseMetadataService
 from services.simple_case_processing_service import SimpleCaseProcessingService
 from services.document_processing_service import DocumentProcessingService
@@ -946,6 +947,28 @@ async def process_case_enhanced(case_id: int, db: Session = Depends(get_db)):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing case with analytics: {str(e)}")
+
+# Google Maps API Key
+@router.get("/google-maps-api-key")
+async def get_google_maps_api_key(db: Session = Depends(get_db)):
+    """Get Google Maps API key for frontend use"""
+    try:
+        setting = db.query(Settings).filter(Settings.key == "google_maps_api_key").first()
+        
+        if not setting:
+            raise HTTPException(status_code=404, detail="Google Maps API key not configured")
+        
+        if not setting.value:
+            raise HTTPException(status_code=404, detail="Google Maps API key not set")
+        
+        return {
+            "api_key": setting.value,
+            "description": setting.description
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching Google Maps API key: {str(e)}")
 
 # Include the new admin route modules
 router.include_router(admin_people.router, prefix="/people", tags=["admin-people"])
