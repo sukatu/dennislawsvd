@@ -84,7 +84,18 @@ REACT_APP_API_URL=https://your-backend-app.onrender.com
 - Password: `admin123`
 
 ## Troubleshooting
+
+### Build Errors
+- **Metadata generation failed**: Try using the minimal requirements.txt
+- **Rust/Cargo errors**: Make sure you're not using packages that require Rust compilation
+- **Package conflicts**: Use version ranges (>=) instead of exact versions
+
+### Database Connection Issues
 - Check Render logs for any errors
-- Ensure DATABASE_URL is correct
+- Ensure DATABASE_URL_ENV is correct and starts with `mysql+pymysql://`
 - Verify CORS_ORIGINS includes your frontend URL
 - Check that all environment variables are set
+
+### Alternative Requirements File
+If you get metadata generation errors, try using `requirements-minimal.txt` instead:
+- Change Build Command to: `pip install -r requirements-minimal.txt`

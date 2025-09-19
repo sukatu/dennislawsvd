@@ -1,17 +1,11 @@
-# Minimal requirements for basic functionality
 fastapi
-uvicorn[standard]
+uvicorn
 sqlalchemy
 pymysql
-python-jose[cryptography]
-passlib[bcrypt]
+python-jose
+passlib
 python-multipart
 python-dotenv
-pydantic-settings
-fastapi-mail
 pydantic
-python-dateutil
-httpx
-requests
+pydantic-settings
 email-validator
-loguru
