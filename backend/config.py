@@ -53,7 +53,7 @@ class Settings(BaseSettings):
             return self.database_url_env
         from urllib.parse import quote_plus
         password = quote_plus(self.mysql_password)
-        return f"mysql+pymysql://{self.mysql_user}:{password}@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}"
+        return f"postgresql://{self.mysql_user}:{password}@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}"
     
     class Config:
         env_file = ".env"
