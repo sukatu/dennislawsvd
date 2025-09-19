@@ -13,3 +13,4 @@ PyJWT
 requests
 openai
 pyotp
+qrcode

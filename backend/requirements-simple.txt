@@ -12,3 +12,4 @@ email-validator
 requests
 openai
 pyotp
+qrcode
