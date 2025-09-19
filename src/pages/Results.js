@@ -349,10 +349,12 @@ const Results = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-sky-400 flex items-center justify-center">
-                <Gavel className="h-4 w-4 text-white" />
-              </div>
-              <h1 className="text-xl font-bold">Dennislaw SVD</h1>
+              <img 
+                src="/logo.jpeg" 
+                alt="juridence logo" 
+                className="h-8 w-8 rounded-lg object-cover"
+              />
+              <h1 className="text-xl font-bold">juridence</h1>
             </div>
             <nav className="hidden md:flex space-x-6">
               <button

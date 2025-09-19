@@ -15,47 +15,47 @@ import {
 const Services = () => {
   const services = [
     {
-      icon: <Search className="h-8 w-8 text-blue-600" />,
-      title: "People Search",
-      description: "Comprehensive search across Ghana's legal database to find individuals involved in legal cases.",
+      icon: <Search className="h-8 w-8 text-brand-500" />,
+      title: "Customer Due Diligence",
+      description: "Comprehensive KYC verification and risk assessment for individuals across Ghana's legal system.",
       features: [
-        "Advanced search filters",
-        "Case history tracking",
-        "Risk assessment profiles",
-        "Real-time data updates"
+        "Identity verification",
+        "Legal history analysis",
+        "Risk scoring & profiling",
+        "Compliance monitoring"
       ]
     },
     {
-      icon: <Building2 className="h-8 w-8 text-green-600" />,
-      title: "Company Database",
-      description: "Access detailed information about companies, their legal standing, and case involvement.",
+      icon: <Building2 className="h-8 w-8 text-accent-300" />,
+      title: "Corporate KYC Solutions",
+      description: "Advanced due diligence and compliance verification for corporate entities and business relationships.",
       features: [
-        "Company profiles & details",
-        "Legal case history",
-        "Financial standing analysis",
-        "Compliance tracking"
+        "Corporate identity verification",
+        "Legal standing analysis",
+        "Financial risk assessment",
+        "Regulatory compliance tracking"
       ]
     },
     {
-      icon: <Shield className="h-8 w-8 text-purple-600" />,
-      title: "Insurance Records",
-      description: "Search and analyze insurance companies and their legal case involvement.",
+      icon: <Shield className="h-8 w-8 text-light-500" />,
+      title: "Risk Mitigation Analytics",
+      description: "Comprehensive risk assessment and mitigation strategies based on legal analytics and compliance data.",
       features: [
-        "Insurance company profiles",
-        "Claim history analysis",
-        "Policy coverage details",
-        "Legal dispute tracking"
+        "Risk scoring algorithms",
+        "Compliance monitoring",
+        "Automated reporting",
+        "Predictive analytics"
       ]
     },
     {
-      icon: <Database className="h-8 w-8 text-orange-600" />,
-      title: "Bank Records",
-      description: "Comprehensive banking sector database with legal case information.",
+      icon: <Database className="h-8 w-8 text-brand-600" />,
+      title: "Regulatory Compliance Automation",
+      description: "Automated compliance monitoring and reporting solutions for regulatory requirements and KYC obligations.",
       features: [
-        "Bank profiles & details",
-        "Financial case history",
-        "Regulatory compliance",
-        "Risk assessment"
+        "Automated compliance checks",
+        "Regulatory reporting",
+        "Audit trail management",
+        "Policy enforcement"
       ]
     },
     {
@@ -111,11 +111,10 @@ const Services = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
-            Our Services
+            KYC & Due Diligence Solutions
           </h1>
           <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
-            Comprehensive legal database solutions designed to help legal professionals, 
-            researchers, and organizations access critical legal information across Ghana.
+            Revolutionary software solutions for comprehensive KYC processes, risk mitigation, and regulatory compliance across Ghana's legal landscape.
           </p>
         </div>
 
@@ -150,7 +149,7 @@ const Services = () => {
         {/* Features Section */}
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-8 mb-16">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">
-            Why Choose Dennislaw SVD?
+            Why Choose juridence?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
@@ -170,19 +169,19 @@ const Services = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-center text-white">
+        <div className="bg-gradient-to-r from-brand-500 to-accent-300 rounded-lg p-8 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Get Started?
           </h2>
           <p className="text-xl mb-6 opacity-90">
-            Join thousands of legal professionals who trust Dennislaw SVD for their research needs.
+            Join thousands of legal professionals who trust juridence for their research needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors flex items-center justify-center">
+            <button className="bg-white text-brand-500 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors flex items-center justify-center">
               Start Free Trial
               <ArrowRight className="h-4 w-4 ml-2" />
             </button>
-            <button className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+            <button className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-brand-500 transition-colors">
               Contact Sales
             </button>
           </div>

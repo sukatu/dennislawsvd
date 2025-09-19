@@ -337,19 +337,27 @@ const Header = () => {
     return notificationTime.toLocaleDateString();
   };
 
-  const navigation = [
+  const allNavigationItems = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
     { name: 'Services', href: '/services' },
     { name: 'Contact', href: '/contact' },
-    { name: 'People', href: '/people' },
-    { name: 'Banks', href: '/banks' },
-    { name: 'Insurance', href: '/insurance' },
-    { name: 'Companies', href: '/companies' },
-    { name: 'Courts', href: '/justice-locator' },
+    { name: 'People', href: '/people', requiresAuth: true },
+    { name: 'Banks', href: '/banks', requiresAuth: true },
+    { name: 'Insurance', href: '/insurance', requiresAuth: true },
+    { name: 'Companies', href: '/companies', requiresAuth: true },
+    { name: 'Courts', href: '/justice-locator', requiresAuth: true },
     { name: 'Subscribe', href: '/subscribe' },
     ...(isAdmin ? [{ name: 'Admin', href: '/admin' }] : []),
   ];
+
+  // Filter navigation items based on authentication status
+  const navigation = allNavigationItems.filter(item => 
+    !item.requiresAuth || isAuthenticated
+  );
+
+  // Debug logging
+  console.log('Auth Status:', { isAuthenticated, navigation: navigation.map(item => item.name) });
 
   const isActive = (path) => location.pathname === path;
 
@@ -359,16 +367,13 @@ const Header = () => {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <div className="h-8 w-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-                <span className="text-white font-bold text-sm">D</span>
-              </div>
-              <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white dark:border-slate-900"></div>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-slate-900 dark:text-white text-lg leading-none">Dennislaw</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">SVD</span>
-            </div>
+      <div className="relative">
+        <img
+          src="/logo.jpeg" 
+          alt="juridence logo" 
+          className="h-12 w-12 rounded-lg object-cover shadow-lg group-hover:shadow-xl transition-shadow"
+        />
+      </div>
         </Link>
         
           {/* Desktop Navigation */}
@@ -379,8 +384,8 @@ const Header = () => {
               to={item.href}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                   isActive(item.href)
-                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
+        ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-500 dark:text-brand-400'
+        : 'text-slate-600 dark:text-slate-300 hover:text-brand-500 dark:hover:text-brand-400 hover:bg-light-100 dark:hover:bg-slate-800'
               }`}
             >
               {item.name}
@@ -592,10 +597,10 @@ const Header = () => {
               >
                 Login
               </Link>
-              <Link
-                to="/signup"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
-              >
+        <Link
+          to="/signup"
+          className="px-4 py-2 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-lg transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
+        >
                   Get Started
               </Link>
             </div>
@@ -603,7 +608,7 @@ const Header = () => {
         
             {/* Mobile Menu Button */}
         <button
-              className="lg:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              className="lg:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 hover:bg-light-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -622,7 +627,7 @@ const Header = () => {
                 to={item.href}
                 className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                   isActive(item.href)
-                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                    ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300'
                     : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -643,7 +648,7 @@ const Header = () => {
                   </Link>
                   <Link
                     to="/signup"
-                  className="block px-4 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-center whitespace-nowrap"
+                  className="block px-4 py-3 text-base font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-lg transition-colors text-center whitespace-nowrap"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                   Get Started

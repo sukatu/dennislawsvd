@@ -1,4 +1,4 @@
-# Dennislaw SVD - React Application
+# juridence - React Application
 
 A comprehensive legal database platform built with React for searching people and legal cases in Ghana's court system.
 
@@ -193,9 +193,9 @@ This project is licensed under the MIT License.
 ## Support
 
 For support and questions, please contact:
-- Email: support@dennislawsvd.com
+- Email: support@juridence.com
 - Phone: +233 302 123 456
 
 ---
 
-**Dennislaw SVD** - Your trusted partner for comprehensive people search and case history discovery.
+**juridence** - Your trusted partner for comprehensive legal intelligence and case history discovery.

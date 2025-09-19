@@ -7,12 +7,16 @@ const Footer = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="h-2.5 w-2.5 rounded-full bg-sky-400 ring-4 ring-white/10"></span>
-              <span className="font-semibold">Dennislaw SVD</span>
+            <div className="flex items-center gap-3 mb-4">
+              <img 
+                src="/logo.jpeg" 
+                alt="juridence logo" 
+                className="h-8 w-8 rounded-lg object-cover"
+              />
+              <span className="font-semibold">juridence</span>
             </div>
             <p className="text-slate-300 text-sm">
-              Your trusted partner for comprehensive people search and case history discovery.
+              Your trusted partner for comprehensive legal intelligence and case history discovery.
             </p>
           </div>
           
@@ -46,7 +50,7 @@ const Footer = () => {
         </div>
         
         <div className="mt-8 pt-8 border-t border-slate-700 text-center text-sm text-slate-400">
-          <p>&copy; 2025 Dennislaw SVD. All rights reserved. | Privacy Policy | Terms of Service</p>
+          <p>&copy; 2025 juridence. All rights reserved. | Privacy Policy | Terms of Service</p>
         </div>
       </div>
     </footer>

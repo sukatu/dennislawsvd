@@ -185,7 +185,7 @@ const Contact = () => {
             {/* Contact Information */}
             <div className="space-y-8">
               <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Get in Touch with DL SVD</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Get in Touch with juridence</h3>
                 <p className="text-slate-600 mb-6">
                   We are strategically positioned to serve clients across the country. Reach out for consultations, urgent requests, or to learn more about our court document services.
                 </p>
@@ -209,7 +209,7 @@ const Contact = () => {
                     <div>
                       <h4 className="font-semibold text-slate-900 mb-1">Email</h4>
                       <p className="text-slate-600 text-sm mb-2">For detailed inquiries and follow-ups</p>
-                      <p className="text-slate-900 font-medium">dlservices@dennislawgh.com</p>
+                      <p className="text-slate-900 font-medium">info@juridence.com</p>
                     </div>
                   </div>
                   
@@ -229,7 +229,7 @@ const Contact = () => {
                       <MapPin className="h-6 w-6 text-sky-600" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-slate-900 mb-1">Dennislaw SVD Services Headquarters</h4>
+                      <h4 className="font-semibold text-slate-900 mb-1">juridence Headquarters</h4>
                       <p className="text-slate-900 font-medium">No. 15 Netflix Street,<br />Madina Estate, Off-UPSA Road</p>
                     </div>
                   </div>

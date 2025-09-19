@@ -35,17 +35,17 @@ from config import settings
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    print("Starting Dennislaw SVD Backend...")
+    print("Starting juridence Backend...")
     create_tables()
     print("Database tables created successfully")
     yield
     # Shutdown
-    print("Shutting down Dennislaw SVD Backend...")
+    print("Shutting down juridence Backend...")
 
 # Create FastAPI app
 app = FastAPI(
-    title="Dennislaw SVD API",
-    description="Backend API for Dennislaw SVD Services - Court Search, Document Verification & Document Request",
+    title="juridence API",
+    description="Backend API for juridence Services - Court Search, Document Verification & Document Request",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -93,7 +93,7 @@ app.include_router(courts.router, prefix="/api/courts", tags=["courts"])
 @app.get("/")
 async def root():
     return {
-        "message": "Welcome to Dennislaw SVD API",
+        "message": "Welcome to juridence API",
         "version": "1.0.0",
         "docs": "/docs",
         "status": "running"
@@ -104,7 +104,7 @@ async def root():
 async def health_check():
     return {
         "status": "healthy",
-        "service": "dennislaw-svd-api",
+        "service": "juridence-api",
         "version": "1.0.0"
     }
 

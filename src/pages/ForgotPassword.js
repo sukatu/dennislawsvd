@@ -18,7 +18,7 @@ const ForgotPassword = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Mock validation - in real app, this would check if email exists
-      if (email === 'demo@dennislaw.com') {
+      if (email === 'demo@juridence.com') {
         setIsSubmitted(true);
       } else {
         setError('No account found with this email address.');
@@ -177,7 +177,7 @@ const ForgotPassword = () => {
           <div className="mt-6 bg-slate-50 rounded-md p-4">
             <p className="text-sm text-slate-600 mb-2">Demo Information:</p>
             <div className="text-sm">
-              <p><strong>Demo Email:</strong> demo@dennislaw.com</p>
+              <p><strong>Demo Email:</strong> demo@juridence.com</p>
               <p className="text-slate-500">Use this email to test the forgot password flow</p>
             </div>
           </div>

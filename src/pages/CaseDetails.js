@@ -1295,9 +1295,9 @@ const CaseDetails = () => {
                           <td className="py-3 px-4 text-center">
                             <div className="flex items-center justify-center space-x-2">
                     <button
-                                onClick={() => window.open('https://dennislawgh.com', '_blank')}
+                                onClick={() => window.open('https://juridence.com', '_blank')}
                                 className="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                                title="View on DennisLawGH.com"
+                                title="View on juridence.com"
                     >
                                 <Eye className="w-3 h-3" />
                                 <span>View</span>

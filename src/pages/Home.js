@@ -176,12 +176,27 @@ const Home = () => {
       <section className="bg-white dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-6">
-              Search People Names
-            </h1>
+            {/* Logo Section */}
+            <div className="flex justify-center mb-8">
+              <div className="flex items-center gap-4">
+                <img 
+                  src="/logo.jpeg" 
+                  alt="juridence logo" 
+                  className="h-16 w-16 rounded-xl object-cover shadow-xl"
+                />
+                <div className="text-left">
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white">juridence</h1>
+          <p className="text-lg text-slate-600 dark:text-slate-400">Revolutionizing KYC with Legal Analytics</p>
+                </div>
+              </div>
+            </div>
+            
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+              Advanced KYC & Due Diligence Solutions
+            </h2>
             
             <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto">
-              Search our comprehensive database of people by name. Get instant access to detailed profiles, legal history, and case information.
+              Empowering businesses with innovative legal analytics for comprehensive risk mitigation, compliance, and informed decision-making across Ghana's legal landscape.
             </p>
             
             {/* Authentication Notice */}
@@ -257,10 +272,10 @@ const Home = () => {
                       </div>
                     )}
                   </div>
-                  <button
-                    type="submit"
-                    className="rounded-lg bg-sky-600 px-6 py-3 text-sm font-medium text-white hover:bg-sky-700 transition-colors"
-                  >
+        <button
+          type="submit"
+          className="rounded-lg bg-brand-500 px-6 py-3 text-sm font-medium text-white hover:bg-brand-600 transition-colors"
+        >
                     Search
                   </button>
                 </form>
@@ -290,8 +305,8 @@ const Home = () => {
       <section className="bg-slate-50 dark:bg-slate-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Why Choose Dennislaw SVD?</h2>
-            <p className="mt-2 text-slate-600 dark:text-slate-300">Advanced features designed for legal professionals and researchers</p>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Why Choose juridence?</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Innovative KYC solutions designed for comprehensive due diligence and regulatory compliance</p>
           </div>
           
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -309,15 +324,15 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-sky-600">
+      <section className="bg-brand-500">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
-            <p className="text-xl text-sky-100 mb-8">Join thousands of legal professionals who trust Dennislaw SVD for their research needs.</p>
+            <p className="text-xl text-white/90 mb-8">Join thousands of legal professionals who trust juridence for their research needs.</p>
             <div className="flex gap-4 justify-center">
               <button
                 onClick={() => navigate('/results')}
-                className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-medium text-sky-600 hover:bg-slate-50 transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-medium text-brand-500 hover:bg-slate-50 transition-colors"
               >
                 Start Searching
               </button>

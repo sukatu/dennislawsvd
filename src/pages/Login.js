@@ -89,7 +89,7 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: 'admin@dennislaw.com', // Default admin email
+          email: 'admin@juridence.com', // Default admin email
           password: 'admin123' // Default admin password
         })
       });
