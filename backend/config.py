@@ -5,7 +5,6 @@ import os
 class Settings(BaseSettings):
     # Database Configuration
     database_url_env: Optional[str] = None
-    render_database_url: Optional[str] = None
     mysql_host: str = "localhost"
     mysql_port: int = 3306
     mysql_user: str = "root"
@@ -52,8 +51,6 @@ class Settings(BaseSettings):
     def database_url(self) -> str:
         if self.database_url_env:
             return self.database_url_env
-        if self.render_database_url:
-            return self.render_database_url
         from urllib.parse import quote_plus
         password = quote_plus(self.mysql_password)
         return f"mysql+pymysql://{self.mysql_user}:{password}@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}"

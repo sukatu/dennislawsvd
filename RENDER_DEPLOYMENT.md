@@ -7,7 +7,7 @@
 - Click "New +" → "Web Service"
 - Choose "Build and deploy from a Git repository" (NOT Docker)
 - Connect your GitHub repository
-- Choose the `backend` folder as root directory
+- Set the `backend` folder as root directory
 
 ### 2. Backend Configuration
 ```
@@ -19,12 +19,14 @@ Build Command: pip install -r requirements.txt
 Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
 ```
 
+**Note**: Since frontend and backend are in the same repo, the Root Directory should be `backend` for the backend service.
+
 **IMPORTANT**: Make sure to select "Python" environment, NOT "Docker"!
 
 ### 3. Backend Environment Variables
 Add these in Render dashboard → Environment tab:
 ```
-DATABASE_URL=postgresql://username:password@hostname:port/database
+DATABASE_URL_ENV=mysql+pymysql://username:password@hostname:port/database
 SECRET_KEY=your-production-secret-key-here
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 CORS_ORIGINS=["https://your-frontend-app.onrender.com"]
@@ -32,8 +34,9 @@ ENVIRONMENT=production
 ```
 
 ### 4. Database Setup
-- In Render dashboard, create a PostgreSQL database
-- Copy the DATABASE_URL to your backend environment variables
+- In Render dashboard, create a MySQL database
+- Copy the DATABASE_URL to your backend environment variables as `DATABASE_URL_ENV`
+- Make sure the URL starts with `mysql+pymysql://` instead of `mysql://`
 
 ## Frontend Deployment
 
@@ -42,16 +45,18 @@ ENVIRONMENT=production
 - Click "New +" → "Static Site"
 - Choose "Build and deploy from a Git repository" (NOT Docker)
 - Connect your GitHub repository
-- Choose root directory (not backend folder)
+- Set root directory to `/` (the main project folder)
 
 ### 2. Frontend Configuration
 ```
 Name: juridence-frontend
 Branch: main (or your default branch)
-Root Directory: / (root)
+Root Directory: / (root - main project folder)
 Build Command: npm install && npm run build
 Publish Directory: build
 ```
+
+**Note**: Since frontend and backend are in the same repo, the Root Directory should be `/` (root) for the frontend service, so it can access package.json and src/ folder.
 
 **IMPORTANT**: Make sure to select "Static Site" environment, NOT "Docker"!
 
