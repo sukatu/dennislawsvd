@@ -5,11 +5,11 @@ import os
 class Settings(BaseSettings):
     # Database Configuration
     database_url_env: Optional[str] = None
-    mysql_host: str = "localhost"
-    mysql_port: int = 3306
-    mysql_user: str = "root"
-    mysql_password: str = "Hausawi@2025"
-    mysql_database: str = "dennislaw_svd"
+    postgres_host: str = "localhost"
+    postgres_port: int = 5432
+    postgres_user: str = "postgres"
+    postgres_password: str = "62579011"
+    postgres_database: str = "juridence"
     
     # JWT Configuration
     secret_key: str = "your-secret-key-change-this-in-production"
@@ -52,8 +52,8 @@ class Settings(BaseSettings):
         if self.database_url_env:
             return self.database_url_env
         from urllib.parse import quote_plus
-        password = quote_plus(self.mysql_password)
-        return f"postgresql://{self.mysql_user}:{password}@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}"
+        password = quote_plus(self.postgres_password)
+        return f"postgresql://{self.postgres_user}:{password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_database}"
     
     class Config:
         env_file = ".env"
