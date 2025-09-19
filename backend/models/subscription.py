@@ -25,6 +25,11 @@ class PaymentStatus(str, enum.Enum):
     REFUNDED = "refunded"
     CANCELLED = "cancelled"
 
+# PostgreSQL ENUM types with proper names
+subscriptionstatus_enum = Enum(SubscriptionStatus, name="subscription_status")
+subscriptionplan_enum = Enum(SubscriptionPlan, name="subscription_plan")
+paymentstatus_enum = Enum(PaymentStatus, name="payment_status")
+
 class Subscription(Base):
     __tablename__ = "subscriptions"
     
@@ -32,8 +37,8 @@ class Subscription(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     
     # Subscription details
-    plan = Column(Enum(SubscriptionPlan), nullable=False, default=SubscriptionPlan.FREE)
-    status = Column(Enum(SubscriptionStatus), nullable=False, default=SubscriptionStatus.ACTIVE)
+    plan = Column(subscriptionplan_enum, nullable=False, default=SubscriptionPlan.FREE)
+    status = Column(subscriptionstatus_enum, nullable=False, default=SubscriptionStatus.ACTIVE)
     
     # Billing
     amount = Column(DECIMAL(10, 2), nullable=False, default=0.00)
@@ -84,3 +89,6 @@ class UsageRecord(Base):
     # Relationships
     subscription = relationship("Subscription", back_populates="usage_records")
     user = relationship("User")
+
+
+

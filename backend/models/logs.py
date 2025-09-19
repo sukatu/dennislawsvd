@@ -27,6 +27,10 @@ class ActivityType(enum.Enum):
     SECURITY = "security"
     ADMIN_ACTION = "admin_action"
 
+# PostgreSQL ENUM types with proper names
+log_level_enum = Enum(LogLevel, name="log_level")
+activity_type_enum = Enum(ActivityType, name="activity_type")
+
 class AccessLog(Base):
     __tablename__ = "access_logs"
     
@@ -59,7 +63,7 @@ class ActivityLog(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     session_id = Column(String(255), nullable=True, index=True)
-    activity_type = Column(Enum(ActivityType), nullable=False, index=True)
+    activity_type = Column(activity_type_enum, nullable=False, index=True)
     action = Column(String(255), nullable=False)  # e.g., "User logged in", "Profile updated"
     description = Column(Text, nullable=True)
     resource_type = Column(String(100), nullable=True)  # e.g., "User", "Case", "Document"
@@ -69,7 +73,7 @@ class ActivityLog(Base):
     ip_address = Column(String(45), nullable=True)
     user_agent = Column(Text, nullable=True)
     log_metadata = Column(JSON, nullable=True)  # Additional context data
-    severity = Column(Enum(LogLevel), default=LogLevel.INFO, nullable=False)
+    severity = Column(log_level_enum, default=LogLevel.INFO, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
     # Relationships - temporarily disabled to avoid circular import issues
@@ -109,7 +113,7 @@ class ErrorLog(Base):
     ip_address = Column(String(45), nullable=True)
     user_agent = Column(Text, nullable=True)
     log_metadata = Column(JSON, nullable=True)
-    severity = Column(Enum(LogLevel), default=LogLevel.ERROR, nullable=False)
+    severity = Column(log_level_enum, default=LogLevel.ERROR, nullable=False)
     resolved = Column(Boolean, default=False, nullable=False)
     resolved_at = Column(DateTime(timezone=True), nullable=True)
     resolved_by = Column(Integer, ForeignKey("users.id"), nullable=True)
@@ -127,7 +131,7 @@ class SecurityLog(Base):
     session_id = Column(String(255), nullable=True, index=True)
     event_type = Column(String(100), nullable=False, index=True)  # e.g., "failed_login", "suspicious_activity"
     description = Column(Text, nullable=False)
-    severity = Column(Enum(LogLevel), default=LogLevel.WARNING, nullable=False)
+    severity = Column(log_level_enum, default=LogLevel.WARNING, nullable=False)
     ip_address = Column(String(45), nullable=True)
     user_agent = Column(Text, nullable=True)
     country = Column(String(100), nullable=True)
@@ -138,3 +142,6 @@ class SecurityLog(Base):
     
     # Relationships - temporarily disabled to avoid circular import issues
     # user = relationship("User", back_populates="security_logs")
+
+
+

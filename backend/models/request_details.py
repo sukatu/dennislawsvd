@@ -35,14 +35,20 @@ class Priority(str, enum.Enum):
     HIGH = "high"
     URGENT = "urgent"
 
+# PostgreSQL ENUM types with proper names
+requesttype_enum = Enum(RequestType, name="request_type")
+entitytype_enum = Enum(EntityType, name="entity_type")
+requeststatus_enum = Enum(RequestStatus, name="request_status")
+priority_enum = Enum(Priority, name="priority")
+
 class RequestDetails(Base):
     __tablename__ = "request_details"
 
     id = Column(Integer, primary_key=True, index=True)
     
     # Request information
-    request_type = Column(Enum(RequestType), nullable=False)
-    entity_type = Column(Enum(EntityType), nullable=False)
+    request_type = Column(requesttype_enum, nullable=False)
+    entity_type = Column(entitytype_enum, nullable=False)
     entity_id = Column(Integer, nullable=True)  # ID of the specific entity (person, bank, etc.)
     entity_name = Column(String(255), nullable=True)  # Name of the entity for reference
     
@@ -52,7 +58,7 @@ class RequestDetails(Base):
     
     # Request details
     message = Column(Text, nullable=True)  # Additional message from requester
-    status = Column(Enum(RequestStatus), default=RequestStatus.PENDING)
+    status = Column(requeststatus_enum, default=RequestStatus.PENDING)
     
     # Requester information
     requester_name = Column(String(255), nullable=True)
@@ -71,7 +77,7 @@ class RequestDetails(Base):
     completed_at = Column(DateTime(timezone=True), nullable=True)
     
     # Priority and urgency
-    priority = Column(Enum(Priority), default=Priority.MEDIUM)
+    priority = Column(priority_enum, default=Priority.MEDIUM)
     is_urgent = Column(Boolean, default=False)
     
     # Additional metadata
@@ -80,4 +86,4 @@ class RequestDetails(Base):
     referrer = Column(String(500), nullable=True)  # Where the request came from
 
     def __repr__(self):
-        return f"<RequestDetails(id={self.id}, type={self.request_type}, entity={self.entity_type}, status={self.status})>"
+        return f"<RequestDetails(id={self.id}, request_type='{self.request_type}', status='{self.status}')>"

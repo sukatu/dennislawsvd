@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from middleware.logging_middleware import LoggingMiddleware
+# from middleware.logging_middleware import LoggingMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 
@@ -60,7 +60,7 @@ app.add_middleware(
 )
 
 # Logging middleware
-app.add_middleware(LoggingMiddleware)
+# app.add_middleware(LoggingMiddleware)
 
 # Mount static files
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

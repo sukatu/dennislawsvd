@@ -9,6 +9,9 @@ class HearingRemark(enum.Enum):
     fr = "fr"  # For Ruling
     fj = "fj"  # For Judgement
 
+# PostgreSQL ENUM types with proper names
+hearingremark_enum = Enum(HearingRemark, name="hearing_remark")
+
 class CaseHearing(Base):
     __tablename__ = "case_hearings"
 
@@ -19,7 +22,7 @@ class CaseHearing(Base):
     hearing_date = Column(DateTime, nullable=False)
     hearing_time = Column(String(20), nullable=True)  # e.g., "10:00 AM"
     coram = Column(Text, nullable=True)  # Judges present
-    remark = Column(Enum(HearingRemark), nullable=False)
+    remark = Column(hearingremark_enum, nullable=False)
     proceedings = Column(Text, nullable=True)  # Summary of proceedings
     
     # Metadata
@@ -31,3 +34,6 @@ class CaseHearing(Base):
 
 # Add the relationship to ReportedCase model
 # This will be added to the existing reported_cases.py file
+
+
+

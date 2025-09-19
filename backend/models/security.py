@@ -21,6 +21,9 @@ class SecurityEventType(str, enum.Enum):
     API_KEY_CREATED = "api_key_created"
     API_KEY_REVOKED = "api_key_revoked"
 
+# PostgreSQL ENUM types with proper names
+securityeventtype_enum = Enum(SecurityEventType, name="security_event_type")
+
 class SecurityEvent(Base):
     __tablename__ = "security_events"
     
@@ -28,7 +31,7 @@ class SecurityEvent(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     
     # Event details
-    event_type = Column(Enum(SecurityEventType), nullable=False)
+    event_type = Column(securityeventtype_enum, nullable=False)
     description = Column(Text, nullable=False)
     
     # Request details
@@ -136,3 +139,6 @@ class LoginSession(Base):
     
     # Relationships
     user = relationship("User", back_populates="login_sessions")
+
+
+

@@ -22,6 +22,9 @@ class PaymentMethod(enum.Enum):
     CASH = "cash"
     CHECK = "check"
 
+# PostgreSQL ENUM types with proper names
+paymentstatus_enum = Enum(PaymentStatus, name="payment_status")
+paymentmethod_enum = Enum(PaymentMethod, name="payment_method")
 
 class Payment(Base):
     __tablename__ = "payments"
@@ -33,7 +36,7 @@ class Payment(Base):
     # Payment details
     amount = Column(DECIMAL(10, 2), nullable=False)
     currency = Column(String(3), nullable=False, default="USD")
-    status = Column(Enum(PaymentStatus), nullable=False, default=PaymentStatus.PENDING)
+    status = Column(paymentstatus_enum, nullable=False, default=PaymentStatus.PENDING)
     
     # External payment provider
     stripe_payment_intent_id = Column(String(255), nullable=True, index=True)
@@ -55,3 +58,6 @@ class Payment(Base):
     # Relationships
     subscription = relationship("Subscription", back_populates="payments")
     user = relationship("User", back_populates="payments")
+
+
+

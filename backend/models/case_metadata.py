@@ -11,7 +11,7 @@ class CaseMetadata(Base):
     
     # Case Summary and Analysis
     case_summary = Column(Text, nullable=True)
-    summernote_content = Column(Text(length=4294967295), nullable=True)  # WYSIWYG formatted case content (LONGTEXT)
+    summernote_content = Column(Text, nullable=True)  # WYSIWYG formatted case content (LONGTEXT)
     case_type = Column(String(100), nullable=True)
     area_of_law = Column(String(200), nullable=True)
     keywords = Column(JSON, nullable=True)  # Array of keywords

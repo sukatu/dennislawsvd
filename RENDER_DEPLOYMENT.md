@@ -26,7 +26,7 @@ Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
 ### 3. Backend Environment Variables
 Add these in Render dashboard → Environment tab:
 ```
-DATABASE_URL_ENV=mysql+pymysql://username:password@hostname:port/database
+DATABASE_URL_ENV=postgresql://postgres:62579011@hostname:5432/juridence
 SECRET_KEY=your-production-secret-key-here
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 CORS_ORIGINS=["https://your-frontend-app.onrender.com"]
@@ -34,9 +34,10 @@ ENVIRONMENT=production
 ```
 
 ### 4. Database Setup
-- In Render dashboard, create a MySQL database
-- Copy the DATABASE_URL to your backend environment variables as `DATABASE_URL_ENV`
-- Make sure the URL starts with `mysql+pymysql://` instead of `mysql://`
+- In Render dashboard, create a PostgreSQL database
+- Copy the DATABASE_URL from your PostgreSQL service
+- Add it as `DATABASE_URL_ENV` environment variable in your backend service
+- Make sure the URL starts with `postgresql://` instead of `mysql://`
 
 ## Frontend Deployment
 

@@ -15,6 +15,10 @@ class UserStatus(str, enum.Enum):
     SUSPENDED = "suspended"
     PENDING = "pending"
 
+# PostgreSQL ENUM types with proper names
+user_role_enum = Enum(UserRole, name="user_role")
+user_status_enum = Enum(UserStatus, name="user_status")
+
 class User(Base):
     __tablename__ = "users"
     
@@ -43,8 +47,8 @@ class User(Base):
     reset_token_expires = Column(DateTime, nullable=True)
     
     # User status and role
-    role = Column(Enum(UserRole), default=UserRole.USER, nullable=False)
-    status = Column(Enum(UserStatus), default=UserStatus.PENDING, nullable=False)
+    role = Column(user_role_enum, default=UserRole.USER, nullable=False)
+    status = Column(user_status_enum, default=UserStatus.PENDING, nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False)
     
     # Multi-tenant support

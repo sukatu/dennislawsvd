@@ -3,6 +3,9 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from database import Base
 
+# Create named ENUM types for PostgreSQL
+risk_level_enum = Enum('Low', 'Medium', 'High', 'Critical', name='risk_level')
+
 class PersonAnalytics(Base):
     __tablename__ = "person_analytics"
 
@@ -11,13 +14,13 @@ class PersonAnalytics(Base):
     
     # Risk Assessment
     risk_score = Column(Integer, default=0, index=True)
-    risk_level = Column(Enum('Low', 'Medium', 'High', 'Critical'), default='Low', index=True)
+    risk_level = Column(risk_level_enum, default='Low', index=True)
     risk_factors = Column(JSON)
     
     # Financial Impact
     total_monetary_amount = Column(DECIMAL(15, 2), default=0.00)
     average_case_value = Column(DECIMAL(15, 2), default=0.00)
-    financial_risk_level = Column(Enum('Low', 'Medium', 'High', 'Critical'), default='Low', index=True)
+    financial_risk_level = Column(risk_level_enum, default='Low', index=True)
     
     # Subject Matter
     primary_subject_matter = Column(String(255))

@@ -24,6 +24,11 @@ class NotificationStatus(str, enum.Enum):
     READ = "READ"
     ARCHIVED = "ARCHIVED"
 
+# PostgreSQL ENUM types with proper names
+notificationtype_enum = Enum(NotificationType, name="notification_type")
+notificationpriority_enum = Enum(NotificationPriority, name="notification_priority")
+notificationstatus_enum = Enum(NotificationStatus, name="notification_status")
+
 class Notification(Base):
     __tablename__ = "notifications"
 
@@ -35,9 +40,9 @@ class Notification(Base):
     # Notification content
     title = Column(String(255), nullable=False)
     message = Column(Text, nullable=False)
-    type = Column(Enum(NotificationType), default=NotificationType.GENERAL, nullable=False)
-    priority = Column(Enum(NotificationPriority), default=NotificationPriority.MEDIUM, nullable=False)
-    status = Column(Enum(NotificationStatus), default=NotificationStatus.UNREAD, nullable=False)
+    type = Column(notificationtype_enum, default=NotificationType.GENERAL, nullable=False)
+    priority = Column(notificationpriority_enum, default=NotificationPriority.MEDIUM, nullable=False)
+    status = Column(notificationstatus_enum, default=NotificationStatus.UNREAD, nullable=False)
     
     # Optional metadata
     category = Column(String(100), nullable=True)  # e.g., 'subscription', 'cases', 'billing'
