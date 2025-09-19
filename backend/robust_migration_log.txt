@@ -1,0 +1,329 @@
+[2025-09-19 13:38:24] 🚀 Starting robust database migration to PostgreSQL...
+[2025-09-19 13:38:24] ✅ Connected to MySQL successfully
+[2025-09-19 13:38:24] ✅ Connected to PostgreSQL successfully
+[2025-09-19 13:38:24] 📋 Found 44 tables to migrate
+[2025-09-19 13:38:24] 🔄 Migrating table: access_logs
+[2025-09-19 13:38:24] ✅ Created PostgreSQL table: access_logs
+[2025-09-19 13:38:24] 📊 Table access_logs has 3659 records
+[2025-09-19 13:38:24] ✅ Inserted 1000/3659 records into access_logs
+[2025-09-19 13:38:24] ✅ Inserted 2000/3659 records into access_logs
+[2025-09-19 13:38:24] ✅ Inserted 3000/3659 records into access_logs
+[2025-09-19 13:38:25] ✅ Inserted 3659/3659 records into access_logs
+[2025-09-19 13:38:25] ✅ Successfully migrated 3659 records to access_logs
+[2025-09-19 13:38:25] 🔄 Migrating table: activity_logs
+[2025-09-19 13:38:25] ✅ Created PostgreSQL table: activity_logs
+[2025-09-19 13:38:25] 📊 Table activity_logs has 3655 records
+[2025-09-19 13:38:25] ❌ Failed to insert data into activity_logs: invalid input syntax for type date: "VIEW"
+LINE 1: ...(1, NULL, '80f91634-bad5-40a8-a2da-c1a867ead4d8', 'VIEW', 'V...
+                                                             ^
+
+[2025-09-19 13:38:25] 🔄 Migrating table: api_keys
+[2025-09-19 13:38:25] ✅ Created PostgreSQL table: api_keys
+[2025-09-19 13:38:25] 📊 Table api_keys has 1 records
+[2025-09-19 13:38:25] ❌ Failed to insert data into api_keys: column "is_active" is of type boolean but expression is of type integer
+LINE 1: ...K8uRky5rGr2weuQGb52hvjs', 'S0atOtWD', NULL, NULL, 1, NULL, '...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:25] 🔄 Migrating table: audit_logs
+[2025-09-19 13:38:25] ✅ Created PostgreSQL table: audit_logs
+[2025-09-19 13:38:25] 📊 Table audit_logs has 0 records
+[2025-09-19 13:38:25] 🔄 Migrating table: bank_analytics
+[2025-09-19 13:38:25] ✅ Created PostgreSQL table: bank_analytics
+[2025-09-19 13:38:25] 📊 Table bank_analytics has 21 records
+[2025-09-19 13:38:25] ✅ Inserted 21/21 records into bank_analytics
+[2025-09-19 13:38:25] ✅ Successfully migrated 21 records to bank_analytics
+[2025-09-19 13:38:25] 🔄 Migrating table: bank_case_statistics
+[2025-09-19 13:38:25] ✅ Created PostgreSQL table: bank_case_statistics
+[2025-09-19 13:38:25] 📊 Table bank_case_statistics has 21 records
+[2025-09-19 13:38:25] ✅ Inserted 21/21 records into bank_case_statistics
+[2025-09-19 13:38:25] ✅ Successfully migrated 21 records to bank_case_statistics
+[2025-09-19 13:38:25] 🔄 Migrating table: banks
+[2025-09-19 13:38:25] ✅ Created PostgreSQL table: banks
+[2025-09-19 13:38:25] 📊 Table banks has 37 records
+[2025-09-19 13:38:25] ❌ Failed to insert data into banks: column "has_mobile_app" is of type boolean but expression is of type integer
+LINE 1: ...ffice, Ghana Commercial Bank, Accra', NULL, NULL, 0, 0, 1, 0...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:25] 🔄 Migrating table: case_hearings
+[2025-09-19 13:38:25] ✅ Created PostgreSQL table: case_hearings
+[2025-09-19 13:38:25] 📊 Table case_hearings has 42048 records
+[2025-09-19 13:38:25] ✅ Inserted 1000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 2000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 3000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 4000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 5000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 6000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 7000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 8000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 9000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 10000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 11000/42048 records into case_hearings
+[2025-09-19 13:38:25] ✅ Inserted 12000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 13000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 14000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 15000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 16000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 17000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 18000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 19000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 20000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 21000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 22000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 23000/42048 records into case_hearings
+[2025-09-19 13:38:26] ✅ Inserted 24000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 25000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 26000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 27000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 28000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 29000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 30000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 31000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 32000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 33000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 34000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 35000/42048 records into case_hearings
+[2025-09-19 13:38:27] ✅ Inserted 36000/42048 records into case_hearings
+[2025-09-19 13:38:28] ✅ Inserted 37000/42048 records into case_hearings
+[2025-09-19 13:38:28] ✅ Inserted 38000/42048 records into case_hearings
+[2025-09-19 13:38:28] ✅ Inserted 39000/42048 records into case_hearings
+[2025-09-19 13:38:28] ✅ Inserted 40000/42048 records into case_hearings
+[2025-09-19 13:38:28] ✅ Inserted 41000/42048 records into case_hearings
+[2025-09-19 13:38:28] ✅ Inserted 42000/42048 records into case_hearings
+[2025-09-19 13:38:28] ✅ Inserted 42048/42048 records into case_hearings
+[2025-09-19 13:38:28] ✅ Successfully migrated 42048 records to case_hearings
+[2025-09-19 13:38:28] 🔄 Migrating table: case_mentions
+[2025-09-19 13:38:28] ✅ Created PostgreSQL table: case_mentions
+[2025-09-19 13:38:28] 📊 Table case_mentions has 0 records
+[2025-09-19 13:38:28] 🔄 Migrating table: case_metadata
+[2025-09-19 13:38:28] ✅ Created PostgreSQL table: case_metadata
+[2025-09-19 13:38:28] 📊 Table case_metadata has 12082 records
+[2025-09-19 13:38:28] ❌ Failed to insert data into case_metadata: column "is_processed" is of type boolean but expression is of type integer
+LINE 7: ...pute", "anything", "acquired", "evidence"]', 0.0, 1, '2025-0...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:28] 🔄 Migrating table: case_search_index
+[2025-09-19 13:38:28] ✅ Created PostgreSQL table: case_search_index
+[2025-09-19 13:38:28] 📊 Table case_search_index has 12022 records
+[2025-09-19 13:38:29] ✅ Inserted 1000/12022 records into case_search_index
+[2025-09-19 13:38:30] ✅ Inserted 2000/12022 records into case_search_index
+[2025-09-19 13:38:31] ✅ Inserted 3000/12022 records into case_search_index
+[2025-09-19 13:38:33] ✅ Inserted 4000/12022 records into case_search_index
+[2025-09-19 13:38:34] ✅ Inserted 5000/12022 records into case_search_index
+[2025-09-19 13:38:35] ✅ Inserted 6000/12022 records into case_search_index
+[2025-09-19 13:38:36] ✅ Inserted 7000/12022 records into case_search_index
+[2025-09-19 13:38:37] ✅ Inserted 8000/12022 records into case_search_index
+[2025-09-19 13:38:38] ✅ Inserted 9000/12022 records into case_search_index
+[2025-09-19 13:38:40] ✅ Inserted 10000/12022 records into case_search_index
+[2025-09-19 13:38:41] ✅ Inserted 11000/12022 records into case_search_index
+[2025-09-19 13:38:42] ✅ Inserted 12000/12022 records into case_search_index
+[2025-09-19 13:38:43] ✅ Inserted 12022/12022 records into case_search_index
+[2025-09-19 13:38:43] ✅ Successfully migrated 12022 records to case_search_index
+[2025-09-19 13:38:43] 🔄 Migrating table: companies
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: companies
+[2025-09-19 13:38:43] 📊 Table companies has 4832 records
+[2025-09-19 13:38:43] ❌ Failed to insert data into companies: column "has_website" is of type boolean but expression is of type integer
+LINE 1: ...'+233 30 277 2777', 'customerservice@mtn.com.gh', 1, 1, 1, 1...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:43] 🔄 Migrating table: company_analytics
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: company_analytics
+[2025-09-19 13:38:43] 📊 Table company_analytics has 4802 records
+[2025-09-19 13:38:43] ✅ Inserted 1000/4802 records into company_analytics
+[2025-09-19 13:38:43] ✅ Inserted 2000/4802 records into company_analytics
+[2025-09-19 13:38:43] ✅ Inserted 3000/4802 records into company_analytics
+[2025-09-19 13:38:43] ✅ Inserted 4000/4802 records into company_analytics
+[2025-09-19 13:38:43] ✅ Inserted 4802/4802 records into company_analytics
+[2025-09-19 13:38:43] ✅ Successfully migrated 4802 records to company_analytics
+[2025-09-19 13:38:43] 🔄 Migrating table: company_case_statistics
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: company_case_statistics
+[2025-09-19 13:38:43] 📊 Table company_case_statistics has 4802 records
+[2025-09-19 13:38:43] ✅ Inserted 1000/4802 records into company_case_statistics
+[2025-09-19 13:38:43] ✅ Inserted 2000/4802 records into company_case_statistics
+[2025-09-19 13:38:43] ✅ Inserted 3000/4802 records into company_case_statistics
+[2025-09-19 13:38:43] ✅ Inserted 4000/4802 records into company_case_statistics
+[2025-09-19 13:38:43] ✅ Inserted 4802/4802 records into company_case_statistics
+[2025-09-19 13:38:43] ✅ Successfully migrated 4802 records to company_case_statistics
+[2025-09-19 13:38:43] 🔄 Migrating table: courts
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: courts
+[2025-09-19 13:38:43] 📊 Table courts has 400 records
+[2025-09-19 13:38:43] ❌ Failed to insert data into courts: column "is_active" is of type boolean but expression is of type integer
+LINE 1: ...rday": "9:00 AM - 1:00 PM", "sunday": "Closed"}', 1, 1, '202...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:43] 🔄 Migrating table: error_logs
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: error_logs
+[2025-09-19 13:38:43] 📊 Table error_logs has 402 records
+[2025-09-19 13:38:43] ❌ Failed to insert data into error_logs: column "resolved" is of type boolean but expression is of type integer
+LINE 1: ...Chrome/140.0.0.0 Safari/537.36', 'null', 'ERROR', 0, NULL, N...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:43] 🔄 Migrating table: insurance
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: insurance
+[2025-09-19 13:38:43] 📊 Table insurance has 49 records
+[2025-09-19 13:38:43] ❌ Failed to insert data into insurance: column "has_mobile_app" is of type boolean but expression is of type integer
+LINE 1: ...nsurance Company, Accra', NULL, NULL, NULL, NULL, 0, 0, 1, 1...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:43] 🔄 Migrating table: insurance_analytics
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: insurance_analytics
+[2025-09-19 13:38:43] 📊 Table insurance_analytics has 13 records
+[2025-09-19 13:38:43] ✅ Inserted 13/13 records into insurance_analytics
+[2025-09-19 13:38:43] ✅ Successfully migrated 13 records to insurance_analytics
+[2025-09-19 13:38:43] 🔄 Migrating table: insurance_case_statistics
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: insurance_case_statistics
+[2025-09-19 13:38:43] 📊 Table insurance_case_statistics has 13 records
+[2025-09-19 13:38:43] ✅ Inserted 13/13 records into insurance_case_statistics
+[2025-09-19 13:38:43] ✅ Successfully migrated 13 records to insurance_case_statistics
+[2025-09-19 13:38:43] 🔄 Migrating table: legal_history
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: legal_history
+[2025-09-19 13:38:43] 📊 Table legal_history has 0 records
+[2025-09-19 13:38:43] 🔄 Migrating table: legal_search_index
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: legal_search_index
+[2025-09-19 13:38:43] 📊 Table legal_search_index has 0 records
+[2025-09-19 13:38:43] 🔄 Migrating table: login_sessions
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: login_sessions
+[2025-09-19 13:38:43] 📊 Table login_sessions has 0 records
+[2025-09-19 13:38:43] 🔄 Migrating table: notification_preferences
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: notification_preferences
+[2025-09-19 13:38:43] 📊 Table notification_preferences has 0 records
+[2025-09-19 13:38:43] 🔄 Migrating table: notifications
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: notifications
+[2025-09-19 13:38:43] 📊 Table notifications has 11 records
+[2025-09-19 13:38:43] ❌ Failed to insert data into notifications: invalid input syntax for type date: "SUBSCRIPTION"
+LINE 1: ...case analysis and advanced search capabilities.', 'SUBSCRIPT...
+                                                             ^
+
+[2025-09-19 13:38:43] 🔄 Migrating table: payments
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: payments
+[2025-09-19 13:38:43] 📊 Table payments has 0 records
+[2025-09-19 13:38:43] 🔄 Migrating table: people
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: people
+[2025-09-19 13:38:43] 📊 Table people has 6331 records
+[2025-09-19 13:38:43] ❌ Failed to insert data into people: column "is_verified" is of type boolean but expression is of type integer
+LINE 1: ...LL, NULL, NULL, NULL, '["English", "Ewe", "Ga"]', 0, NULL, N...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:43] 🔄 Migrating table: permissions
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: permissions
+[2025-09-19 13:38:43] 📊 Table permissions has 36 records
+[2025-09-19 13:38:43] ❌ Failed to insert data into permissions: column "is_system_permission" is of type boolean but expression is of type integer
+LINE 1: ...te new user accounts', 'users', 'user', 'create', 1, 1, '202...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:43] 🔄 Migrating table: person_analytics
+[2025-09-19 13:38:43] ✅ Created PostgreSQL table: person_analytics
+[2025-09-19 13:38:44] 📊 Table person_analytics has 3908 records
+[2025-09-19 13:38:44] ✅ Inserted 1000/3908 records into person_analytics
+[2025-09-19 13:38:44] ✅ Inserted 2000/3908 records into person_analytics
+[2025-09-19 13:38:44] ✅ Inserted 3000/3908 records into person_analytics
+[2025-09-19 13:38:44] ✅ Inserted 3908/3908 records into person_analytics
+[2025-09-19 13:38:44] ✅ Successfully migrated 3908 records to person_analytics
+[2025-09-19 13:38:44] 🔄 Migrating table: person_case_statistics
+[2025-09-19 13:38:44] ✅ Created PostgreSQL table: person_case_statistics
+[2025-09-19 13:38:44] 📊 Table person_case_statistics has 6315 records
+[2025-09-19 13:38:44] ✅ Inserted 1000/6315 records into person_case_statistics
+[2025-09-19 13:38:44] ✅ Inserted 2000/6315 records into person_case_statistics
+[2025-09-19 13:38:44] ✅ Inserted 3000/6315 records into person_case_statistics
+[2025-09-19 13:38:44] ✅ Inserted 4000/6315 records into person_case_statistics
+[2025-09-19 13:38:44] ✅ Inserted 5000/6315 records into person_case_statistics
+[2025-09-19 13:38:44] ✅ Inserted 6000/6315 records into person_case_statistics
+[2025-09-19 13:38:44] ✅ Inserted 6315/6315 records into person_case_statistics
+[2025-09-19 13:38:44] ✅ Successfully migrated 6315 records to person_case_statistics
+[2025-09-19 13:38:44] 🔄 Migrating table: reported_cases
+[2025-09-19 13:38:44] ✅ Created PostgreSQL table: reported_cases
+[2025-09-19 13:38:44] 📊 Table reported_cases has 12089 records
+[2025-09-19 13:38:45] ❌ Failed to insert data into reported_cases: invalid input syntax for type time: "2024-06-06T00:00:00"
+LINE 1: ..._NATIONAL_V._DINNI_GH_LTD_(2).pdf', NULL, '1960', '2024-06-0...
+                                                             ^
+
+[2025-09-19 13:38:45] 🔄 Migrating table: request_details
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: request_details
+[2025-09-19 13:38:45] 📊 Table request_details has 0 records
+[2025-09-19 13:38:45] 🔄 Migrating table: roles
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: roles
+[2025-09-19 13:38:45] 📊 Table roles has 5 records
+[2025-09-19 13:38:45] ❌ Failed to insert data into roles: column "is_system_role" is of type boolean but expression is of type integer
+LINE 1: ...ator', 'Full system access with all permissions', 1, 1, '[1,...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:45] 🔄 Migrating table: security_events
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: security_events
+[2025-09-19 13:38:45] 📊 Table security_events has 0 records
+[2025-09-19 13:38:45] 🔄 Migrating table: security_logs
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: security_logs
+[2025-09-19 13:38:45] 📊 Table security_logs has 0 records
+[2025-09-19 13:38:45] 🔄 Migrating table: settings
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: settings
+[2025-09-19 13:38:45] 📊 Table settings has 23 records
+[2025-09-19 13:38:45] ❌ Failed to insert data into settings: column "is_public" is of type boolean but expression is of type integer
+LINE 1: ...tring', 'OpenAI API key for AI-powered features', 0, 1, 1, '...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:45] 🔄 Migrating table: subscription_plans
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: subscription_plans
+[2025-09-19 13:38:45] 📊 Table subscription_plans has 4 records
+[2025-09-19 13:38:45] ❌ Failed to insert data into subscription_plans: column "is_active" is of type boolean but expression is of type integer
+LINE 1: ...se access", "Email support", "Basic analytics"]', 1, 0, 1, '...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:45] 🔄 Migrating table: subscription_requests
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: subscription_requests
+[2025-09-19 13:38:45] 📊 Table subscription_requests has 9 records
+[2025-09-19 13:38:45] ✅ Inserted 9/9 records into subscription_requests
+[2025-09-19 13:38:45] ✅ Successfully migrated 9 records to subscription_requests
+[2025-09-19 13:38:45] 🔄 Migrating table: subscriptions
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: subscriptions
+[2025-09-19 13:38:45] 📊 Table subscriptions has 2 records
+[2025-09-19 13:38:45] ✅ Inserted 2/2 records into subscriptions
+[2025-09-19 13:38:45] ✅ Successfully migrated 2 records to subscriptions
+[2025-09-19 13:38:45] 🔄 Migrating table: tenant_settings
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: tenant_settings
+[2025-09-19 13:38:45] 📊 Table tenant_settings has 0 records
+[2025-09-19 13:38:45] 🔄 Migrating table: tenants
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: tenants
+[2025-09-19 13:38:45] 📊 Table tenants has 5 records
+[2025-09-19 13:38:45] ❌ Failed to insert data into tenants: column "is_active" is of type boolean but expression is of type integer
+LINE 1: ...ic_search", "people_database", "email_support"]', 1, 1, 1, N...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:45] 🔄 Migrating table: two_factor_auth
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: two_factor_auth
+[2025-09-19 13:38:45] 📊 Table two_factor_auth has 2 records
+[2025-09-19 13:38:45] ❌ Failed to insert data into two_factor_auth: column "is_enabled" is of type boolean but expression is of type integer
+LINE 1: ... created_at, updated_at, last_used) VALUES (1, 3, 0, NULL, N...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:45] 🔄 Migrating table: usage_records
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: usage_records
+[2025-09-19 13:38:45] 📊 Table usage_records has 0 records
+[2025-09-19 13:38:45] 🔄 Migrating table: user_roles
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: user_roles
+[2025-09-19 13:38:45] 📊 Table user_roles has 1 records
+[2025-09-19 13:38:45] ❌ Failed to insert data into user_roles: column "is_active" is of type boolean but expression is of type integer
+LINE 1: ...LUES (2, 7, 1, NULL, '2025-09-16T11:49:33', NULL, 1, 'Auto-a...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:45] 🔄 Migrating table: users
+[2025-09-19 13:38:45] ✅ Created PostgreSQL table: users
+[2025-09-19 13:38:45] 📊 Table users has 8 records
+[2025-09-19 13:38:45] ❌ Failed to insert data into users: column "is_verified" is of type boolean but expression is of type integer
+LINE 1: ...Q/lxizrFRKeobsMOBPwretc1XGyNBTRwVsTNs5zvNup4EdO', 1, 'U2E8B9...
+                                                             ^
+HINT:  You will need to rewrite or cast the expression.
+
+[2025-09-19 13:38:45] ✅ Migration completed: 25/44 tables migrated successfully

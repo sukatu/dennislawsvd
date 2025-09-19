@@ -1,0 +1,140 @@
+[2025-09-19 13:36:57] 🚀 Starting simple database migration to PostgreSQL...
+[2025-09-19 13:36:57] ✅ Connected to MySQL successfully
+[2025-09-19 13:36:57] ✅ Connected to PostgreSQL successfully
+[2025-09-19 13:36:57] 📋 Found 44 tables to migrate
+[2025-09-19 13:36:57] 🔄 Migrating table: access_logs
+[2025-09-19 13:36:57] ✅ Created PostgreSQL table: access_logs
+[2025-09-19 13:36:57] ✅ Inserted 1000 records into access_logs
+[2025-09-19 13:36:57] 🔄 Migrating table: activity_logs
+[2025-09-19 13:36:57] ✅ Created PostgreSQL table: activity_logs
+[2025-09-19 13:36:57] ❌ Failed to insert data into activity_logs: invalid input syntax for type date: "VIEW"
+LINE 1: ...1', NULL, '80f91634-bad5-40a8-a2da-c1a867ead4d8', 'VIEW', 'V...
+                                                             ^
+
+[2025-09-19 13:36:57] 🔄 Migrating table: api_keys
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table api_keys: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: audit_logs
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table audit_logs: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: bank_analytics
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table bank_analytics: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: bank_case_statistics
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table bank_case_statistics: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: banks
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table banks: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: case_hearings
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table case_hearings: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: case_mentions
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table case_mentions: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: case_metadata
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table case_metadata: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: case_search_index
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table case_search_index: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: companies
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table companies: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: company_analytics
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table company_analytics: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: company_case_statistics
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table company_case_statistics: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: courts
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table courts: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: error_logs
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table error_logs: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: insurance
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table insurance: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: insurance_analytics
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table insurance_analytics: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: insurance_case_statistics
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table insurance_case_statistics: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: legal_history
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table legal_history: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: legal_search_index
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table legal_search_index: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: login_sessions
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table login_sessions: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: notification_preferences
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table notification_preferences: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: notifications
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table notifications: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: payments
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table payments: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: people
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table people: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: permissions
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table permissions: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: person_analytics
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table person_analytics: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: person_case_statistics
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table person_case_statistics: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: reported_cases
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table reported_cases: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: request_details
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table request_details: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: roles
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table roles: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: security_events
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table security_events: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: security_logs
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table security_logs: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: settings
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table settings: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: subscription_plans
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table subscription_plans: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: subscription_requests
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table subscription_requests: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: subscriptions
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table subscriptions: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: tenant_settings
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table tenant_settings: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: tenants
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table tenants: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: two_factor_auth
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table two_factor_auth: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: usage_records
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table usage_records: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: user_roles
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table user_roles: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] 🔄 Migrating table: users
+[2025-09-19 13:36:57] ❌ Failed to create PostgreSQL table users: current transaction is aborted, commands ignored until end of transaction block
+
+[2025-09-19 13:36:57] ✅ Migration completed: 1/44 tables migrated successfully
