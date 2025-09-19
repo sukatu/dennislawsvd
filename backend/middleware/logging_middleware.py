@@ -4,7 +4,7 @@ Logging middleware for FastAPI to automatically log requests and responses
 
 import time
 import uuid
-import jwt
+from jose import jwt
 from fastapi import Request, Response
 from fastapi.responses import StreamingResponse
 from starlette.middleware.base import BaseHTTPMiddleware
