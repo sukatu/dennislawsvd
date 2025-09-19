@@ -4,6 +4,7 @@ import os
 
 class Settings(BaseSettings):
     # Database Configuration
+    database_url_env: Optional[str] = None
     render_database_url: Optional[str] = None
     mysql_host: str = "localhost"
     mysql_port: int = 3306
@@ -49,6 +50,8 @@ class Settings(BaseSettings):
     
     @property
     def database_url(self) -> str:
+        if self.database_url_env:
+            return self.database_url_env
         if self.render_database_url:
             return self.render_database_url
         from urllib.parse import quote_plus
@@ -58,6 +61,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+        extra = "ignore"
 
 # Create settings instance
 settings = Settings()
