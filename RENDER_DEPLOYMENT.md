@@ -16,7 +16,7 @@ Environment: Python 3
 Branch: main (or your default branch)
 Root Directory: backend
 Build Command: pip install -r requirements.txt
-Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
+Start Command: python start_render.py
 ```
 
 **Note**: Since frontend and backend are in the same repo, the Root Directory should be `backend` for the backend service.
@@ -26,12 +26,14 @@ Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
 ### 3. Backend Environment Variables
 Add these in Render dashboard → Environment tab:
 ```
-DATABASE_URL_ENV=postgresql://postgres:62579011@hostname:5432/juridence
+DATABASE_URL_ENV=postgresql://username:password@hostname:port/database
 SECRET_KEY=your-production-secret-key-here
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 CORS_ORIGINS=["https://your-frontend-app.onrender.com"]
 ENVIRONMENT=production
 ```
+
+**Note**: Replace the DATABASE_URL_ENV with the actual PostgreSQL connection string from your Render PostgreSQL database.
 
 ### 4. Database Setup
 - In Render dashboard, create a PostgreSQL database
@@ -93,9 +95,23 @@ REACT_APP_API_URL=https://your-backend-app.onrender.com
 
 ### Database Connection Issues
 - Check Render logs for any errors
-- Ensure DATABASE_URL_ENV is correct and starts with `mysql+pymysql://`
+- Ensure DATABASE_URL_ENV is correct and starts with `postgresql://`
 - Verify CORS_ORIGINS includes your frontend URL
 - Check that all environment variables are set
+- Make sure your PostgreSQL database is running and accessible
+
+#### Common Database Connection Errors:
+
+**Error: "connection to server at localhost failed"**
+- This means DATABASE_URL_ENV is not set or not being read correctly
+- Go to your Render backend service → Environment tab
+- Add/update: `DATABASE_URL_ENV=postgresql://username:password@hostname:port/database`
+- Use the exact DATABASE_URL from your Render PostgreSQL service
+
+**Error: "Application startup failed"**
+- Check if your PostgreSQL database is running
+- Verify the database URL format is correct
+- Make sure all required environment variables are set
 
 ### Alternative Requirements File
 If you get metadata generation errors, try using `requirements-minimal.txt` instead:
