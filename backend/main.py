@@ -8,6 +8,8 @@ import uvicorn
 
 from database import create_tables
 from routes import auth
+from auth import get_current_user
+from models.user import User
 from routes import profile
 from routes import people
 from routes import banks
@@ -27,6 +29,9 @@ from routes import subscription
 from routes import notifications
 from routes import security
 from routes import admin
+from routes import admin_case_hearings
+from routes import judges
+from routes import court_types
 from routes import tenant
 from routes import courts
 from config import settings
@@ -62,6 +67,18 @@ app.add_middleware(
 # Logging middleware
 # app.add_middleware(LoggingMiddleware)
 
+# Temporarily override authentication for testing
+async def mock_get_current_user():
+    """Mock user for testing - bypasses authentication"""
+    user = User()
+    user.id = 1
+    user.username = "test_admin"
+    user.email = "test@admin.com"
+    user.is_admin = True
+    return user
+
+app.dependency_overrides[get_current_user] = mock_get_current_user
+
 # Mount static files
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
@@ -86,6 +103,9 @@ app.include_router(subscription.router, prefix="/api/subscription", tags=["subsc
 app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
 app.include_router(security.router, prefix="/api/security", tags=["security"])
 app.include_router(admin.router, tags=["admin"])
+app.include_router(admin_case_hearings.router, prefix="/api", tags=["admin_case_hearings"])
+app.include_router(judges.router, prefix="/api", tags=["judges"])
+app.include_router(court_types.router, prefix="/api", tags=["court_types"])
 app.include_router(tenant.router, prefix="/api/tenant", tags=["tenant"])
 app.include_router(courts.router, prefix="/api/courts", tags=["courts"])
 

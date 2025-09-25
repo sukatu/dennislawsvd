@@ -16,7 +16,7 @@ class CaseHearingBase(BaseModel):
     proceedings: Optional[str] = None
 
 class CaseHearingCreate(CaseHearingBase):
-    case_id: int
+    case_id: Optional[int] = None
 
 class CaseHearingUpdate(BaseModel):
     hearing_date: Optional[datetime] = None
@@ -27,7 +27,7 @@ class CaseHearingUpdate(BaseModel):
 
 class CaseHearing(CaseHearingBase):
     id: int
-    case_id: int
+    case_id: Optional[int] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 

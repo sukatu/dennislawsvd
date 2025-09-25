@@ -53,6 +53,9 @@ import {
 import UserManagement from '../components/admin/UserManagement';
 import ApiKeyManagement from '../components/admin/ApiKeyManagement';
 import CaseManagement from '../components/admin/CaseManagement';
+import CaseHearingManagement from '../components/admin/CaseHearingManagement';
+import JudgeManagement from '../components/admin/JudgeManagement';
+import CourtTypeManagement from '../components/admin/CourtTypeManagement';
 import PeopleManagement from '../components/admin/PeopleManagement';
 import BankManagement from '../components/admin/BankManagement';
 import InsuranceManagement from '../components/admin/InsuranceManagement';
@@ -338,6 +341,9 @@ const AdminDashboard = () => {
     { id: 'users', name: 'Users', icon: UserCheck },
     { id: 'api-keys', name: 'API Keys', icon: Key },
     { id: 'cases', name: 'Cases', icon: FileText },
+    { id: 'case-hearings', name: 'Case Hearing Details', icon: Calendar },
+    { id: 'judges', name: 'Judges', icon: Scale },
+    { id: 'court-types', name: 'Court Types', icon: Building2 },
     { id: 'people', name: 'People', icon: UserCheck },
     { id: 'banks', name: 'Banks', icon: Building2 },
     { id: 'insurance', name: 'Insurance', icon: Shield },
@@ -363,6 +369,12 @@ const AdminDashboard = () => {
         return <ApiKeyManagement />;
       case 'cases':
         return <CaseManagement />;
+      case 'case-hearings':
+        return <CaseHearingManagement />;
+      case 'judges':
+        return <JudgeManagement />;
+      case 'court-types':
+        return <CourtTypeManagement />;
       case 'people':
         return <PeopleManagement />;
       case 'banks':
