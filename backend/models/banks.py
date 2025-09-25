@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Float, JSON
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from backend.database import Base
+from database import Base
 
 class Banks(Base):
     __tablename__ = "banks"

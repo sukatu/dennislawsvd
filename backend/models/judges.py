@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Enum
 from sqlalchemy.sql import func
-from backend.database import Base
+from database import Base
 import enum
 
 class JudgeStatus(enum.Enum):

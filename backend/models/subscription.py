@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Enum, ForeignKey, DECIMAL, JSON
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from backend.database import Base
+from database import Base
 import enum
 
 class SubscriptionStatus(str, enum.Enum):

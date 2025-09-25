@@ -6,7 +6,7 @@ Stores pre-calculated case statistics for each person.
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from backend.database import Base
+from database import Base
 
 class PersonCaseStatistics(Base):
     __tablename__ = "person_case_statistics"
