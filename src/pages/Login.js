@@ -13,6 +13,9 @@ const Login = () => {
   const [isAdminLoading, setIsAdminLoading] = useState(false);
   const [error, setError] = useState('');
   
+  // Determine if we're on server or local
+  const isServer = window.location.hostname !== 'localhost';
+  
 
 
   const handleInputChange = (e) => {
@@ -31,16 +34,23 @@ const Login = () => {
     setError('');
 
     try {
+      // Determine if we're connecting to server or local
+      const isServer = window.location.hostname !== 'localhost';
+      const baseUrl = isServer ? 'http://62.171.137.28' : 'http://localhost:8000';
+      const authEndpoint = isServer ? '/api/auth/login' : '/auth/login';
+      
+      // Prepare request data based on endpoint
+      const requestData = isServer 
+        ? { username: formData.email, password: formData.password }
+        : { email: formData.email, password: formData.password };
+
       // Call the backend API
-      const response = await fetch('http://localhost:8000/auth/login', {
+      const response = await fetch(`${baseUrl}${authEndpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
+        body: JSON.stringify(requestData)
       });
 
       const data = await response.json();
@@ -82,16 +92,23 @@ const Login = () => {
     setError('');
 
     try {
+      // Determine if we're connecting to server or local
+      const isServer = window.location.hostname !== 'localhost';
+      const baseUrl = isServer ? 'http://62.171.137.28' : 'http://localhost:8000';
+      const authEndpoint = isServer ? '/api/auth/login' : '/auth/login';
+      
+      // Prepare admin credentials based on environment
+      const adminCredentials = isServer 
+        ? { username: 'admin', password: 'admin123' } // Server admin
+        : { email: 'admin@juridence.com', password: 'admin123' }; // Local admin
+
       // Call the backend API for admin login
-      const response = await fetch('http://localhost:8000/auth/login', {
+      const response = await fetch(`${baseUrl}${authEndpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: 'admin@juridence.com', // Default admin email
-          password: 'admin123' // Default admin password
-        })
+        body: JSON.stringify(adminCredentials)
       });
 
       const data = await response.json();
@@ -155,7 +172,7 @@ const Login = () => {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-                Email address
+                {isServer ? 'Username or Email' : 'Email address'}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -164,13 +181,13 @@ const Login = () => {
                 <input
                   id="email"
                   name="email"
-                  type="email"
-                  autoComplete="email"
+                  type={isServer ? "text" : "email"}
+                  autoComplete={isServer ? "username" : "email"}
                   required
                   value={formData.email}
                   onChange={handleInputChange}
                   className="appearance-none block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-                  placeholder="Enter your email"
+                  placeholder={isServer ? "Enter your username or email" : "Enter your email"}
                 />
               </div>
             </div>
