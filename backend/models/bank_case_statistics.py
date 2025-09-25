@@ -6,7 +6,7 @@ Stores pre-calculated case statistics for each bank.
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from database import Base
+from backend.database import Base
 
 class BankCaseStatistics(Base):
     __tablename__ = "bank_case_statistics"

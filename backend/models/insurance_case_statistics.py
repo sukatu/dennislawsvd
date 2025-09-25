@@ -6,7 +6,7 @@ Stores pre-calculated case statistics for each insurance company.
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from database import Base
+from backend.database import Base
 
 class InsuranceCaseStatistics(Base):
     __tablename__ = "insurance_case_statistics"

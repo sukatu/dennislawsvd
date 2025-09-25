@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Enum, F
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import enum
-from database import Base
+from backend.database import Base
 
 class NotificationType(str, enum.Enum):
     SYSTEM = "SYSTEM"

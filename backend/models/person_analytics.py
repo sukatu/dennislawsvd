@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, DECIMAL, Enum, JSON, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from database import Base
+from backend.database import Base
 
 # Create named ENUM types for PostgreSQL
 risk_level_enum = Enum('Low', 'Medium', 'High', 'Critical', name='risk_level')
