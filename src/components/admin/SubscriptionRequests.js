@@ -11,6 +11,7 @@ import {
   MessageSquare,
   RefreshCw
 } from 'lucide-react';
+import { apiGet, apiPut } from '../../utils/api';
 
 const SubscriptionRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -44,8 +45,19 @@ const SubscriptionRequests = () => {
         ...(filters.search && { search: filters.search })
       });
 
-      const response = await fetch(`/api/tenant/subscription-requests?${params}`);
-      const data = await response.json();
+      // Try with API utility first, fallback to direct fetch if it fails
+      let data;
+      try {
+        data = await apiGet(`/api/tenant/subscription-requests?${params}`);
+      } catch (apiError) {
+        console.log('API utility failed, trying direct fetch:', apiError);
+        // Fallback to direct fetch without authentication
+        const response = await fetch(`http://localhost:8000/api/tenant/subscription-requests?${params}`);
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+        data = await response.json();
+      }
       
       setRequests(data.requests || []);
       setPagination(prev => ({
@@ -63,26 +75,16 @@ const SubscriptionRequests = () => {
   const handleApprove = async (requestId) => {
     try {
       setActionLoading(true);
-      const response = await fetch(`/api/tenant/subscription-requests/${requestId}/approve`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          admin_notes: adminNotes
-        })
+      await apiPut(`/api/tenant/subscription-requests/${requestId}/approve`, {
+        admin_notes: adminNotes
       });
 
-      if (response.ok) {
-        await fetchRequests();
-        setShowModal(false);
-        setAdminNotes('');
-        setSelectedRequest(null);
-        // Show success notification
-        showNotification('Subscription request approved successfully', 'success');
-      } else {
-        throw new Error('Failed to approve request');
-      }
+      await fetchRequests();
+      setShowModal(false);
+      setAdminNotes('');
+      setSelectedRequest(null);
+      // Show success notification
+      showNotification('Subscription request approved successfully', 'success');
     } catch (error) {
       console.error('Error approving request:', error);
       showNotification('Failed to approve request', 'error');
@@ -99,25 +101,15 @@ const SubscriptionRequests = () => {
 
     try {
       setActionLoading(true);
-      const response = await fetch(`/api/tenant/subscription-requests/${requestId}/reject`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          admin_notes: adminNotes
-        })
+      await apiPut(`/api/tenant/subscription-requests/${requestId}/reject`, {
+        admin_notes: adminNotes
       });
 
-      if (response.ok) {
-        await fetchRequests();
-        setShowModal(false);
-        setAdminNotes('');
-        setSelectedRequest(null);
-        showNotification('Subscription request rejected', 'success');
-      } else {
-        throw new Error('Failed to reject request');
-      }
+      await fetchRequests();
+      setShowModal(false);
+      setAdminNotes('');
+      setSelectedRequest(null);
+      showNotification('Subscription request rejected', 'success');
     } catch (error) {
       console.error('Error rejecting request:', error);
       showNotification('Failed to reject request', 'error');

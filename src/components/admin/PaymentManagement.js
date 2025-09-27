@@ -14,6 +14,7 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react';
+import { apiGet, apiPost, apiPut, apiDelete } from '../../utils/api';
 
 const PaymentManagement = () => {
   const [payments, setPayments] = useState([]);
@@ -50,10 +51,20 @@ const PaymentManagement = () => {
         ...(statusFilter && { status: statusFilter })
       });
       
-      const response = await fetch(`/api/admin/payments?${params}`);
-      if (!response.ok) throw new Error('Failed to fetch payments');
+      // Try with API utility first, fallback to direct fetch if it fails
+      let data;
+      try {
+        data = await apiGet(`/api/admin/payments?${params}`);
+      } catch (apiError) {
+        console.log('API utility failed, trying direct fetch:', apiError);
+        // Fallback to direct fetch without authentication
+        const response = await fetch(`http://localhost:8000/api/admin/payments?${params}`);
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+        data = await response.json();
+      }
       
-      const data = await response.json();
       setPayments(data.payments || []);
       setTotalPages(data.total_pages || 1);
       setTotalPayments(data.total || 0);
@@ -66,10 +77,19 @@ const PaymentManagement = () => {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('/api/admin/payments/stats');
-      if (!response.ok) throw new Error('Failed to fetch stats');
-      
-      const data = await response.json();
+      // Try with API utility first, fallback to direct fetch if it fails
+      let data;
+      try {
+        data = await apiGet('/api/admin/payments/stats');
+      } catch (apiError) {
+        console.log('API utility failed, trying direct fetch:', apiError);
+        // Fallback to direct fetch without authentication
+        const response = await fetch('http://localhost:8000/api/admin/payments/stats');
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+        data = await response.json();
+      }
       setStats(data);
     } catch (err) {
       console.error('Error loading stats:', err);
@@ -88,21 +108,11 @@ const PaymentManagement = () => {
 
   const handleSavePayment = async (paymentData) => {
     try {
-      const url = editingPayment 
-        ? `/api/admin/payments/${editingPayment.id}`
-        : '/api/admin/payments';
-      
-      const method = editingPayment ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(paymentData),
-      });
-      
-      if (!response.ok) throw new Error('Failed to save payment');
+      if (editingPayment) {
+        await apiPut(`/api/admin/payments/${editingPayment.id}`, paymentData);
+      } else {
+        await apiPost('/api/admin/payments', paymentData);
+      }
       
       setShowCreateModal(false);
       setShowEditModal(false);
@@ -118,12 +128,7 @@ const PaymentManagement = () => {
     if (!window.confirm('Are you sure you want to delete this payment?')) return;
     
     try {
-      const response = await fetch(`/api/admin/payments/${paymentId}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) throw new Error('Failed to delete payment');
-      
+      await apiDelete(`/api/admin/payments/${paymentId}`);
       loadPayments();
       loadStats();
     } catch (err) {
