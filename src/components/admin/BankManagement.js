@@ -27,6 +27,7 @@ import {
 const BankManagement = () => {
   const [banks, setBanks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [bankTypeFilter, setBankTypeFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,14 +41,38 @@ const BankManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingBank, setEditingBank] = useState(null);
 
+  // Initial load
   useEffect(() => {
-    loadBanks();
+    loadBanks(false);
     loadAnalytics();
-  }, [currentPage, searchTerm, bankTypeFilter]);
+  }, []);
 
-  const loadBanks = async () => {
+  // Debounced search and filter changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Only show search loading if we have a search term or filter
+      const hasSearchOrFilter = searchTerm || bankTypeFilter;
+      loadBanks(hasSearchOrFilter);
+      loadAnalytics();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, bankTypeFilter]);
+
+  // Page changes (no debouncing needed)
+  useEffect(() => {
+    const hasSearchOrFilter = searchTerm || bankTypeFilter;
+    loadBanks(hasSearchOrFilter);
+  }, [currentPage]);
+
+  const loadBanks = async (isSearch = false) => {
     try {
-      setLoading(true);
+      if (isSearch) {
+        setSearchLoading(true);
+      } else {
+        setLoading(true);
+      }
+      
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10'
@@ -69,7 +94,11 @@ const BankManagement = () => {
     } catch (error) {
       console.error('Error loading banks:', error);
     } finally {
-      setLoading(false);
+      if (isSearch) {
+        setSearchLoading(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -281,6 +310,11 @@ const BankManagement = () => {
               onChange={handleSearch}
               className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
             />
+            {searchLoading && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-sky-500"></div>
+              </div>
+            )}
           </div>
           
           <select

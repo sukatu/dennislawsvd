@@ -27,6 +27,7 @@ import {
 const CompanyManagement = () => {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [companyTypeFilter, setCompanyTypeFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,9 +41,14 @@ const CompanyManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
 
+  // Debounce search term to avoid too many API calls
   useEffect(() => {
-    loadCompanies();
-    loadAnalytics();
+    const timeoutId = setTimeout(() => {
+      loadCompanies();
+      loadAnalytics();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
   }, [currentPage, searchTerm, companyTypeFilter]);
 
   const loadCompanies = async () => {

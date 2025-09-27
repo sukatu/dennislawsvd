@@ -27,6 +27,7 @@ import {
 const InsuranceManagement = () => {
   const [insurance, setInsurance] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [insuranceTypeFilter, setInsuranceTypeFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,14 +41,38 @@ const InsuranceManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingInsurance, setEditingInsurance] = useState(null);
 
+  // Initial load
   useEffect(() => {
-    loadInsurance();
+    loadInsurance(false);
     loadAnalytics();
-  }, [currentPage, searchTerm, insuranceTypeFilter]);
+  }, []);
 
-  const loadInsurance = async () => {
+  // Debounced search and filter changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Only show search loading if we have a search term or filter
+      const hasSearchOrFilter = searchTerm || insuranceTypeFilter;
+      loadInsurance(hasSearchOrFilter);
+      loadAnalytics();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, insuranceTypeFilter]);
+
+  // Page changes (no debouncing needed)
+  useEffect(() => {
+    const hasSearchOrFilter = searchTerm || insuranceTypeFilter;
+    loadInsurance(hasSearchOrFilter);
+  }, [currentPage]);
+
+  const loadInsurance = async (isSearch = false) => {
     try {
-      setLoading(true);
+      if (isSearch) {
+        setSearchLoading(true);
+      } else {
+        setLoading(true);
+      }
+      
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10'
@@ -69,7 +94,11 @@ const InsuranceManagement = () => {
     } catch (error) {
       console.error('Error loading insurance:', error);
     } finally {
-      setLoading(false);
+      if (isSearch) {
+        setSearchLoading(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
