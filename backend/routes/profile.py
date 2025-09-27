@@ -24,18 +24,23 @@ async def update_my_profile(
     db: Session = Depends(get_db)
 ):
     """Update current user's profile information."""
-    # Update only provided fields
+    # Get the user from the current database session to ensure it's bound
+    db_user = db.query(User).filter(User.id == current_user.id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Update the database user
     update_data = profile_data.dict(exclude_unset=True)
     
     for field, value in update_data.items():
-        if hasattr(current_user, field):
-            setattr(current_user, field, value)
+        if hasattr(db_user, field):
+            setattr(db_user, field, value)
     
-    current_user.updated_at = datetime.utcnow()
+    db_user.updated_at = datetime.utcnow()
     db.commit()
-    db.refresh(current_user)
+    db.refresh(db_user)
     
-    return current_user
+    return db_user
 
 @router.post("/change-password")
 async def change_password(

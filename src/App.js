@@ -14,6 +14,10 @@ import CaseDetails from './pages/CaseDetails';
 import CaseSearchResults from './pages/CaseSearchResults';
 import Results from './pages/Results';
 import PeopleResults from './pages/PeopleResults';
+import BanksResults from './pages/BanksResults';
+import InsuranceResults from './pages/InsuranceResults';
+import CompaniesResults from './pages/CompaniesResults';
+import SearchResults from './pages/SearchResults';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
@@ -46,6 +50,10 @@ function App() {
               <Route path="/services" element={<Services />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/people-results" element={<PeopleResults />} />
+              <Route path="/banks-results" element={<BanksResults />} />
+              <Route path="/insurance-results" element={<InsuranceResults />} />
+              <Route path="/companies-results" element={<CompaniesResults />} />
+              <Route path="/search-results" element={<SearchResults />} />
               <Route path="/people" element={<People />} />
               <Route path="/person-profile/:id" element={<PersonProfile />} />
               <Route path="/case-detail" element={<CaseDetail />} />

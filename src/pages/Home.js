@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Shield, Clock, Users, Database } from 'lucide-react';
+import { Search, Shield, Clock, Users, Database, Building2, Banknote, Building, User } from 'lucide-react';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,10 +18,10 @@ const Home = () => {
     setIsAuthenticated(authStatus && !!token);
   }, []);
 
-  // Load search suggestions from API - Only people names
+  // Load search suggestions from API - All entity types (people, banks, insurance, companies)
   const loadSuggestions = async (query) => {
     console.log('loadSuggestions called with query:', query);
-    if (query.length < 2) {
+    if (query.length < 1) {
       console.log('Query too short, clearing suggestions');
       setSuggestions([]);
       return;
@@ -30,41 +30,39 @@ const Home = () => {
     console.log('Starting to load suggestions...');
     setIsLoadingSuggestions(true);
     try {
-      const token = localStorage.getItem('accessToken') || 'test-token-123';
-      console.log('Using token:', token);
-      
-      // Only load people suggestions - no case titles, banks, or insurance
-      const url = `http://localhost:8000/api/people/search?query=${encodeURIComponent(query)}&limit=8`;
+      // Use unified search endpoint for all entity types
+      const url = `http://localhost:8000/api/search/quick?query=${encodeURIComponent(query)}&limit=10`;
       console.log('Making request to:', url);
       
-      const peopleResponse = await fetch(url, {
+      const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
-      console.log('Response status:', peopleResponse.status);
-      console.log('Response ok:', peopleResponse.ok);
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
 
       let allSuggestions = [];
       
-      if (peopleResponse.ok) {
-        const peopleData = await peopleResponse.json();
-        console.log('People data received:', peopleData);
-        const peopleSuggestions = (peopleData.people || []).map(person => ({
-          name: person.full_name,
-          text: person.full_name,
-          type: 'person',
-          category: 'Person',
-          id: person.id,
-          city: person.city,
-          occupation: person.occupation
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Unified search data received:', data);
+        const unifiedSuggestions = (data.suggestions || []).map(item => ({
+          name: item.name,
+          text: item.name,
+          type: item.type,
+          entity_type: item.type,
+          description: item.description,
+          id: item.id,
+          city: item.city,
+          region: item.region,
+          logo_url: item.logo_url
         }));
-        allSuggestions = [...peopleSuggestions];
+        allSuggestions = [...unifiedSuggestions];
         console.log('Mapped suggestions:', allSuggestions);
       } else {
-        console.error('API response not ok:', peopleResponse.status, peopleResponse.statusText);
+        console.error('API response not ok:', response.status, response.statusText);
       }
       
       setSuggestions(allSuggestions);
@@ -96,13 +94,30 @@ const Home = () => {
     setShowSuggestions(value.length > 0);
   };
 
-  // Handle suggestion selection - Only people names
+  // Handle suggestion selection - All entity types
   const handleSuggestionClick = (suggestion) => {
     setSearchQuery(suggestion.text || suggestion.name || suggestion);
     setShowSuggestions(false);
     
-    // All suggestions are people names, navigate to people results
-    navigate(`/people-results?search=${encodeURIComponent(suggestion.name)}`);
+    // Route to appropriate entity type based on suggestion type
+    const entityType = suggestion.entity_type || suggestion.type;
+    switch (entityType) {
+      case 'people':
+        navigate(`/people-results?search=${encodeURIComponent(suggestion.name)}`);
+        break;
+      case 'banks':
+        navigate(`/bank-detail/${suggestion.id}`);
+        break;
+      case 'insurance':
+        navigate(`/insurance-profile/${suggestion.id}`);
+        break;
+      case 'companies':
+        navigate(`/company-profile/${suggestion.id}`);
+        break;
+      default:
+        // Default to people results for backward compatibility
+        navigate(`/people-results?search=${encodeURIComponent(suggestion.name)}`);
+    }
   };
 
 
@@ -118,8 +133,8 @@ const Home = () => {
         return;
       }
       
-      // Navigate to people search results to show names, not case titles
-      navigate(`/people-results?search=${encodeURIComponent(searchQuery)}`);
+      // Navigate to unified search results to show all entity types
+      navigate(`/search-results?search=${encodeURIComponent(searchQuery)}`);
     }
   };
 
@@ -227,7 +242,7 @@ const Home = () => {
                   <div className="flex-1 relative">
                     <input
                       type="text"
-                      placeholder={isAuthenticated ? "Search for people by name..." : "Please login to search..."}
+                      placeholder={isAuthenticated ? "Search for people, banks, insurance, companies..." : "Please login to search..."}
                       value={searchQuery}
                       onChange={handleInputChange}
                       onFocus={() => searchQuery.length > 0 && setShowSuggestions(true)}
@@ -243,27 +258,47 @@ const Home = () => {
                             Loading suggestions...
                           </div>
                         ) : suggestions.length > 0 ? (
-                          suggestions.map((suggestion, index) => (
-                            <button
-                              key={index}
-                              type="button"
-                              onClick={() => handleSuggestionClick(suggestion)}
-                              className="w-full text-left px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-600 last:border-b-0 transition-colors"
-                            >
-                              <div className="flex items-center gap-3">
-                                <Users className="h-4 w-4 text-blue-500" />
-                                <div className="flex-1">
-                                  <div className="font-medium">{suggestion.text || suggestion.name}</div>
-                                  {suggestion.category && (
-                                    <div className="text-xs text-slate-500 dark:text-slate-400">{suggestion.category}</div>
-                                  )}
-                                  {suggestion.city && (
-                                    <div className="text-xs text-slate-500 dark:text-slate-400">{suggestion.city} • {suggestion.occupation}</div>
-                                  )}
+                          suggestions.map((suggestion, index) => {
+                            // Get appropriate icon based on entity type
+                            const getEntityIcon = (type) => {
+                              switch (type) {
+                                case 'people':
+                                  return <User className="h-4 w-4 text-blue-500" />;
+                                case 'banks':
+                                  return <Building2 className="h-4 w-4 text-green-500" />;
+                                case 'insurance':
+                                  return <Shield className="h-4 w-4 text-purple-500" />;
+                                case 'companies':
+                                  return <Building className="h-4 w-4 text-orange-500" />;
+                                default:
+                                  return <Users className="h-4 w-4 text-gray-500" />;
+                              }
+                            };
+
+                            return (
+                              <button
+                                key={index}
+                                type="button"
+                                onClick={() => handleSuggestionClick(suggestion)}
+                                className="w-full text-left px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-600 last:border-b-0 transition-colors"
+                              >
+                                <div className="flex items-center gap-3">
+                                  {getEntityIcon(suggestion.entity_type || suggestion.type)}
+                                  <div className="flex-1">
+                                    <div className="font-medium">{suggestion.text || suggestion.name}</div>
+                                    {suggestion.description && (
+                                      <div className="text-xs text-slate-500 dark:text-slate-400">{suggestion.description}</div>
+                                    )}
+                                    {(suggestion.city || suggestion.region) && (
+                                      <div className="text-xs text-slate-500 dark:text-slate-400">
+                                        {suggestion.city && suggestion.region ? `${suggestion.city}, ${suggestion.region}` : suggestion.city || suggestion.region}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                            </button>
-                          ))
+                              </button>
+                            );
+                          })
                         ) : searchQuery.length > 1 ? (
                           <div className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 text-center">
                             No suggestions found

@@ -95,7 +95,7 @@ class TenantResponse(TenantBase):
     max_users: int
     max_cases_per_month: int
     max_storage_gb: float
-    features_enabled: Optional[Dict[str, Any]] = None
+    features_enabled: Optional[List[str]] = None
     is_active: bool
     is_approved: bool
     is_verified: bool

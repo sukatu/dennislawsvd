@@ -5,6 +5,7 @@ from database import get_db
 from models.people import People
 from models.banks import Banks
 from models.insurance import Insurance
+from models.companies import Companies
 from models.user import User
 from schemas.search import (
     UnifiedSearchRequest,
@@ -27,9 +28,9 @@ router = APIRouter()
 @router.get("/unified", response_model=UnifiedSearchResponse)
 async def unified_search(
     query: Optional[str] = Query(None, description="General search query"),
-    search_type: str = Query("all", description="Type of search (all, people, banks, insurance)"),
+    search_type: str = Query("all", description="Type of search (all, people, banks, insurance, companies)"),
     page: int = Query(1, ge=1, description="Page number"),
-    limit: int = Query(20, ge=1, le=100, description="Items per page"),
+    limit: int = Query(1000, ge=1, le=5000, description="Items per page"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -60,10 +61,24 @@ async def unified_search(
                 )
             )
         
-        people_results = people_query.limit(limit).all()
+        people_results = people_query.all()
         
-        # Add to unified results
+        # Add to unified results with case statistics
         for person in people_results:
+            # Add case statistics if available (same logic as people search endpoint)
+            if hasattr(person, 'case_statistics') and person.case_statistics:
+                stats = person.case_statistics
+                total_cases = stats.total_cases
+                resolved_cases = stats.resolved_cases
+                unresolved_cases = stats.unresolved_cases
+                case_outcome = stats.case_outcome
+            else:
+                # Default values if no statistics available
+                total_cases = 0
+                resolved_cases = 0
+                unresolved_cases = 0
+                case_outcome = "N/A"
+            
             results.append(SearchResultItem(
                 id=person.id,
                 name=person.full_name,
@@ -74,6 +89,10 @@ async def unified_search(
                 additional_info={
                     "risk_level": person.risk_level,
                     "case_count": person.case_count,
+                    "total_cases": total_cases,
+                    "resolved_cases": resolved_cases,
+                    "unresolved_cases": unresolved_cases,
+                    "case_outcome": case_outcome,
                     "phone": person.phone_number,
                     "email": person.email
                 }
@@ -95,7 +114,7 @@ async def unified_search(
                 )
             )
         
-        banks_results = banks_query.limit(limit).all()
+        banks_results = banks_query.all()
         
         # Add to unified results
         for bank in banks_results:
@@ -133,7 +152,7 @@ async def unified_search(
                 )
             )
         
-        insurance_results = insurance_query.limit(limit).all()
+        insurance_results = insurance_query.all()
         
         # Add to unified results
         for insurance in insurance_results:
@@ -152,6 +171,46 @@ async def unified_search(
                     "website": insurance.website,
                     "has_mobile_app": insurance.has_mobile_app,
                     "has_online_portal": insurance.has_online_portal
+                }
+            ))
+    
+    # Search companies
+    if search_type in ["all", "companies"]:
+        companies_query = db.query(Companies).filter(Companies.is_active == True)
+        if query:
+            search_term = f"%{query.lower()}%"
+            companies_query = companies_query.filter(
+                or_(
+                    func.lower(Companies.name).like(search_term),
+                    func.lower(Companies.short_name).like(search_term),
+                    func.lower(Companies.registration_number).like(search_term),
+                    func.lower(Companies.city).like(search_term),
+                    func.lower(Companies.region).like(search_term),
+                    func.lower(Companies.industry).like(search_term),
+                    func.lower(Companies.description).like(search_term)
+                )
+            )
+        
+        companies_results = companies_query.all()
+        
+        # Add to unified results
+        for company in companies_results:
+            results.append(SearchResultItem(
+                id=company.id,
+                name=company.name,
+                type="companies",
+                description=f"{company.company_type} • {company.industry} • {company.city}, {company.region}",
+                city=company.city,
+                region=company.region,
+                logo_url=company.logo_url,
+                additional_info={
+                    "company_type": company.company_type,
+                    "industry": company.industry,
+                    "registration_number": company.registration_number,
+                    "phone": company.phone,
+                    "website": company.website,
+                    "employee_count": company.employee_count,
+                    "annual_revenue": company.annual_revenue
                 }
             ))
     
@@ -188,10 +247,11 @@ async def unified_search(
 
 @router.get("/quick", response_model=QuickSearchResponse)
 async def quick_search(
-    query: str = Query(..., min_length=2, description="Search query"),
+    query: str = Query(..., min_length=1, description="Search query"),
     limit: int = Query(10, ge=1, le=50, description="Maximum results"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db)
+    # Temporarily removed authentication for home page search
+    # current_user: User = Depends(get_current_user)
 ):
     """Quick search for suggestions and autocomplete"""
     
@@ -206,7 +266,7 @@ async def quick_search(
             func.lower(People.first_name).like(search_term),
             func.lower(People.last_name).like(search_term)
         )
-    ).limit(limit // 3).all()
+    ).limit(limit).all()
     
     for person in people:
         suggestions.append(SearchResultItem(
@@ -256,6 +316,26 @@ async def quick_search(
             city=ins.city,
             region=ins.region,
             logo_url=ins.logo_url
+        ))
+    
+    # Search companies
+    companies = db.query(Companies).filter(
+        Companies.is_active == True,
+        or_(
+            func.lower(Companies.name).like(search_term),
+            func.lower(Companies.short_name).like(search_term)
+        )
+    ).limit(limit // 4).all()
+    
+    for company in companies:
+        suggestions.append(SearchResultItem(
+            id=company.id,
+            name=company.name,
+            type="companies",
+            description=f"{company.company_type} • {company.industry or 'N/A'}",
+            city=company.city,
+            region=company.region,
+            logo_url=company.logo_url
         ))
     
     return QuickSearchResponse(

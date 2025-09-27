@@ -9,6 +9,7 @@ import uuid
 
 from database import get_db
 from models.tenant import Tenant, SubscriptionPlan, SubscriptionRequest, TenantSetting
+from models.subscription import SubscriptionStatus
 from models.user import User
 from schemas.tenant import (
     TenantResponse, TenantCreateRequest, TenantUpdateRequest, TenantListResponse,
@@ -18,6 +19,51 @@ from schemas.tenant import (
 )
 
 router = APIRouter()
+
+# Tenant Statistics (must be before parameterized routes)
+@router.get("/tenants/stats")
+async def get_tenant_stats(db: Session = Depends(get_db)):
+    """Get tenant statistics"""
+    try:
+        total_tenants = db.query(Tenant).count()
+        active_tenants = db.query(Tenant).filter(Tenant.is_active == True).count()
+        approved_tenants = db.query(Tenant).filter(Tenant.is_approved == True).count()
+        pending_approval = db.query(Tenant).filter(Tenant.is_approved == False).count()
+        
+        # Subscription status breakdown
+        status_breakdown = db.query(
+            Tenant.subscription_status,
+            func.count(Tenant.id).label('count')
+        ).group_by(Tenant.subscription_status).all()
+        
+        # Recent tenants (last 30 days)
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        recent_tenants = db.query(Tenant).filter(
+            Tenant.created_at >= thirty_days_ago
+        ).count()
+        
+        # Pending subscription requests
+        pending_requests = db.query(SubscriptionRequest).filter(
+            SubscriptionRequest.status == "pending"
+        ).count()
+        
+        return {
+            "total": total_tenants,
+            "active": active_tenants,
+            "pending": pending_approval,
+            "trial": db.query(Tenant).filter(Tenant.subscription_status == SubscriptionStatus.TRIALING).count(),
+            "cancelled": db.query(Tenant).filter(Tenant.subscription_status == SubscriptionStatus.CANCELLED).count(),
+            "approved_tenants": approved_tenants,
+            "recent_tenants": recent_tenants,
+            "pending_requests": pending_requests,
+            "subscription_status_breakdown": [
+                {"status": status, "count": count} 
+                for status, count in status_breakdown
+            ],
+            "last_updated": datetime.utcnow()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching tenant statistics: {str(e)}")
 
 # Tenant Management
 @router.get("/tenants", response_model=TenantListResponse)
@@ -443,50 +489,6 @@ async def update_tenant_setting(
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error updating tenant setting: {str(e)}")
 
-# Tenant Statistics
-@router.get("/tenants/stats")
-async def get_tenant_stats(db: Session = Depends(get_db)):
-    """Get tenant statistics"""
-    try:
-        total_tenants = db.query(Tenant).count()
-        active_tenants = db.query(Tenant).filter(Tenant.is_active == True).count()
-        approved_tenants = db.query(Tenant).filter(Tenant.is_approved == True).count()
-        pending_approval = db.query(Tenant).filter(Tenant.is_approved == False).count()
-        
-        # Subscription status breakdown
-        status_breakdown = db.query(
-            Tenant.subscription_status,
-            func.count(Tenant.id).label('count')
-        ).group_by(Tenant.subscription_status).all()
-        
-        # Recent tenants (last 30 days)
-        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-        recent_tenants = db.query(Tenant).filter(
-            Tenant.created_at >= thirty_days_ago
-        ).count()
-        
-        # Pending subscription requests
-        pending_requests = db.query(SubscriptionRequest).filter(
-            SubscriptionRequest.status == "pending"
-        ).count()
-        
-        return {
-            "total": total_tenants,
-            "active": active_tenants,
-            "pending": pending_approval,
-            "trial": db.query(Tenant).filter(Tenant.subscription_status == SubscriptionStatus.TRIAL).count(),
-            "cancelled": db.query(Tenant).filter(Tenant.subscription_status == SubscriptionStatus.CANCELLED).count(),
-            "approved_tenants": approved_tenants,
-            "recent_tenants": recent_tenants,
-            "pending_requests": pending_requests,
-            "subscription_status_breakdown": [
-                {"status": status, "count": count} 
-                for status, count in status_breakdown
-            ],
-            "last_updated": datetime.utcnow()
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching tenant statistics: {str(e)}")
 
 # Tenant CRUD Operations
 @router.get("/tenants", response_model=TenantListResponse)

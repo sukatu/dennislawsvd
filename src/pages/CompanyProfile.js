@@ -154,7 +154,25 @@ const CompanyProfile = () => {
       <div className="space-y-1">
         {items.map((item, index) => (
           <div key={index} className="text-sm text-gray-900 bg-gray-50 px-3 py-1 rounded">
-            {item}
+            {typeof item === 'object' ? (
+              <div className="space-y-1">
+                {item.name && <div className="font-medium">{item.name}</div>}
+                {item.position && <div className="text-xs text-gray-600">{item.position}</div>}
+                {item.nationality && <div className="text-xs text-gray-500">{item.nationality}</div>}
+                {item.occupation && <div className="text-xs text-gray-500">{item.occupation}</div>}
+                {item.email && <div className="text-xs text-blue-600">{item.email}</div>}
+                {item.contact && <div className="text-xs text-gray-500">{item.contact}</div>}
+                {item.address && <div className="text-xs text-gray-500">{item.address}</div>}
+                {item.tax_identification_number && <div className="text-xs text-gray-500">TIN: {item.tax_identification_number}</div>}
+                {item.other_directorship && Array.isArray(item.other_directorship) && item.other_directorship.length > 0 && (
+                  <div className="text-xs text-gray-500">
+                    Other Directorships: {item.other_directorship.join(', ')}
+                  </div>
+                )}
+              </div>
+            ) : (
+              item
+            )}
           </div>
         ))}
       </div>

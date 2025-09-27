@@ -29,6 +29,7 @@ from routes import subscription
 from routes import notifications
 from routes import security
 from routes import admin
+from routes import admin_payments
 from routes import admin_case_hearings
 from routes import judges
 from routes import court_types
@@ -67,17 +68,26 @@ app.add_middleware(
 # Logging middleware
 # app.add_middleware(LoggingMiddleware)
 
-# Temporarily override authentication for testing
-async def mock_get_current_user():
-    """Mock user for testing - bypasses authentication"""
-    user = User()
-    user.id = 1
-    user.username = "test_admin"
-    user.email = "test@admin.com"
-    user.is_admin = True
-    return user
+# Temporarily override authentication for testing - using real database user
+async def get_real_admin_user():
+    """Get real admin user from database - bypasses authentication"""
+    from database import get_db
+    from datetime import datetime
+    
+    db = next(get_db())
+    # Get the real admin user from database
+    admin_user = db.query(User).filter(User.email == "admin@juridence.com").first()
+    if not admin_user:
+        db.close()
+        raise HTTPException(status_code=404, detail="Admin user not found")
+    
+    # Update last login without committing (let the profile endpoint handle commits)
+    admin_user.last_login = datetime.utcnow()
+    
+    # Don't close the session here - let the endpoint handle it
+    return admin_user
 
-app.dependency_overrides[get_current_user] = mock_get_current_user
+app.dependency_overrides[get_current_user] = get_real_admin_user
 
 # Mount static files
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
@@ -103,6 +113,7 @@ app.include_router(subscription.router, prefix="/api/subscription", tags=["subsc
 app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
 app.include_router(security.router, prefix="/api/security", tags=["security"])
 app.include_router(admin.router, tags=["admin"])
+app.include_router(admin_payments.router, prefix="/api/admin/payments", tags=["admin_payments"])
 app.include_router(admin_case_hearings.router, prefix="/api", tags=["admin_case_hearings"])
 app.include_router(judges.router, prefix="/api", tags=["judges"])
 app.include_router(court_types.router, prefix="/api", tags=["court_types"])
