@@ -42,6 +42,7 @@ import {
   MessageCircle,
   Check
 } from 'lucide-react';
+import AIChat from '../components/AIChat';
 
 const CaseDetails = () => {
   const { caseId } = useParams();
@@ -70,6 +71,9 @@ const CaseDetails = () => {
     caseDocuments: true,
     subjectMatter: true
   });
+  
+  // AI Chat state
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
   // Get search query from URL params
   const searchParams = new URLSearchParams(location.search);
@@ -838,11 +842,14 @@ const CaseDetails = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-2">
-              {getOutcomeIcon(caseData?.metadata?.outcome)}
-              <span className="text-sm text-gray-600">
-                {caseData?.metadata?.outcome || 'Unknown'}
-              </span>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                {getOutcomeIcon(caseData?.metadata?.outcome)}
+                <span className="text-sm text-gray-600">
+                  {caseData?.metadata?.outcome || 'Unknown'}
+                </span>
+              </div>
+              
             </div>
           </div>
         </div>
@@ -2164,6 +2171,25 @@ const CaseDetails = () => {
           }
         }
       `}</style>
+      
+      {/* Floating AI Assistant Button */}
+      <button
+        onClick={() => setIsAIChatOpen(true)}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center group"
+        title="Open AI Legal Assistant"
+      >
+        <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
+        <span className="sr-only">AI Assistant</span>
+      </button>
+
+      {/* AI Chat Component */}
+      <AIChat
+        caseId={parseInt(caseId)}
+        caseTitle={caseData?.title}
+        isOpen={isAIChatOpen}
+        onClose={() => setIsAIChatOpen(false)}
+        onMinimize={() => setIsAIChatOpen(false)}
+      />
     </div>
   );
 };
