@@ -20,19 +20,15 @@ const Home = () => {
 
   // Load search suggestions from API - All entity types (people, banks, insurance, companies)
   const loadSuggestions = async (query) => {
-    console.log('loadSuggestions called with query:', query);
     if (query.length < 1) {
-      console.log('Query too short, clearing suggestions');
       setSuggestions([]);
       return;
     }
 
-    console.log('Starting to load suggestions...');
     setIsLoadingSuggestions(true);
     try {
       // Use unified search endpoint for all entity types
       const url = `http://localhost:8000/api/search/quick?query=${encodeURIComponent(query)}&limit=10`;
-      console.log('Making request to:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -40,14 +36,11 @@ const Home = () => {
         }
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
 
       let allSuggestions = [];
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Unified search data received:', data);
         const unifiedSuggestions = (data.suggestions || []).map(item => ({
           name: item.name,
           text: item.name,
@@ -60,7 +53,6 @@ const Home = () => {
           logo_url: item.logo_url
         }));
         allSuggestions = [...unifiedSuggestions];
-        console.log('Mapped suggestions:', allSuggestions);
       } else {
         console.error('API response not ok:', response.status, response.statusText);
       }

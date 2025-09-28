@@ -89,7 +89,6 @@ const InsuranceDetail = () => {
     const companyId = searchParams.get('id');
     const companyName = searchParams.get('name');
     
-    console.log('URL Parameters - Insurance ID:', companyId, 'Insurance Name:', companyName);
     
     if (companyId || companyName) {
       setCurrentPage(1); // Reset pagination when insurance changes
@@ -113,7 +112,6 @@ const InsuranceDetail = () => {
         url = `http://localhost:8000/api/insurance/search?name=${encodeURIComponent(companyName)}&limit=1`;
       }
 
-      console.log('Loading insurance data from:', url);
 
       const response = await fetch(url, {
         headers: {
@@ -132,7 +130,6 @@ const InsuranceDetail = () => {
         }
 
         if (data) {
-          console.log('Insurance data loaded:', data);
           // Transform API data to match expected format
           const companyData = {
             id: data.id,

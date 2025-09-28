@@ -81,7 +81,7 @@ const SearchResults = () => {
     // Route to appropriate entity type based on result type
     switch (result.type) {
       case 'people':
-        navigate(`/person-profile/${result.id}`);
+        navigate(`/person-profile/${result.id}?search=${encodeURIComponent(query)}`);
         break;
       case 'banks':
         navigate(`/bank-detail/${result.id}`);
@@ -93,7 +93,7 @@ const SearchResults = () => {
         navigate(`/company-profile/${result.id}`);
         break;
       default:
-        console.log('Unknown entity type:', result.type);
+        // Unknown entity type - could add handling here if needed
     }
   };
 

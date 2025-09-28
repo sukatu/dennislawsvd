@@ -56,7 +56,6 @@ const PaymentManagement = () => {
       try {
         data = await apiGet(`/api/admin/payments?${params}`);
       } catch (apiError) {
-        console.log('API utility failed, trying direct fetch:', apiError);
         // Fallback to direct fetch without authentication
         const response = await fetch(`http://localhost:8000/api/admin/payments?${params}`);
         if (!response.ok) {
@@ -82,7 +81,6 @@ const PaymentManagement = () => {
       try {
         data = await apiGet('/api/admin/payments/stats');
       } catch (apiError) {
-        console.log('API utility failed, trying direct fetch:', apiError);
         // Fallback to direct fetch without authentication
         const response = await fetch('http://localhost:8000/api/admin/payments/stats');
         if (!response.ok) {

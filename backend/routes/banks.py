@@ -407,7 +407,7 @@ async def generate_bank_analytics(
 @router.get("/{bank_id}/related-cases")
 async def get_bank_related_cases(
     bank_id: int,
-    limit: int = Query(10, ge=1, le=50, description="Maximum related cases"),
+    limit: int = Query(10, ge=1, le=100, description="Maximum related cases"),
     db: Session = Depends(get_db)
     # Temporarily removed authentication for testing
     # current_user: User = Depends(get_current_user)

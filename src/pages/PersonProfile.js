@@ -94,9 +94,6 @@ const PersonProfile = () => {
     const loadPersonData = async () => {
       try {
         setIsLoading(true);
-        console.log('Loading person data for ID:', id);
-        console.log('Search query:', searchQuery);
-        console.log('URL being called:', `http://localhost:8000/api/people/${id}`);
         const token = localStorage.getItem('accessToken') || 'test-token-123';
         
         const response = await fetch(`http://localhost:8000/api/people/${id}`, {
@@ -107,10 +104,8 @@ const PersonProfile = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('Person data loaded:', data);
           setPersonData(data);
         } else {
-          console.log('API call failed, using fallback data');
           // Fallback to mock data
           setPersonData({
             id: id,
@@ -167,11 +162,12 @@ const PersonProfile = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('Analytics data loaded:', data);
           setAnalytics(data);
         } else {
-          console.log('Analytics API call failed, using fallback data');
-          // Fallback to mock data
+          // Fallback to mock data - don't log 404 errors as they're expected
+          if (response.status !== 404) {
+            console.error('Error loading analytics data:', response.status);
+          }
           setAnalytics({
             risk_score: 0,
             risk_level: 'Low',
@@ -230,10 +226,8 @@ const PersonProfile = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('Case statistics loaded:', data);
           setCaseStats(data);
         } else {
-          console.log('Case statistics API call failed, using fallback data');
           // Fallback to mock data
           setCaseStats({
             total_cases: 0,
@@ -271,8 +265,6 @@ const PersonProfile = () => {
   useEffect(() => {
     const loadRelatedCases = async () => {
       try {
-        console.log('Loading related cases for person:', personData?.full_name);
-        console.log('Search query:', searchQuery);
         const token = localStorage.getItem('accessToken') || 'test-token-123';
         const response = await fetch(`http://localhost:8000/api/case-search/search?query=${encodeURIComponent(personData?.full_name || '')}&limit=50`, {
           headers: {
@@ -282,11 +274,6 @@ const PersonProfile = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('API Response for related cases:', data);
-          console.log('Results:', data.results);
-          if (data.results && data.results.length > 0) {
-            console.log('First case:', data.results[0]);
-          }
           setRelatedCases(data.results || []);
           setFilteredCases(data.results || []);
         } else {

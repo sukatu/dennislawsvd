@@ -168,7 +168,6 @@ const CaseHearingManagement = () => {
       // Only search if search term is 3+ characters, otherwise return empty
       if (searchTerm.length < 3) {
         setCases([]);
-        console.log('🔍 Search term too short, clearing cases');
         return;
       }
 
@@ -181,7 +180,6 @@ const CaseHearingManagement = () => {
       
       if (response.ok) {
         const data = await response.json();
-        console.log(`✅ SUCCESS: Found ${data.length} cases for search: "${searchTerm}"`);
         setCases(data);
       } else {
         console.error('❌ FAILED to fetch cases:', response.status, response.statusText);
@@ -205,7 +203,6 @@ const CaseHearingManagement = () => {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Court types loaded:', data);
         setCourts(data);
       } else {
         console.error('Failed to fetch court types:', response.statusText);
@@ -253,7 +250,6 @@ const CaseHearingManagement = () => {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Modal court types loaded:', data);
         setModalCourts(data);
       } else {
         console.error('Failed to fetch modal court types:', response.statusText);
@@ -305,7 +301,6 @@ const CaseHearingManagement = () => {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Modal cases loaded:', data);
         setModalCases(data);
       } else {
         console.error('Failed to fetch modal cases:', response.statusText);

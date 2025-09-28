@@ -656,7 +656,6 @@ const CaseManagement = () => {
         )
       };
 
-      console.log('Sending case data:', transformedData);
 
       const url = editingCase 
         ? `http://localhost:8000/api/admin/cases/${editingCase.id}`
@@ -674,7 +673,6 @@ const CaseManagement = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Case saved successfully:', result);
         setShowCreateModal(false);
         setShowEditModal(false);
         setEditingCase(null);

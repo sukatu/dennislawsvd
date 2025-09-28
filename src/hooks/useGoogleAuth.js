@@ -89,7 +89,6 @@ const useGoogleAuth = () => {
 
   // Handle Google Sign-In success
   const handleGoogleSuccess = useCallback((userInfo) => {
-    console.log('Google authentication successful:', userInfo);
     // You can add additional logic here, like sending user data to your backend
     
     // Check if there's a redirect URL stored

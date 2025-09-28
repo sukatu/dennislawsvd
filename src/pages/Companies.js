@@ -90,7 +90,6 @@ const Companies = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Companies data loaded:', data);
         
         // Load case statistics and analytics for each company
         const companiesWithStats = await Promise.all(

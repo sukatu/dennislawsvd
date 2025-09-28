@@ -77,7 +77,6 @@ const CaseDetails = () => {
   const originalSearch = searchParams.get('search') || searchQuery; // Original search term
 
   useEffect(() => {
-    console.log('CaseDetails useEffect triggered with caseId:', caseId);
     if (caseId) {
       // Check if we have original person cases from navigation state
       const state = location.state;
@@ -95,10 +94,8 @@ const CaseDetails = () => {
   const loadCaseDetails = async () => {
     try {
       setLoading(true);
-      console.log('Loading case details for caseId:', caseId);
       
       const token = localStorage.getItem('accessToken') || 'test-token-123';
-      console.log('Using token:', token ? 'Present' : 'Missing');
       
       // Load case details first
       const caseResponse = await fetch(`http://localhost:8000/api/case-search/${caseId}/details`, {
@@ -108,16 +105,13 @@ const CaseDetails = () => {
         }
       });
 
-      console.log('API Response status:', caseResponse.status);
       
       if (caseResponse.ok) {
         const data = await caseResponse.json();
-        console.log('Case data loaded:', data);
         setCaseData(data);
         
         // After loading case data, determine if this is an insurance-related case
         const isInsuranceCase = checkIfInsuranceCase(data);
-        console.log('Is insurance case:', isInsuranceCase);
         
         if (isInsuranceCase) {
           // Load insurance-related cases
@@ -225,7 +219,6 @@ const CaseDetails = () => {
       );
       
       if (foundInsurance) {
-        console.log('Found insurance company:', foundInsurance);
         
         // Search for cases related to this insurance company
         const searchResponse = await fetch(`http://localhost:8000/api/case-search/search?query=${encodeURIComponent(foundInsurance)}&limit=8`, {
@@ -237,17 +230,14 @@ const CaseDetails = () => {
         
         if (searchResponse.ok) {
           const searchData = await searchResponse.json();
-          console.log('Insurance-related cases loaded:', searchData);
           
           // Filter out the current case and format the results
           const relatedCases = (searchData.results || []).filter(caseItem => caseItem.id !== parseInt(caseId));
           setRelatedCases(relatedCases);
         } else {
-          console.log('Failed to load insurance-related cases');
           setRelatedCases([]);
         }
       } else {
-        console.log('No insurance company found in case data');
         setRelatedCases([]);
       }
     } catch (err) {
@@ -269,24 +259,18 @@ const CaseDetails = () => {
 
       if (relatedResponse.ok) {
         const relatedData = await relatedResponse.json();
-        console.log('Related cases loaded:', relatedData);
         
         // If we have original person cases, filter to only show those
         if (originalPersonCases) {
           const originalCaseIds = originalPersonCases.map(caseItem => caseItem.id);
-          console.log('Original person case IDs:', originalCaseIds);
-          console.log('Related cases from API:', relatedData.related_cases);
           const filteredCases = relatedData.related_cases.filter(relatedCase => 
             originalCaseIds.includes(relatedCase.id)
           );
-          console.log('Filtered to original person cases:', filteredCases);
           setRelatedCases(filteredCases);
         } else {
-          console.log('No original person cases, showing all related cases:', relatedData.related_cases);
           setRelatedCases(relatedData.related_cases || []);
         }
       } else {
-        console.log('Failed to load related cases, continuing without them');
         setRelatedCases([]);
       }
     } catch (err) {
@@ -1707,7 +1691,6 @@ const CaseDetails = () => {
           </div>
 
           {/* Right Sidebar - Related Cases */}
-          {console.log('Related cases length:', relatedCases.length, 'Related cases:', relatedCases)}
           {(relatedCases.length > 0 || true) && (
             <div className="lg:w-80 space-y-6">
               <div className="bg-white rounded-lg shadow-sm border">

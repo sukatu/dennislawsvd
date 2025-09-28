@@ -88,7 +88,6 @@ const Banks = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Banks data loaded:', data);
         
         // Load case statistics and analytics for each bank
         const banksWithStats = await Promise.all(

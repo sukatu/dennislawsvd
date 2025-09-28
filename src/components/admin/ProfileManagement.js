@@ -81,7 +81,6 @@ const ProfileManagement = () => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('accessToken');
-      console.log('Profile token:', token ? 'Present' : 'Missing');
       
       if (!token) {
         throw new Error('No authentication token found. Please log in again.');
@@ -94,7 +93,6 @@ const ProfileManagement = () => {
         }
       });
 
-      console.log('Profile response status:', response.status);
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -103,7 +101,6 @@ const ProfileManagement = () => {
       }
 
       const data = await response.json();
-      console.log('Profile data loaded:', data);
       setProfileData({
         first_name: data.first_name || '',
         last_name: data.last_name || '',
@@ -207,8 +204,6 @@ const ProfileManagement = () => {
     try {
       setIsSaving(true);
       const token = localStorage.getItem('accessToken');
-      console.log('Save token:', token ? 'Present' : 'Missing');
-      console.log('Save data:', profileData);
       
       if (!token) {
         throw new Error('No authentication token found. Please log in again.');
@@ -223,7 +218,6 @@ const ProfileManagement = () => {
         body: JSON.stringify(profileData)
       });
 
-      console.log('Save response status:', response.status);
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -232,7 +226,6 @@ const ProfileManagement = () => {
       }
 
       const updatedData = await response.json();
-      console.log('Profile updated successfully:', updatedData);
       setSuccess('Profile updated successfully');
       setIsEditing(false);
       setError(null);
@@ -288,18 +281,16 @@ const ProfileManagement = () => {
   // Upload avatar
   const handleAvatarUpload = async (event) => {
     const file = event.target.files[0];
-    console.log('File selected:', file);
     
     if (!file) {
-      console.log('No file selected');
       return;
     }
 
-    console.log('File details:', {
+    const fileData = {
       name: file.name,
       type: file.type,
       size: file.size
-    });
+    };
 
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file');
@@ -326,11 +317,9 @@ const ProfileManagement = () => {
         throw new Error('No authentication token found');
       }
       
-      console.log('Uploading file with token:', token ? 'Present' : 'Missing');
       
       const formData = new FormData();
       formData.append('file', file);
-      console.log('FormData created with file');
 
       const response = await fetch('http://localhost:8000/api/profile/upload-avatar', {
         method: 'POST',
@@ -340,7 +329,6 @@ const ProfileManagement = () => {
         body: formData
       });
 
-      console.log('Upload response status:', response.status);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -349,7 +337,6 @@ const ProfileManagement = () => {
       }
 
       const data = await response.json();
-      console.log('Upload success, response data:', data);
       
       setProfileData(prev => ({
         ...prev,

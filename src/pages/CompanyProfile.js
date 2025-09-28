@@ -74,7 +74,6 @@ const CompanyProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Company data loaded:', data);
         setCompanyData(data);
       } else {
         const errorData = await response.json();

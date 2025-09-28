@@ -116,9 +116,7 @@ const TenantSetup = ({ onComplete, isLoading = false }) => {
         if (!formData.app_name.trim()) newErrors.app_name = 'App name is required';
         break;
       case 4:
-        console.log('Validating step 4 - selected_plan_id:', formData.selected_plan_id);
         if (!formData.selected_plan_id) {
-          console.log('No plan selected, adding error');
           newErrors.selected_plan_id = 'Please select a subscription plan';
         }
         break;
@@ -612,10 +610,7 @@ const TenantSetup = ({ onComplete, isLoading = false }) => {
 
       <SubscriptionPlans
         onSelectPlan={(plan) => {
-          console.log('Plan received in TenantSetup:', plan);
-          console.log('Plan ID:', plan.id);
           handleInputChange('selected_plan_id', plan.id);
-          console.log('Updated formData.selected_plan_id:', plan.id);
         }}
         currentPlan={formData.selected_plan_id ? { id: formData.selected_plan_id } : null}
         isLoading={isLoading}

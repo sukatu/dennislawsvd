@@ -197,7 +197,6 @@ const People = () => {
   // Load all people for alphabet grouping
   const loadAllPeopleForAlphabet = async () => {
     try {
-      console.log('Loading all people for alphabet grouping...');
       setIsLoadingAllPeople(true);
       setLoadingProgress(0);
       setLoadingStatus('Connecting to database...');
@@ -213,7 +212,6 @@ const People = () => {
       }
 
       // First, get the total count
-      console.log('Getting total count...');
       setLoadingStatus('Getting total count...');
       setLoadingProgress(5);
       
@@ -223,19 +221,16 @@ const People = () => {
       }
       const countData = await countResponse.json();
       const totalPeople = countData.total || 0;
-      console.log('Total people in database:', totalPeople);
 
       // Load all people in batches
       const allPeopleData = [];
       const batchSize = 100; // Load 100 at a time
       const totalPages = Math.ceil(totalPeople / batchSize);
       
-      console.log(`Loading ${totalPeople} people in ${totalPages} batches of ${batchSize}...`);
       setLoadingStatus(`Loading ${totalPeople} people in ${totalPages} batches...`);
       setLoadingProgress(10);
       
       for (let page = 1; page <= totalPages; page++) {
-        console.log(`Loading batch ${page}/${totalPages}...`);
         setLoadingStatus(`Loading batch ${page} of ${totalPages}...`);
         
         const response = await fetch(`http://localhost:8000/api/people/search?page=${page}&limit=${batchSize}`, { headers });
@@ -243,7 +238,6 @@ const People = () => {
         if (response.ok) {
           const data = await response.json();
           allPeopleData.push(...(data.people || []));
-          console.log(`Batch ${page} loaded: ${data.people?.length || 0} people`);
           
           // Update progress
           const progress = 10 + ((page / totalPages) * 80); // 10% to 90%
@@ -253,7 +247,6 @@ const People = () => {
         }
       }
 
-      console.log(`Total people loaded: ${allPeopleData.length}`);
       setLoadingStatus('Processing data...');
       setLoadingProgress(90);
       
@@ -268,11 +261,9 @@ const People = () => {
         location: person.region || 'N/A'
       }));
 
-      console.log('Transformed results sample:', transformedResults.slice(0, 3));
       setAllPeople(transformedResults);
       setLoadingStatus('Complete!');
       setLoadingProgress(100);
-      console.log('All people set successfully');
       
       // Hide loading after a short delay
       setTimeout(() => {
@@ -287,7 +278,6 @@ const People = () => {
       setLoadingProgress(0);
       
       // Fallback to sample data if API fails
-      console.log('Using fallback sample data due to error...');
       const sampleData = [
         { id: 1, name: 'AARON KWESI KAITOO', idNumber: 'N/A', riskLevel: 'Low', riskScore: 0, cases: 0, caseTypes: [], location: 'UER' },
         { id: 2, name: 'AARON MFARFO', idNumber: 'N/A', riskLevel: 'Low', riskScore: 0, cases: 0, caseTypes: [], location: 'WR' },
@@ -301,7 +291,6 @@ const People = () => {
         { id: 10, name: 'HENRY BOATENG', idNumber: 'N/A', riskLevel: 'Medium', riskScore: 55, cases: 2, caseTypes: ['Civil'], location: 'ASR' }
       ];
       setAllPeople(sampleData);
-      console.log('Fallback sample data set due to error');
       
       setTimeout(() => {
         setIsLoadingAllPeople(false);
@@ -313,7 +302,6 @@ const People = () => {
 
   // Load all people for alphabet grouping on component mount
   useEffect(() => {
-    console.log('Component mounted, loading all people...');
     loadAllPeopleForAlphabet();
   }, []);
 
@@ -325,7 +313,6 @@ const People = () => {
       // If no search query, reload all people
       const loadAllPeople = async () => {
         try {
-          console.log('Loading people for current page...');
           const token = localStorage.getItem('accessToken');
           
           const headers = {
@@ -337,16 +324,12 @@ const People = () => {
           }
 
           setIsLoading(true);
-          console.log('Making API call for paginated people...');
           const response = await fetch(`http://localhost:8000/api/people/search?page=${currentPage}&limit=${itemsPerPage}`, {
             headers
           });
 
-          console.log('Paginated API response status:', response.status);
           if (response.ok) {
             const data = await response.json();
-            console.log('Paginated API response data:', data);
-            console.log('Number of people received:', data.people?.length || 0);
             
             const transformedResults = (data.people || []).map(person => ({
               id: person.id,
@@ -359,11 +342,9 @@ const People = () => {
               location: person.region || 'N/A'
             }));
 
-            console.log('Transformed paginated results:', transformedResults.slice(0, 3));
             setFilteredResults(transformedResults);
             setTotalResults(data.total || 0);
             setTotalPages(data.total_pages || 0);
-            console.log('Paginated people set successfully');
           } else {
             console.error('Paginated API response not ok:', response.status, response.statusText);
           }
@@ -401,9 +382,7 @@ const People = () => {
 
   // Get alphabetically grouped results for the full dataset
   // For alphabet grouping, we need all people, not just the current page
-  console.log('All people for grouping:', allPeople.length);
   const groupedResults = groupResultsAlphabetically(allPeople);
-  console.log('Grouped results:', Object.keys(groupedResults).map(letter => `${letter}: ${groupedResults[letter]?.length || 0}`));
   
   // Create all alphabet sections A-Z
   const allAlphabetSections = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
@@ -572,8 +551,6 @@ const People = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Search results:', data);
-        console.log('Number of people found:', data.people?.length || 0);
         
         const transformedResults = (data.people || []).map(person => ({
           id: person.id,
@@ -586,7 +563,6 @@ const People = () => {
           location: person.region || 'N/A'
         }));
 
-        console.log('Transformed search results:', transformedResults);
         setFilteredResults(transformedResults);
         setTotalResults(data.total || 0);
         setTotalPages(data.total_pages || 0);
@@ -608,7 +584,6 @@ const People = () => {
     // Allow search without authentication since API works without auth
     setIsAuthenticated(true);
     
-    console.log('Search functionality available');
   }, []);
 
   // Load all people when component mounts
@@ -624,7 +599,6 @@ const People = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('All people loaded:', data);
           
           // Transform API data to match component format
           const transformedResults = (data.people || []).map(person => ({
@@ -680,11 +654,9 @@ const People = () => {
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        console.log('No authentication token found for suggestions');
         return;
       }
 
-      console.log('Loading suggestions for query:', query);
       const response = await fetch(`http://localhost:8000/api/people/search?query=${encodeURIComponent(query)}&limit=5`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -692,11 +664,9 @@ const People = () => {
         }
       });
 
-      console.log('Suggestions response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Suggestions data:', data);
         const suggestionNames = (data.people || []).map(person => person.full_name);
         setSuggestions(suggestionNames);
       } else {

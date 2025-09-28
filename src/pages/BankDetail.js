@@ -22,7 +22,7 @@ const BankDetail = () => {
   const [caseSortBy, setCaseSortBy] = useState('date');
   const [caseSortOrder, setCaseSortOrder] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [casesPerPage] = useState(10);
+  const [casesPerPage] = useState(100);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null);
   const [showProfileRequestModal, setShowProfileRequestModal] = useState(false);
@@ -61,7 +61,6 @@ const BankDetail = () => {
 
   // Load bank data
   useEffect(() => {
-    console.log('URL Parameters - Bank ID:', id);
     
     if (id) {
       loadBankData(id);
@@ -77,10 +76,8 @@ const BankDetail = () => {
       setIsLoading(true);
       setError(null);
       
-      console.log('loadBankData called with:', { bankId });
 
       const url = `http://localhost:8000/api/banks/${bankId}`;
-      console.log('Using bank ID URL:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -88,14 +85,11 @@ const BankDetail = () => {
         }
       });
 
-      console.log('Response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Bank data from ID:', data);
 
         if (data) {
-          console.log('Raw bank data received:', data);
           // Transform API data to match expected format
           const transformedData = {
             id: data.id,
@@ -172,9 +166,7 @@ const BankDetail = () => {
             branches: [],
             cases: []
           };
-          console.log('Transformed bank data:', transformedData);
           setBankData(transformedData);
-          console.log('Bank data set successfully');
         } else {
           console.error('No bank data found');
           setError('Bank not found');
@@ -203,7 +195,6 @@ const BankDetail = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Bank analytics loaded:', data);
         setAnalytics(data);
       } else {
         console.error('Failed to load bank analytics:', response.status);
@@ -229,7 +220,6 @@ const BankDetail = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Bank case stats loaded:', data);
         setCaseStats(data);
       } else {
         console.error('Failed to load bank case stats:', response.status);
@@ -292,10 +282,8 @@ const BankDetail = () => {
   const loadRelatedCases = async (bankId) => {
     try {
       setCasesLoading(true);
-      console.log('Loading related cases for bank ID:', bankId);
 
-      const url = `http://localhost:8000/api/banks/${bankId}/related-cases?limit=10`;
-      console.log('API URL:', url);
+      const url = `http://localhost:8000/api/banks/${bankId}/related-cases?limit=100`;
       
       const response = await fetch(url, {
         headers: {
@@ -303,16 +291,13 @@ const BankDetail = () => {
         }
       });
 
-      console.log('Response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Related cases loaded:', data);
         
         if (data.related_cases && data.related_cases.length > 0) {
           setRelatedCases(data.related_cases);
         } else {
-          console.log('No cases found in API response');
           setRelatedCases([]);
         }
       } else {

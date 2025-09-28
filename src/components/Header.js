@@ -37,7 +37,6 @@ const Header = () => {
     
     // Log authentication provider for debugging
     if (authProvider) {
-      console.log('User authenticated via:', authProvider);
     }
     };
 
@@ -357,7 +356,6 @@ const Header = () => {
   );
 
   // Debug logging
-  console.log('Auth Status:', { isAuthenticated, navigation: navigation.map(item => item.name) });
 
   const isActive = (path) => location.pathname === path;
 

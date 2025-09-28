@@ -21,7 +21,6 @@ const ThemeDebugger = () => {
 
     // Listen for theme changes
     const handleThemeChange = (event) => {
-      console.log('Theme changed event received:', event.detail);
       updateDebugInfo();
     };
 

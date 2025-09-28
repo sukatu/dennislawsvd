@@ -12,12 +12,8 @@ const SubscriptionPlans = ({ onSelectPlan, currentPlan, isLoading = false }) => 
 
   const fetchPlans = async () => {
     try {
-      console.log('Fetching plans from API...');
       const response = await fetch('http://localhost:8000/api/tenant/plans?is_active=true');
-      console.log('API response status:', response.status);
       const data = await response.json();
-      console.log('API response data:', data);
-      console.log('Plans array:', data.plans);
       setPlans(data.plans || []);
     } catch (error) {
       console.error('Error fetching plans:', error);
@@ -204,8 +200,6 @@ const SubscriptionPlans = ({ onSelectPlan, currentPlan, isLoading = false }) => 
                 {/* Action Button */}
                 <button
                   onClick={() => {
-                    console.log('Plan selected:', plan);
-                    console.log('Plan ID:', plan.id);
                     onSelectPlan(plan);
                   }}
                   disabled={isCurrentPlan || isLoading}

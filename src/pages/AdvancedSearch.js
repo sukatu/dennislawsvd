@@ -28,7 +28,6 @@ const AdvancedSearch = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Search submitted:', formData);
     // Handle search logic here
   };
 

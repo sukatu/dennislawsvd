@@ -102,15 +102,14 @@ const JusticeLocator = () => {
 
   // Initialize Google Maps
   const initializeMap = (courtsData, bounds = null) => {
-    console.log('initializeMap called with:', {
+    const debugInfo = {
       mapRefExists: !!mapRef.current,
       googleLoaded: !!window.google,
       googleMapsLoaded: !!(window.google && window.google.maps),
       courtsDataLength: courtsData?.length
-    });
+    };
     
     if (!mapRef.current || !window.google || !window.google.maps) {
-      console.log('Map initialization skipped - missing mapRef or Google Maps API');
       return;
     }
 
@@ -148,7 +147,6 @@ const JusticeLocator = () => {
       }
     }
 
-    console.log('Creating map with center:', mapCenter, 'zoom:', mapZoom);
     
     let mapInstance;
     try {
@@ -164,7 +162,6 @@ const JusticeLocator = () => {
         ]
       });
 
-      console.log('Map instance created:', mapInstance);
       setMap(mapInstance);
     } catch (error) {
       console.error('Error creating Google Map:', error);
@@ -221,7 +218,6 @@ const JusticeLocator = () => {
         
         const data = await response.json();
         const apiKey = data.api_key;
-        console.log('Google Maps API Key:', apiKey ? 'Present' : 'Missing');
         
         if (!apiKey) {
           console.warn('Google Maps API key not configured. Map functionality will be limited.');
@@ -234,24 +230,20 @@ const JusticeLocator = () => {
 
         const loadGoogleMaps = () => {
       if (!window.google) {
-        console.log('Loading Google Maps API...');
         
         // Test the API key first
         fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=Accra,Ghana&key=${apiKey}`)
           .then(response => response.json())
           .then(data => {
             if (data.status === 'OK') {
-              console.log('Google Maps API key is valid');
               const script = document.createElement('script');
               script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
               script.async = true;
               script.defer = true;
               script.onload = () => {
-                console.log('Google Maps API script loaded successfully');
                 // Add a small delay to ensure Google Maps is fully initialized
                 setTimeout(() => {
                   if (window.google && window.google.maps) {
-                    console.log('Google Maps API is fully available');
                     setMapsAvailable(true);
                     loadCourts();
                     loadFilterOptions();
@@ -284,7 +276,6 @@ const JusticeLocator = () => {
             loadFilterOptions();
           });
       } else {
-        console.log('Google Maps API already loaded');
         setMapsAvailable(true);
         loadCourts();
         loadFilterOptions();
@@ -297,7 +288,6 @@ const JusticeLocator = () => {
         // Fallback: try again after 2 seconds if not loaded
         const fallbackTimer = setTimeout(() => {
           if (!window.google || !window.google.maps) {
-            console.log('Fallback: Retrying Google Maps API load...');
             loadGoogleMaps();
           }
         }, 2000);
@@ -368,27 +358,23 @@ const JusticeLocator = () => {
 
   // Initialize map when view mode changes to map and we have courts data
   useEffect(() => {
-    console.log('Map initialization check:', {
+    const debugInfo = {
       viewMode,
       mapsAvailable,
       googleLoaded: !!window.google,
       googleMapsLoaded: !!(window.google && window.google.maps),
       courtsCount: courts.length
-    });
+    };
     
     if (viewMode === 'map' && mapsAvailable && courts.length > 0) {
       const courtsWithCoords = courts.filter(court => court.latitude && court.longitude);
-      console.log('Courts with coordinates:', courtsWithCoords.length);
       if (courtsWithCoords.length > 0) {
         // Check if Google Maps is ready, if not, retry after a short delay
         if (window.google && window.google.maps) {
-          console.log('Initializing map with courts data');
           initializeMap(courtsWithCoords);
         } else {
-          console.log('Google Maps not ready, retrying in 500ms...');
           setTimeout(() => {
             if (window.google && window.google.maps) {
-              console.log('Retry: Initializing map with courts data');
               initializeMap(courtsWithCoords);
             } else {
               console.error('Google Maps still not available after retry');
@@ -496,7 +482,6 @@ const JusticeLocator = () => {
                 </button>
                 <button
                   onClick={() => {
-                    console.log('Map button clicked, mapsAvailable:', mapsAvailable);
                     setViewMode('map');
                   }}
                   disabled={!mapsAvailable}

@@ -116,7 +116,6 @@ const InsuranceProfile = () => {
 
   // Load insurance data
   useEffect(() => {
-    console.log('URL Parameters - Insurance ID:', id);
     
     if (id) {
       loadInsuranceData(id);
@@ -132,10 +131,8 @@ const InsuranceProfile = () => {
       setIsLoading(true);
       setError(null);
       
-      console.log('loadInsuranceData called with:', { insuranceId });
 
       const url = `http://localhost:8000/api/insurance/${insuranceId}`;
-      console.log('Using insurance ID URL:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -143,14 +140,11 @@ const InsuranceProfile = () => {
         }
       });
 
-      console.log('Response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Insurance data from ID:', data);
 
         if (data) {
-          console.log('Raw insurance data received:', data);
           // Transform API data to match expected format
           const transformedData = {
             id: data.id,
@@ -227,9 +221,7 @@ const InsuranceProfile = () => {
             branches: [],
             cases: []
           };
-          console.log('Transformed insurance data:', transformedData);
           setInsuranceData(transformedData);
-          console.log('Insurance data set successfully');
         } else {
           console.error('No insurance data found');
           setError('Insurance company not found');
@@ -258,7 +250,6 @@ const InsuranceProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Insurance analytics loaded:', data);
         setAnalytics(data);
       } else {
         console.error('Failed to load insurance analytics:', response.status);
@@ -284,7 +275,6 @@ const InsuranceProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Insurance case stats loaded:', data);
         setCaseStats(data);
       } else {
         console.error('Failed to load insurance case stats:', response.status);
@@ -347,10 +337,8 @@ const InsuranceProfile = () => {
   const loadRelatedCases = async (insuranceId) => {
     try {
       setCasesLoading(true);
-      console.log('Loading related cases for insurance ID:', insuranceId);
 
       const url = `http://localhost:8000/api/insurance/${insuranceId}/related-cases?limit=10`;
-      console.log('API URL:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -358,16 +346,13 @@ const InsuranceProfile = () => {
         }
       });
 
-      console.log('Response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Related cases loaded:', data);
         
         if (data.related_cases && data.related_cases.length > 0) {
           setRelatedCases(data.related_cases);
         } else {
-          console.log('No cases found in API response');
           setRelatedCases([]);
         }
       } else {

@@ -124,7 +124,6 @@ const Insurance = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Insurance data loaded:', data);
         
         const transformedInsurance = (data.insurance || []).map(company => ({
           id: company.id,

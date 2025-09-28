@@ -4,6 +4,7 @@ import re
 from typing import Dict, List, Any, Optional, Tuple
 from decimal import Decimal
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from models.banks import Banks
 from models.reported_cases import ReportedCases
 from models.bank_analytics import BankAnalytics
@@ -378,13 +379,32 @@ class BankAnalyticsService:
         if not bank:
             return []
         
-        # Search for cases where the bank name appears in title, protagonist, or antagonist
-        bank_name = bank.name
-        cases = self.db.query(ReportedCases).filter(
-            (ReportedCases.title.like(f"%{bank_name}%")) |
-            (ReportedCases.protagonist.like(f"%{bank_name}%")) |
-            (ReportedCases.antagonist.like(f"%{bank_name}%"))
-        ).all()
+        # Create search terms including bank name and previous names
+        search_terms = [bank.name]
+        if bank.previous_names:
+            if isinstance(bank.previous_names, list):
+                search_terms.extend(bank.previous_names)
+            elif isinstance(bank.previous_names, str):
+                # Handle comma-separated string format
+                search_terms.extend([name.strip() for name in bank.previous_names.split(',')])
+        
+        # Build search conditions for all variations
+        conditions = []
+        for term in search_terms:
+            if term:  # Skip empty terms
+                conditions.extend([
+                    ReportedCases.title.ilike(f"%{term}%"),
+                    ReportedCases.protagonist.ilike(f"%{term}%"),
+                    ReportedCases.antagonist.ilike(f"%{term}%")
+                ])
+        
+        # Search for cases where any bank name variation appears
+        if conditions:
+            cases = self.db.query(ReportedCases).filter(
+                or_(*conditions)
+            ).all()
+        else:
+            cases = []
         
         return cases
 

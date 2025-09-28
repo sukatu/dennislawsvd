@@ -50,7 +50,6 @@ const SubscriptionRequests = () => {
       try {
         data = await apiGet(`/api/tenant/subscription-requests?${params}`);
       } catch (apiError) {
-        console.log('API utility failed, trying direct fetch:', apiError);
         // Fallback to direct fetch without authentication
         const response = await fetch(`http://localhost:8000/api/tenant/subscription-requests?${params}`);
         if (!response.ok) {
@@ -120,7 +119,7 @@ const SubscriptionRequests = () => {
 
   const showNotification = (message, type) => {
     // This would integrate with your notification system
-    console.log(`${type.toUpperCase()}: ${message}`);
+    // Notification system integration would go here
   };
 
   const getStatusIcon = (status) => {

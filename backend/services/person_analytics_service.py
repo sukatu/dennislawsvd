@@ -262,9 +262,20 @@ class PersonAnalyticsService:
 
     async def generate_analytics_for_person(self, person_id: int) -> Optional[PersonAnalytics]:
         """Generate comprehensive analytics for a person"""
+        # Check if analytics already exist
+        existing_analytics = self.db.query(PersonAnalytics).filter(PersonAnalytics.person_id == person_id).first()
+        if existing_analytics:
+            return existing_analytics
+        
         # Get person
         person = self.db.query(People).filter(People.id == person_id).first()
         if not person:
+            print(f"Person with ID {person_id} not found in database")
+            # Let's also check if there are any people in the database
+            all_people = self.db.query(People).limit(5).all()
+            print(f"Found {len(all_people)} people in database")
+            if all_people:
+                print(f"First person ID: {all_people[0].id}")
             return None
         
         # Get related cases
@@ -272,57 +283,60 @@ class PersonAnalyticsService:
             ReportedCases.title.contains(person.full_name)
         ).all()
         
-        if not cases:
-            # Create minimal analytics for person with no cases
-            analytics = PersonAnalytics(
-                person_id=person_id,
-                risk_score=0,
-                risk_level="Low",
-                risk_factors=[],
-                total_monetary_amount=Decimal('0.00'),
-                average_case_value=Decimal('0.00'),
-                financial_risk_level="Low",
-                primary_subject_matter="N/A",
-                subject_matter_categories=[],
-                legal_issues=[],
-                financial_terms=[],
-                case_complexity_score=0,
-                success_rate=Decimal('0.00')
-            )
-        else:
-            # Calculate all analytics
-            risk_score, risk_level, risk_factors = self.calculate_risk_score(cases)
-            total_amount, avg_amount, financial_risk = self.calculate_financial_impact(cases)
-            primary_subject, subject_categories, legal_issues, financial_terms = self.analyze_subject_matter(cases)
-            complexity_score = self.calculate_case_complexity(cases)
-            success_rate = self.calculate_success_rate(cases)
+        try:
+            if not cases:
+                # Create minimal analytics for person with no cases
+                analytics = PersonAnalytics(
+                    person_id=person_id,
+                    risk_score=0,
+                    risk_level="Low",
+                    risk_factors=[],
+                    total_monetary_amount=Decimal('0.00'),
+                    average_case_value=Decimal('0.00'),
+                    financial_risk_level="Low",
+                    primary_subject_matter="N/A",
+                    subject_matter_categories=[],
+                    legal_issues=[],
+                    financial_terms=[],
+                    case_complexity_score=0,
+                    success_rate=Decimal('0.00')
+                )
+            else:
+                # Calculate all analytics
+                risk_score, risk_level, risk_factors = self.calculate_risk_score(cases)
+                total_amount, avg_amount, financial_risk = self.calculate_financial_impact(cases)
+                primary_subject, subject_categories, legal_issues, financial_terms = self.analyze_subject_matter(cases)
+                complexity_score = self.calculate_case_complexity(cases)
+                success_rate = self.calculate_success_rate(cases)
+                
+                analytics = PersonAnalytics(
+                    person_id=person_id,
+                    risk_score=risk_score,
+                    risk_level=risk_level,
+                    risk_factors=risk_factors,
+                    total_monetary_amount=total_amount,
+                    average_case_value=avg_amount,
+                    financial_risk_level=financial_risk,
+                    primary_subject_matter=primary_subject,
+                    subject_matter_categories=subject_categories,
+                    legal_issues=legal_issues,
+                    financial_terms=financial_terms,
+                    case_complexity_score=complexity_score,
+                    success_rate=success_rate
+                )
             
-            analytics = PersonAnalytics(
-                person_id=person_id,
-                risk_score=risk_score,
-                risk_level=risk_level,
-                risk_factors=risk_factors,
-                total_monetary_amount=total_amount,
-                average_case_value=avg_amount,
-                financial_risk_level=financial_risk,
-                primary_subject_matter=primary_subject,
-                subject_matter_categories=subject_categories,
-                legal_issues=legal_issues,
-                financial_terms=financial_terms,
-                case_complexity_score=complexity_score,
-                success_rate=success_rate
-            )
-        
-        # Save or update analytics
-        existing_analytics = self.db.query(PersonAnalytics).filter(PersonAnalytics.person_id == person_id).first()
-        if existing_analytics:
-            for key, value in analytics.__dict__.items():
-                if not key.startswith('_') and key != 'id':
-                    setattr(existing_analytics, key, value)
-            self.db.commit()
-            return existing_analytics
-        else:
+            # Save analytics
             self.db.add(analytics)
             self.db.commit()
             self.db.refresh(analytics)
             return analytics
+            
+        except Exception as e:
+            # If there's a unique constraint violation, try to get the existing record
+            self.db.rollback()
+            existing_analytics = self.db.query(PersonAnalytics).filter(PersonAnalytics.person_id == person_id).first()
+            if existing_analytics:
+                return existing_analytics
+            else:
+                # If still no record, return None
+                return None

@@ -326,7 +326,6 @@ const Results = () => {
         navigate(`/case-detail?caseId=${result.caseId}&source=search`);
         break;
       default:
-        console.log('Unknown result type:', result.type);
     }
   };
 
