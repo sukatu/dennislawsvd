@@ -97,11 +97,22 @@ class PasswordResetRequest(BaseModel):
 class PasswordReset(BaseModel):
     token: str
     new_password: str
+
+# Admin password reset schema
+class AdminPasswordReset(BaseModel):
+    new_password: str
+    admin_password: str
     
     @validator('new_password')
     def validate_new_password(cls, v):
         if len(v) < 8:
             raise ValueError('Password must be at least 8 characters long')
+        return v
+    
+    @validator('admin_password')
+    def validate_admin_password(cls, v):
+        if not v or len(v.strip()) == 0:
+            raise ValueError('Admin password is required')
         return v
 
 # Google OAuth schema

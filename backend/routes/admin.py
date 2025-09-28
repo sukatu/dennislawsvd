@@ -9,6 +9,7 @@ import uuid
 
 from database import get_db
 from models.user import User
+from auth import get_current_user
 from models.reported_cases import ReportedCases
 from models.people import People
 from models.banks import Banks
@@ -44,6 +45,7 @@ from schemas.admin import (
     PaymentListResponse,
     SubscriptionListResponse
 )
+from schemas.user import AdminPasswordReset
 
 # Import the new admin route modules
 from . import admin_people, admin_banks, admin_insurance, admin_companies, admin_payments, admin_settings, admin_roles
@@ -307,6 +309,45 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error deleting user: {str(e)}")
+
+@router.post("/users/{user_id}/reset-password")
+async def reset_user_password(
+    user_id: int, 
+    password_data: AdminPasswordReset, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Reset a user's password (admin only)"""
+    try:
+        # Verify admin is logged in and is actually an admin
+        if not current_user or not current_user.is_admin:
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Verify admin's password
+        from auth import verify_password
+        if not verify_password(password_data.admin_password, current_user.hashed_password):
+            raise HTTPException(status_code=401, detail="Invalid admin password")
+        
+        # Get the target user
+        target_user = db.query(User).filter(User.id == user_id).first()
+        if not target_user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Import the password hashing function
+        from auth import get_password_hash
+        
+        # Update the target user's password
+        target_user.hashed_password = get_password_hash(password_data.new_password)
+        target_user.updated_at = datetime.now()
+        
+        db.commit()
+        
+        return {"message": f"Password reset successfully for user {target_user.email}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error resetting password: {str(e)}")
 
 # API Key Management
 @router.get("/api-keys", response_model=List[ApiKeyResponse])

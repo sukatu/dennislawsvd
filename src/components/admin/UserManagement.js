@@ -19,8 +19,10 @@ import {
   ChevronRight,
   X
 } from 'lucide-react';
+import { useToast, ToastContainer } from '../Toast';
 
 const UserManagement = () => {
+  const { toasts, success, error, warning, info, removeToast } = useToast();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,7 +36,13 @@ const UserManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [passwordResetData, setPasswordResetData] = useState({
+    new_password: '',
+    confirm_password: '',
+    admin_password: ''
+  });
 
   // Form states
   const [formData, setFormData] = useState({
@@ -116,6 +124,75 @@ const UserManagement = () => {
   const handleDeleteUser = (user) => {
     setSelectedUser(user);
     setShowDeleteModal(true);
+  };
+
+  const handlePasswordReset = (user) => {
+    setSelectedUser(user);
+    setPasswordResetData({
+      new_password: '',
+      confirm_password: '',
+      admin_password: ''
+    });
+    setShowPasswordResetModal(true);
+  };
+
+  const handlePasswordResetSubmit = async () => {
+    try {
+      // Validate admin password
+      if (!passwordResetData.admin_password || passwordResetData.admin_password.trim() === '') {
+        setErrors({ admin_password: 'Admin password is required' });
+        return;
+      }
+
+      // Validate new passwords
+      if (passwordResetData.new_password !== passwordResetData.confirm_password) {
+        setErrors({ password: 'New passwords do not match' });
+        return;
+      }
+
+      if (passwordResetData.new_password.length < 8) {
+        setErrors({ password: 'New password must be at least 8 characters long' });
+        return;
+      }
+
+      const response = await fetch(`http://localhost:8000/api/admin/users/${selectedUser.id}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          new_password: passwordResetData.new_password,
+          admin_password: passwordResetData.admin_password
+        })
+      });
+
+      if (response.ok) {
+        setShowPasswordResetModal(false);
+        setSelectedUser(null);
+        setPasswordResetData({
+          new_password: '',
+          confirm_password: '',
+          admin_password: ''
+        });
+        setErrors({});
+        success(`Password reset successfully for ${selectedUser.first_name} ${selectedUser.last_name}!`);
+      } else {
+        const data = await response.json();
+        if (response.status === 401) {
+          setErrors({ admin_password: 'Invalid admin password' });
+          error('Invalid admin password. Please try again.');
+        } else if (response.status === 403) {
+          setErrors({ admin_password: 'Admin access required' });
+          error('Admin access required. Please log in as an admin.');
+        } else {
+          setErrors({ password: data.detail || 'Failed to reset password' });
+          error(data.detail || 'Failed to reset password. Please try again.');
+        }
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      setErrors({ password: 'Failed to reset password' });
+    }
   };
 
   const handleCreateUser = () => {
@@ -207,12 +284,15 @@ const UserManagement = () => {
         setShowDeleteModal(false);
         setSelectedUser(null);
         loadUsers();
+        success(`User ${selectedUser.first_name} ${selectedUser.last_name} deleted successfully!`);
       } else {
         const data = await response.json();
         console.error('Error deleting user:', data.detail);
+        error('Failed to delete user. Please try again.');
       }
     } catch (error) {
       console.error('Error deleting user:', error);
+      error('Failed to delete user. Please try again.');
     }
   };
 
@@ -389,6 +469,13 @@ const UserManagement = () => {
                             title="Edit User"
                           >
                             <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handlePasswordReset(user)}
+                            className="text-orange-600 hover:text-orange-900 p-1"
+                            title="Reset Password"
+                          >
+                            <Key className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteUser(user)}
@@ -692,6 +779,128 @@ const UserManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Password Reset Modal */}
+      {showPasswordResetModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Reset Password for {selectedUser.first_name} {selectedUser.last_name}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowPasswordResetModal(false);
+                  setSelectedUser(null);
+                  setPasswordResetData({
+                    new_password: '',
+                    confirm_password: '',
+                    admin_password: ''
+                  });
+                  setErrors({});
+                }}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm text-amber-800">
+                  <strong>Security Notice:</strong> You must confirm your admin password to reset another user's password.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Your Admin Password
+                </label>
+                <input
+                  type="password"
+                  value={passwordResetData.admin_password}
+                  onChange={(e) => setPasswordResetData({
+                    ...passwordResetData,
+                    admin_password: e.target.value
+                  })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  placeholder="Enter your admin password"
+                />
+                {errors.admin_password && (
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.admin_password}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  New Password for {selectedUser.first_name} {selectedUser.last_name}
+                </label>
+                <input
+                  type="password"
+                  value={passwordResetData.new_password}
+                  onChange={(e) => setPasswordResetData({
+                    ...passwordResetData,
+                    new_password: e.target.value
+                  })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  placeholder="Enter new password"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  value={passwordResetData.confirm_password}
+                  onChange={(e) => setPasswordResetData({
+                    ...passwordResetData,
+                    confirm_password: e.target.value
+                  })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  placeholder="Confirm new password"
+                />
+              </div>
+
+              {errors.password && (
+                <div className="text-red-600 text-sm">
+                  {errors.password}
+                </div>
+              )}
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  onClick={() => {
+                    setShowPasswordResetModal(false);
+                    setSelectedUser(null);
+                    setPasswordResetData({
+                      new_password: '',
+                      confirm_password: '',
+                      admin_password: ''
+                    });
+                    setErrors({});
+                  }}
+                  className="px-4 py-2 text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePasswordResetSubmit}
+                  className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                >
+                  Reset Password
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };
