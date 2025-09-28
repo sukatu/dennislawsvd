@@ -224,26 +224,53 @@ const People = () => {
 
       // Load all people in batches
       const allPeopleData = [];
-      const batchSize = 100; // Load 100 at a time
-      const totalPages = Math.ceil(totalPeople / batchSize);
+      const batchSize = 50; // Reduced batch size to prevent timeouts
+      const maxPeople = 500; // Further reduced limit to prevent overwhelming the system
+      const peopleToLoad = Math.min(totalPeople, maxPeople);
+      const totalPages = Math.ceil(peopleToLoad / batchSize);
       
-      setLoadingStatus(`Loading ${totalPeople} people in ${totalPages} batches...`);
+      setLoadingStatus(`Loading ${peopleToLoad} of ${totalPeople} people in ${totalPages} batches...`);
       setLoadingProgress(10);
       
       for (let page = 1; page <= totalPages; page++) {
         setLoadingStatus(`Loading batch ${page} of ${totalPages}...`);
         
-        const response = await fetch(`http://localhost:8000/api/people/search?page=${page}&limit=${batchSize}`, { headers });
-        
-        if (response.ok) {
-          const data = await response.json();
-          allPeopleData.push(...(data.people || []));
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
           
-          // Update progress
-          const progress = 10 + ((page / totalPages) * 80); // 10% to 90%
-          setLoadingProgress(Math.round(progress));
-        } else {
-          console.error(`Batch ${page} failed:`, response.status, response.statusText);
+          const response = await fetch(`http://localhost:8000/api/people/search?page=${page}&limit=${batchSize}`, { 
+            headers,
+            signal: controller.signal
+          });
+          
+          clearTimeout(timeoutId);
+          
+          if (response.ok) {
+            const data = await response.json();
+            allPeopleData.push(...(data.people || []));
+            
+            // Update progress
+            const progress = 10 + ((page / totalPages) * 80); // 10% to 90%
+            setLoadingProgress(Math.round(progress));
+            console.log(`Batch ${page} loaded successfully: ${data.people?.length || 0} people`);
+          } else {
+            const errorText = await response.text();
+            console.error(`Batch ${page} failed:`, response.status, response.statusText, errorText);
+            // Continue with next batch instead of stopping
+          }
+          
+          // Add a delay between requests to prevent overwhelming the backend
+          if (page < totalPages) {
+            await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
+          }
+        } catch (error) {
+          if (error.name === 'AbortError') {
+            console.error(`Batch ${page} timed out after 10 seconds`);
+          } else {
+            console.error(`Batch ${page} error:`, error);
+          }
+          // Continue with next batch instead of stopping
         }
       }
 

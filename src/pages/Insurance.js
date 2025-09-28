@@ -12,7 +12,6 @@ const Insurance = () => {
   const [insuranceData, setInsuranceData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [totalResults, setTotalResults] = useState(0);
 
   // Insurance company logo mapping
@@ -74,19 +73,8 @@ const Insurance = () => {
 
   // Load insurance data from API
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('accessToken');
-      setIsAuthenticated(!!token);
-      return !!token;
-    };
-
-    if (checkAuth()) {
-      const hasSearchOrFilter = searchTerm || filterStatus !== 'all';
-      loadInsuranceData(hasSearchOrFilter);
-    } else {
-      setIsLoading(false);
-      setSearchLoading(false);
-    }
+    const hasSearchOrFilter = searchTerm || filterStatus !== 'all';
+    loadInsuranceData(hasSearchOrFilter);
   }, [currentPage, itemsPerPage, searchTerm, filterStatus]);
 
   const loadInsuranceData = async (isSearch = false) => {
@@ -96,28 +84,17 @@ const Insurance = () => {
       } else {
         setIsLoading(true);
       }
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        console.error('No authentication token found');
-        if (isSearch) {
-          setSearchLoading(false);
-        } else {
-          setIsLoading(false);
-        }
-        return;
-      }
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: itemsPerPage.toString()
       });
 
       if (searchTerm) {
-        params.append('name', searchTerm);
+        params.append('query', searchTerm);
       }
 
       const response = await fetch(`http://localhost:8000/api/insurance/search?${params}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -125,27 +102,97 @@ const Insurance = () => {
       if (response.ok) {
         const data = await response.json();
         
-        const transformedInsurance = (data.insurance || []).map(company => ({
-          id: company.id,
-          name: company.name,
-          logo: company.logo_url || insuranceLogoMap[company.name] || '/insurances/default-insurance.png',
-          phone: company.phone || 'N/A',
-          email: company.email || 'N/A',
-          address: company.address || 'N/A',
-          website: company.website || 'N/A',
-          established: company.established_date ? new Date(company.established_date).getFullYear().toString() : 'N/A',
-          insuranceType: company.insurance_type || 'N/A',
-          totalCases: company.total_cases || 0, // Use real data from backend
-          activeCases: company.total_cases || 0, // Using total cases as active for now
-          resolvedCases: company.total_cases || 0, // Using total cases as resolved for now
-          riskLevel: company.risk_level || 'Low', // Use real risk level from backend
-          riskScore: company.risk_score || 0, // Use real risk score from backend
-          successRate: company.success_rate || 0, // Use real success rate from backend
-          lastActivity: company.updated_at ? new Date(company.updated_at).toISOString().split('T')[0] : 'N/A',
-          cases: [] // This would come from a separate cases API
-        }));
+        // Load case statistics and analytics for each insurance company
+        const insuranceWithStats = await Promise.all(
+          (data.insurance || []).map(async (company) => {
+            try {
+              // Fetch both case statistics and analytics for this insurance company
+              const [statsResponse, analyticsResponse] = await Promise.all([
+                fetch(`http://localhost:8000/api/insurance/${company.id}/case-statistics`, {
+                  headers: { 'Content-Type': 'application/json' }
+                }),
+                fetch(`http://localhost:8000/api/insurance/${company.id}/analytics`, {
+                  headers: { 'Content-Type': 'application/json' }
+                })
+              ]);
+              
+              let caseStats = {
+                total_cases: 0,
+                resolved_cases: 0,
+                unresolved_cases: 0,
+                favorable_cases: 0,
+                unfavorable_cases: 0,
+                mixed_cases: 0,
+                case_outcome: 'N/A'
+              };
+              
+              let analytics = {
+                risk_level: 'Low',
+                risk_score: 0,
+                risk_factors: [],
+                financial_risk_level: 'Low'
+              };
+              
+              if (statsResponse.ok) {
+                const statsData = await statsResponse.json();
+                caseStats = statsData.statistics_available ? statsData : caseStats;
+              }
+              
+              if (analyticsResponse.ok) {
+                const analyticsData = await analyticsResponse.json();
+                analytics = analyticsData.analytics_available ? analyticsData : analytics;
+              }
+              
+              return {
+                id: company.id,
+                name: company.name,
+                logo: company.logo_url || insuranceLogoMap[company.name] || '/insurances/default-insurance.png',
+                phone: company.phone || 'N/A',
+                email: company.email || 'N/A',
+                address: company.address || 'N/A',
+                website: company.website || 'N/A',
+                established: company.established_date ? new Date(company.established_date).getFullYear().toString() : 'N/A',
+                insuranceType: company.insurance_type || 'N/A',
+                totalCases: caseStats.total_cases || 0,
+                activeCases: caseStats.unresolved_cases || 0,
+                resolvedCases: caseStats.resolved_cases || 0,
+                case_outcome: caseStats.case_outcome || 'N/A',
+                riskLevel: analytics.risk_level || 'Low',
+                riskScore: analytics.risk_score || 0,
+                risk_factors: analytics.risk_factors || [],
+                successRate: company.success_rate || 0,
+                lastActivity: company.updated_at ? new Date(company.updated_at).toISOString().split('T')[0] : 'N/A',
+                cases: [] // This would come from a separate cases API
+              };
+            } catch (error) {
+              console.error(`Error loading stats for insurance ${company.name}:`, error);
+              // Return basic data if stats loading fails
+              return {
+                id: company.id,
+                name: company.name,
+                logo: company.logo_url || insuranceLogoMap[company.name] || '/insurances/default-insurance.png',
+                phone: company.phone || 'N/A',
+                email: company.email || 'N/A',
+                address: company.address || 'N/A',
+                website: company.website || 'N/A',
+                established: company.established_date ? new Date(company.established_date).getFullYear().toString() : 'N/A',
+                insuranceType: company.insurance_type || 'N/A',
+                totalCases: company.total_cases || 0,
+                activeCases: 0,
+                resolvedCases: 0,
+                case_outcome: 'N/A',
+                riskLevel: company.risk_level || 'Low',
+                riskScore: company.risk_score || 0,
+                risk_factors: [],
+                successRate: company.success_rate || 0,
+                lastActivity: company.updated_at ? new Date(company.updated_at).toISOString().split('T')[0] : 'N/A',
+                cases: []
+              };
+            }
+          })
+        );
 
-        setInsuranceData(transformedInsurance);
+        setInsuranceData(insuranceWithStats);
         setTotalResults(data.total || 0);
       } else {
         console.error('Failed to load insurance data:', response.status);
@@ -197,26 +244,6 @@ const Insurance = () => {
     );
   }
 
-  // Authentication check
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-600 mb-4">
-            <AlertTriangle className="h-16 w-16 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold">Authentication Required</h2>
-            <p className="text-gray-600 mt-2">Please log in to view insurance data</p>
-          </div>
-          <button
-            onClick={() => navigate('/login')}
-            className="bg-sky-600 text-white px-6 py-2 rounded-lg hover:bg-sky-700 transition-colors"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -305,13 +332,20 @@ const Insurance = () => {
                     <h3 className="text-lg font-semibold text-gray-900">{company.name}</h3>
                     <p className="text-sm text-gray-600">{company.established}</p>
                 </div>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    company.riskLevel === 'Low' ? 'bg-green-100 text-green-800' :
-                    company.riskLevel === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {company.riskLevel} Risk
-                </div>
+                  <div className="text-right">
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      company.riskLevel === 'Low' ? 'bg-green-100 text-green-800' :
+                      company.riskLevel === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {company.riskLevel} Risk
+                    </div>
+                    {company.riskScore > 0 && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Score: {company.riskScore}/100
+                      </div>
+                    )}
+                  </div>
               </div>
 
                 <div className="space-y-2 mb-4">
@@ -329,21 +363,67 @@ const Insurance = () => {
                 </div>
               </div>
 
+                {/* Quick Stats */}
                 <div className="border-t pt-4">
-                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                    <div>
-                      <span className="font-medium">Total Cases: {company.totalCases}</span>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-gray-600">Total Cases:</span>
+                      <span className="font-semibold text-gray-900">{company.totalCases || 0}</span>
                     </div>
-                    <div>
-                      <span className="font-medium">Success Rate: {company.successRate}%</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-gray-600">Resolved:</span>
+                      <span className="font-semibold text-green-600">{company.resolvedCases || 0}</span>
                     </div>
-                    <div>
-                      <span className="font-medium">Risk Score: {company.riskScore}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      <span className="text-gray-600">Unresolved:</span>
+                      <span className="font-semibold text-red-600">{company.activeCases || 0}</span>
                     </div>
-                    <div>
-                      <span className="font-medium">Last Activity: {company.lastActivity}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                      <span className="text-gray-600">Outcome:</span>
+                      <span className="font-semibold text-purple-600">{company.case_outcome || 'N/A'}</span>
                     </div>
                   </div>
+                  
+                  {/* Risk Assessment Details */}
+                  {company.riskScore > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+                        <span>Risk Assessment</span>
+                        <span className="font-medium">{company.riskScore}/100</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div 
+                          className={`h-1.5 rounded-full ${
+                            company.riskScore <= 30 ? 'bg-green-500' :
+                            company.riskScore <= 60 ? 'bg-yellow-500' :
+                            'bg-red-500'
+                          }`}
+                          style={{ width: `${Math.min(company.riskScore, 100)}%` }}
+                        ></div>
+                      </div>
+                      {company.risk_factors && company.risk_factors.length > 0 && (
+                        <div className="mt-2">
+                          <div className="text-xs text-gray-500 mb-1">Risk Factors:</div>
+                          <div className="flex flex-wrap gap-1">
+                            {company.risk_factors.slice(0, 3).map((factor, index) => (
+                              <span key={index} className="px-2 py-1 bg-red-50 text-red-700 text-xs rounded-full">
+                                {factor}
+                              </span>
+                            ))}
+                            {company.risk_factors.length > 3 && (
+                              <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                                +{company.risk_factors.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

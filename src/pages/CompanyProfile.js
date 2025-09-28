@@ -21,7 +21,11 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
+  Search,
+  ArrowUpDown,
+  RefreshCw,
+  BookOpen
 } from 'lucide-react';
 import RequestDetailsModal from '../components/RequestDetailsModal';
 
@@ -42,12 +46,21 @@ const CompanyProfile = () => {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null);
   const [showProfileRequestModal, setShowProfileRequestModal] = useState(false);
+  const [relatedCases, setRelatedCases] = useState([]);
+  const [casesLoading, setCasesLoading] = useState(false);
+  const [filteredCases, setFilteredCases] = useState([]);
+  const [caseSearchQuery, setCaseSearchQuery] = useState('');
+  const [caseSortBy, setCaseSortBy] = useState('date');
+  const [caseSortOrder, setCaseSortOrder] = useState('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [casesPerPage] = useState(100);
 
   const searchQuery = new URLSearchParams(location.search).get('q') || '';
 
   useEffect(() => {
     if (id) {
       loadCompanyData();
+      loadRelatedCases(id);
     } else {
       setError('No company ID provided');
       setLoading(false);
@@ -85,6 +98,93 @@ const CompanyProfile = () => {
       setLoading(false);
     }
   };
+
+  // Load related cases
+  const loadRelatedCases = async (companyId) => {
+    try {
+      setCasesLoading(true);
+
+      const url = `http://localhost:8000/api/companies/${companyId}/related-cases?limit=100`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.cases && data.cases.length > 0) {
+          setRelatedCases(data.cases);
+        } else {
+          setRelatedCases([]);
+        }
+      } else {
+        console.error('Failed to fetch related cases:', response.status);
+        setRelatedCases([]);
+      }
+    } catch (error) {
+      console.error('Error loading related cases:', error);
+      setRelatedCases([]);
+    } finally {
+      setCasesLoading(false);
+    }
+  };
+
+  // Filter and sort cases
+  const filterAndSortCases = (cases, searchQuery, sortBy, sortOrder) => {
+    let filtered = cases;
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(case_ => 
+        case_.title?.toLowerCase().includes(query) ||
+        case_.suit_reference_number?.toLowerCase().includes(query) ||
+        case_.area_of_law?.toLowerCase().includes(query) ||
+        case_.protagonist?.toLowerCase().includes(query) ||
+        case_.antagonist?.toLowerCase().includes(query)
+      );
+    }
+
+    // Sort cases
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortBy) {
+        case 'title':
+          aValue = a.title || '';
+          bValue = b.title || '';
+          break;
+        case 'date':
+          aValue = new Date(a.date || 0);
+          bValue = new Date(b.date || 0);
+          break;
+        case 'court':
+          aValue = a.court_type || '';
+          bValue = b.court_type || '';
+          break;
+        default:
+          aValue = a.title || '';
+          bValue = b.title || '';
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    return filtered;
+  };
+
+  // Update filtered cases when search query, sort options, or related cases change
+  useEffect(() => {
+    const filtered = filterAndSortCases(relatedCases, caseSearchQuery, caseSortBy, caseSortOrder);
+    setFilteredCases(filtered);
+  }, [relatedCases, caseSearchQuery, caseSortBy, caseSortOrder]);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -453,11 +553,111 @@ const CompanyProfile = () => {
               />
               {expandedSections.cases && (
                 <div className="p-6 border-t border-gray-200">
-                  <div className="text-center py-8">
-                    <Scale className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Cases Found</h3>
-                    <p className="text-gray-600">This company has no legal cases in the database</p>
+                  {/* Cases Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Related Cases ({filteredCases.length} of {relatedCases.length})
+                    </h3>
+                    <div className="flex items-center space-x-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Search cases..."
+                          value={caseSearchQuery}
+                          onChange={(e) => setCaseSearchQuery(e.target.value)}
+                          className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                        />
+                      </div>
+                      <select
+                        value={caseSortBy}
+                        onChange={(e) => setCaseSortBy(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="date">Sort by Date</option>
+                        <option value="title">Sort by Title</option>
+                        <option value="court">Sort by Court</option>
+                      </select>
+                      <button
+                        onClick={() => setCaseSortOrder(caseSortOrder === 'asc' ? 'desc' : 'asc')}
+                        className="p-2 text-gray-500 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                      >
+                        <ArrowUpDown className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Cases Loading */}
+                  {casesLoading && (
+                    <div className="flex items-center justify-center py-8">
+                      <RefreshCw className="h-6 w-6 animate-spin text-blue-500" />
+                      <span className="ml-2 text-gray-600">Loading cases...</span>
+                    </div>
+                  )}
+
+                  {/* Cases List */}
+                  {!casesLoading && filteredCases.length > 0 && (
+                    <div className="space-y-3">
+                      {filteredCases.map((case_, index) => (
+                        <div
+                          key={case_.id || index}
+                          className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors cursor-pointer"
+                          onClick={() => {
+                            setSelectedCase(case_);
+                            setShowRequestModal(true);
+                          }}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-gray-900 mb-1">
+                                {case_.title || 'Untitled Case'}
+                              </h4>
+                              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                <span className="flex items-center">
+                                  <FileText className="h-4 w-4 mr-1" />
+                                  {case_.suit_reference_number || 'N/A'}
+                                </span>
+                                <span className="flex items-center">
+                                  <Calendar className="h-4 w-4 mr-1" />
+                                  {formatDate(case_.date)}
+                                </span>
+                                <span className="flex items-center">
+                                  <Scale className="h-4 w-4 mr-1" />
+                                  {case_.court_type || 'N/A'}
+                                </span>
+                                <span className="flex items-center">
+                                  <BookOpen className="h-4 w-4 mr-1" />
+                                  {case_.area_of_law || 'N/A'}
+                                </span>
+                              </div>
+                              <div className="mt-2 text-sm text-gray-600">
+                                <p><strong>Protagonist:</strong> {case_.protagonist || 'N/A'}</p>
+                                <p><strong>Antagonist:</strong> {case_.antagonist || 'N/A'}</p>
+                                {case_.presiding_judge && (
+                                  <p><strong>Judge:</strong> {case_.presiding_judge}</p>
+                                )}
+                              </div>
+                            </div>
+                            <ExternalLink className="h-5 w-5 text-gray-400" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* No Cases Found */}
+                  {!casesLoading && filteredCases.length === 0 && (
+                    <div className="text-center py-8">
+                      <Scale className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Cases Found</h3>
+                      <p className="text-gray-600">
+                        {relatedCases.length === 0 
+                          ? "This company has no legal cases in the database"
+                          : "No cases match your search criteria"
+                        }
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

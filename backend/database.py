@@ -9,6 +9,9 @@ engine = create_engine(
     echo=settings.debug,  # Set to True for SQL query logging
     pool_pre_ping=True,   # Verify connections before use
     pool_recycle=300,     # Recycle connections every 5 minutes
+    pool_size=20,         # Increase pool size
+    max_overflow=30,      # Allow more overflow connections
+    pool_timeout=30,      # Timeout for getting connection from pool
 )
 
 # Create SessionLocal class

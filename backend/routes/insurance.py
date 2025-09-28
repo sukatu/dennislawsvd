@@ -449,7 +449,7 @@ async def get_insurance_case_statistics(
 @router.get("/{insurance_id}/related-cases")
 async def get_insurance_related_cases(
     insurance_id: int,
-    limit: int = Query(10, ge=1, le=50, description="Maximum related cases"),
+    limit: int = Query(10, ge=1, le=100, description="Maximum related cases"),
     db: Session = Depends(get_db)
     # Temporarily removed authentication for testing
     # current_user: User = Depends(get_current_user)

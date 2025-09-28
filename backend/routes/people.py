@@ -51,11 +51,14 @@ async def search_people(
 ):
     """Search for people with various filters"""
     try:
-        # Build query with case statistics join
-        query_obj = db.query(People).outerjoin(
-            PersonCaseStatistics, 
-            People.id == PersonCaseStatistics.person_id
-        )
+        # Build query - only join case statistics for small queries to improve performance
+        if limit <= 20:
+            query_obj = db.query(People).outerjoin(
+                PersonCaseStatistics, 
+                People.id == PersonCaseStatistics.person_id
+            )
+        else:
+            query_obj = db.query(People)
         
         # Apply filters
         filters = []
@@ -142,34 +145,50 @@ async def search_people(
         has_next = page < total_pages
         has_prev = page > 1
         
-        # Update search count for each person and add case statistics
+        # Add case statistics if available (without updating search counts for performance)
         for person in people:
-            if person.search_count is None:
-                person.search_count = 0
-            person.search_count += 1
-            person.last_searched = func.now()
+            # Cap risk score at 200 to prevent validation errors
+            if person.risk_score and person.risk_score > 200:
+                person.risk_score = 200.0
             
-            # Add case statistics if available
-            if hasattr(person, 'case_statistics') and person.case_statistics:
-                stats = person.case_statistics
-                person.total_cases = stats.total_cases
-                person.resolved_cases = stats.resolved_cases
-                person.unresolved_cases = stats.unresolved_cases
-                person.favorable_cases = stats.favorable_cases
-                person.unfavorable_cases = stats.unfavorable_cases
-                person.mixed_cases = stats.mixed_cases
-                person.case_outcome = stats.case_outcome
+            if limit <= 20:
+                # Case statistics already joined for small queries
+                if hasattr(person, 'case_statistics') and person.case_statistics:
+                    stats = person.case_statistics
+                    person.total_cases = stats.total_cases
+                    person.resolved_cases = stats.resolved_cases
+                    person.unresolved_cases = stats.unresolved_cases
+                    person.favorable_cases = stats.favorable_cases
+                    person.unfavorable_cases = stats.unfavorable_cases
+                    person.mixed_cases = stats.mixed_cases
+                    person.case_outcome = stats.case_outcome
+                else:
+                    # Default values if no statistics available
+                    person.total_cases = 0
+                    person.resolved_cases = 0
+                    person.unresolved_cases = 0
+                    person.favorable_cases = 0
+                    person.unfavorable_cases = 0
+                    person.mixed_cases = 0
+                    person.case_outcome = "N/A"
             else:
-                # Default values if no statistics available
-                person.total_cases = 0
+                # For large queries, use basic case count from People table
+                person.total_cases = person.case_count or 0
                 person.resolved_cases = 0
-                person.unresolved_cases = 0
+                person.unresolved_cases = person.case_count or 0
                 person.favorable_cases = 0
                 person.unfavorable_cases = 0
                 person.mixed_cases = 0
                 person.case_outcome = "N/A"
         
-        db.commit()
+        # Only commit if we're updating search counts (for single searches, not batch loads)
+        if limit <= 20:  # Only update search counts for small queries
+            for person in people:
+                if person.search_count is None:
+                    person.search_count = 0
+                person.search_count += 1
+                person.last_searched = func.now()
+            db.commit()
         
         return PeopleSearchResponse(
             people=people,
@@ -183,9 +202,12 @@ async def search_people(
         
     except Exception as e:
         logging.error(f"Error searching people: {str(e)}")
+        logging.error(f"Error type: {type(e).__name__}")
+        import traceback
+        logging.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to search people"
+            detail=f"Failed to search people: {str(e)}"
         )
 
 @router.get("/{people_id}", response_model=PeopleResponse)

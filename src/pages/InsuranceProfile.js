@@ -338,7 +338,7 @@ const InsuranceProfile = () => {
     try {
       setCasesLoading(true);
 
-      const url = `http://localhost:8000/api/insurance/${insuranceId}/related-cases?limit=10`;
+      const url = `http://localhost:8000/api/insurance/${insuranceId}/related-cases?limit=100`;
       
       const response = await fetch(url, {
         headers: {
