@@ -11,6 +11,7 @@ const Insurance = () => {
   const [itemsPerPage] = useState(9);
   const [insuranceData, setInsuranceData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [totalResults, setTotalResults] = useState(0);
 
@@ -80,22 +81,31 @@ const Insurance = () => {
     };
 
     if (checkAuth()) {
-      loadInsuranceData();
+      const hasSearchOrFilter = searchTerm || filterStatus !== 'all';
+      loadInsuranceData(hasSearchOrFilter);
     } else {
       setIsLoading(false);
+      setSearchLoading(false);
     }
   }, [currentPage, itemsPerPage, searchTerm, filterStatus]);
 
-  const loadInsuranceData = async () => {
+  const loadInsuranceData = async (isSearch = false) => {
     try {
+      if (isSearch) {
+        setSearchLoading(true);
+      } else {
+        setIsLoading(true);
+      }
       const token = localStorage.getItem('accessToken');
       if (!token) {
         console.error('No authentication token found');
-        setIsLoading(false);
+        if (isSearch) {
+          setSearchLoading(false);
+        } else {
+          setIsLoading(false);
+        }
         return;
       }
-
-      setIsLoading(true);
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: itemsPerPage.toString()
@@ -144,7 +154,11 @@ const Insurance = () => {
     } catch (error) {
       console.error('Error loading insurance data:', error);
     } finally {
-      setIsLoading(false);
+      if (isSearch) {
+        setSearchLoading(false);
+      } else {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -152,7 +166,8 @@ const Insurance = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    loadInsuranceData();
+    const hasSearchOrFilter = searchTerm || filterStatus !== 'all';
+    loadInsuranceData(hasSearchOrFilter);
   };
 
   // Handle insurance click
@@ -163,7 +178,7 @@ const Insurance = () => {
   // Filter and sort insurance
   const filteredInsurance = insuranceData.filter(company => {
     if (filterStatus === 'all') return true;
-    return company.riskLevel === filterStatus;
+    return company.risk_level === filterStatus;
   });
 
   // Pagination
@@ -171,8 +186,8 @@ const Insurance = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  // Early return for loading state
-  if (isLoading) {
+  // Early return for loading state (only on initial load, not during search)
+  if (isLoading && !searchLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -241,6 +256,11 @@ const Insurance = () => {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
                 ref={searchRef}
               />
+              {searchLoading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-sky-500"></div>
+                </div>
+              )}
             </div>
             <div className="flex gap-2">
               <select

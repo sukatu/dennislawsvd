@@ -72,7 +72,7 @@ async def search_companies(
             Companies.name.ilike(f"%{query}%"),
             Companies.short_name.ilike(f"%{query}%"),
             Companies.industry.ilike(f"%{query}%"),
-            Companies.business_activities.like(f"%{query}%")
+            Companies.description.ilike(f"%{query}%")
         )
         db_query = db_query.filter(search_filter)
     

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Database, 
   Search, 
@@ -40,20 +40,41 @@ const CompanyManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
+  const searchInputRef = useRef(null);
 
-  // Debounce search term to avoid too many API calls
+  // Initial load
+  useEffect(() => {
+    loadCompanies(false);
+    loadAnalytics();
+  }, []);
+
+  // Debounced search and filter changes
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      loadCompanies();
-      loadAnalytics();
+      // Only show search loading if we have a search term or filter
+      const hasSearchOrFilter = searchTerm || companyTypeFilter;
+      loadCompanies(hasSearchOrFilter);
+      // Don't reload analytics on every search - it's expensive and causes re-renders
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [currentPage, searchTerm, companyTypeFilter]);
+  }, [searchTerm, companyTypeFilter]);
 
-  const loadCompanies = async () => {
+  // Page changes (no debouncing needed)
+  useEffect(() => {
+    const hasSearchOrFilter = searchTerm || companyTypeFilter;
+    loadCompanies(hasSearchOrFilter);
+  }, [currentPage]);
+
+  const loadCompanies = async (isSearch = false) => {
     try {
-      setLoading(true);
+      if (isSearch) {
+        setSearchLoading(true);
+        // Don't set loading to true during search operations
+      } else {
+        setLoading(true);
+      }
+      
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10'
@@ -75,7 +96,11 @@ const CompanyManagement = () => {
     } catch (error) {
       console.error('Error loading companies:', error);
     } finally {
-      setLoading(false);
+      if (isSearch) {
+        setSearchLoading(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -282,6 +307,7 @@ const CompanyManagement = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Search companies..."
               value={searchTerm}

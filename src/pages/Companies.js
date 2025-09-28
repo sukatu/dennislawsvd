@@ -11,6 +11,7 @@ const Companies = () => {
   const [itemsPerPage] = useState(9);
   const [companiesData, setCompaniesData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
 
@@ -57,22 +58,28 @@ const Companies = () => {
     };
 
     if (checkAuth()) {
-      loadCompaniesData();
+      const hasSearchOrFilter = searchTerm || filterStatus !== 'all';
+      loadCompaniesData(hasSearchOrFilter);
     } else {
       setIsLoading(false);
+      setSearchLoading(false);
     }
   }, [currentPage, itemsPerPage, searchTerm, filterStatus]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loadCompaniesData = async () => {
+  const loadCompaniesData = async (isSearch = false) => {
     try {
-      setIsLoading(true);
+      if (isSearch) {
+        setSearchLoading(true);
+      } else {
+        setIsLoading(true);
+      }
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: itemsPerPage.toString()
       });
 
       if (searchTerm) {
-        params.append('name', searchTerm);
+        params.append('query', searchTerm);
       }
 
       const response = await fetch(`http://localhost:8000/api/companies/search?${params}`, {
@@ -181,7 +188,11 @@ const Companies = () => {
     } catch (error) {
       console.error('Error loading companies data:', error);
     } finally {
-      setIsLoading(false);
+      if (isSearch) {
+        setSearchLoading(false);
+      } else {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -189,7 +200,8 @@ const Companies = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    loadCompaniesData();
+    const hasSearchOrFilter = searchTerm || filterStatus !== 'all';
+    loadCompaniesData(hasSearchOrFilter);
   };
 
   // Handle company click
@@ -200,7 +212,7 @@ const Companies = () => {
   // Filter and sort companies
   const filteredCompanies = companiesData.filter(company => {
     if (filterStatus === 'all') return true;
-    return company.riskLevel === filterStatus;
+    return company.risk_level === filterStatus;
   });
 
   // Pagination
@@ -208,8 +220,8 @@ const Companies = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  // Early return for loading state
-  if (isLoading) {
+  // Early return for loading state (only on initial load, not during search)
+  if (isLoading && !searchLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -278,6 +290,11 @@ const Companies = () => {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
                 ref={searchRef}
               />
+              {searchLoading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-sky-500"></div>
+                </div>
+              )}
             </div>
             <div className="flex gap-2">
               <select

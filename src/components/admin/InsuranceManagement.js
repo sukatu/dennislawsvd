@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Shield, 
   Search, 
@@ -40,6 +40,7 @@ const InsuranceManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingInsurance, setEditingInsurance] = useState(null);
+  const searchInputRef = useRef(null);
 
   // Initial load
   useEffect(() => {
@@ -53,7 +54,7 @@ const InsuranceManagement = () => {
       // Only show search loading if we have a search term or filter
       const hasSearchOrFilter = searchTerm || insuranceTypeFilter;
       loadInsurance(hasSearchOrFilter);
-      loadAnalytics();
+      // Don't reload analytics on every search - it's expensive and causes re-renders
     }, 300);
 
     return () => clearTimeout(timeoutId);
@@ -69,6 +70,7 @@ const InsuranceManagement = () => {
     try {
       if (isSearch) {
         setSearchLoading(true);
+        // Don't set loading to true during search operations
       } else {
         setLoading(true);
       }
@@ -305,6 +307,7 @@ const InsuranceManagement = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Search insurance companies..."
               value={searchTerm}
