@@ -67,6 +67,7 @@ import SubscriptionRequests from '../components/admin/SubscriptionRequests';
 import TenantManagement from '../components/admin/TenantManagement';
 import CourtManagement from '../components/admin/CourtManagement';
 import ProfileManagement from '../components/admin/ProfileManagement';
+import AIAnalytics from '../components/admin/AIAnalytics';
 import LogsViewer from '../components/LogsViewer';
 import { apiGet } from '../utils/api';
 
@@ -352,6 +353,7 @@ const AdminDashboard = () => {
     { id: 'subscription-requests', name: 'Subscription Requests', icon: Clock },
     { id: 'tenants', name: 'Organizations', icon: Globe },
     { id: 'courts', name: 'Courts', icon: MapPin },
+    { id: 'ai-analytics', name: 'AI Analytics', icon: Zap },
     { id: 'logs', name: 'System Logs', icon: Activity },
     { id: 'roles', name: 'Roles & Permissions', icon: Shield },
     { id: 'settings', name: 'Settings', icon: Settings }
@@ -391,6 +393,8 @@ const AdminDashboard = () => {
         return <TenantManagement />;
       case 'courts':
         return <CourtManagement />;
+      case 'ai-analytics':
+        return <AIAnalytics />;
       case 'logs':
         return <LogsViewer />;
       case 'roles':

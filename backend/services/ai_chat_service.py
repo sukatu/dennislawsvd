@@ -1,5 +1,6 @@
 import os
 import openai
+import logging
 from typing import Dict, List, Any, Optional
 from sqlalchemy.orm import Session
 from models.settings import Settings
@@ -9,12 +10,18 @@ from models.case_hearings import CaseHearing
 from datetime import datetime
 import json
 import re
+from services.usage_tracking_service import UsageTrackingService
+
+# Configure logging for AI chat
+logging.basicConfig(level=logging.INFO)
+ai_chat_logger = logging.getLogger("ai_chat")
 
 class AIChatService:
     def __init__(self, db: Session):
         self.db = db
         self.openai_client = self._get_openai_client()
         self.model = self._get_ai_model()
+        self.usage_service = UsageTrackingService(db)
         
     def _get_openai_client(self):
         """Get OpenAI client with API key from database or environment"""
@@ -45,6 +52,127 @@ class AIChatService:
         if not content or len(content) <= max_length:
             return content
         return content[:max_length] + "... [Content truncated]"
+    
+    def _log_chat_interaction(self, case_id: int, user_message: str, ai_response: str, 
+                            session_id: str = None, user_id: str = None, 
+                            response_time_ms: int = None, tokens_used: int = None,
+                            error: str = None):
+        """Log chat interaction for reporting and analytics"""
+        try:
+            log_data = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "case_id": case_id,
+                "session_id": session_id,
+                "user_id": user_id,
+                "user_message": user_message[:500],  # Truncate for storage
+                "ai_response": ai_response[:500] if ai_response else None,  # Truncate for storage
+                "response_time_ms": response_time_ms,
+                "tokens_used": tokens_used,
+                "ai_model": self.model,
+                "error": error,
+                "message_length": len(user_message),
+                "response_length": len(ai_response) if ai_response else 0
+            }
+            
+            # Log to console/file
+            ai_chat_logger.info(f"AI_CHAT_INTERACTION: {json.dumps(log_data)}")
+            
+            # Log to database for detailed analytics
+            self._log_to_database(log_data)
+            
+        except Exception as e:
+            ai_chat_logger.error(f"Error logging chat interaction: {e}")
+    
+    def _log_session_analytics(self, session_id: str, case_id: int, action: str, 
+                              additional_data: Dict = None):
+        """Log session analytics for reporting"""
+        try:
+            analytics_data = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "session_id": session_id,
+                "case_id": case_id,
+                "action": action,  # 'session_started', 'message_sent', 'session_ended', etc.
+                "ai_model": self.model,
+                "additional_data": additional_data or {}
+            }
+            
+            ai_chat_logger.info(f"AI_CHAT_ANALYTICS: {json.dumps(analytics_data)}")
+            
+        except Exception as e:
+            ai_chat_logger.error(f"Error logging session analytics: {e}")
+    
+    def _log_to_database(self, log_data: Dict):
+        """Log interaction data to database for detailed reporting"""
+        try:
+            # Create a simple log entry in the database
+            # You might want to create a dedicated table for this
+            from models.ai_chat_session import AIChatSession
+            
+            # For now, we'll store analytics in the session's metadata
+            # In a production system, you'd want a separate analytics table
+            session = self.db.query(AIChatSession).filter(
+                AIChatSession.session_id == log_data.get('session_id')
+            ).first()
+            
+            if session:
+                # Update session with interaction count and last activity
+                session.total_messages = (session.total_messages or 0) + 1
+                session.last_activity = datetime.utcnow()
+                
+                # Store interaction metadata
+                if not hasattr(session, 'interaction_logs'):
+                    session.interaction_logs = []
+                
+                if not session.interaction_logs:
+                    session.interaction_logs = []
+                
+                # Add to interaction logs (keep last 100 interactions)
+                session.interaction_logs.append({
+                    "timestamp": log_data["timestamp"],
+                    "user_message_length": log_data["message_length"],
+                    "response_length": log_data["response_length"],
+                    "response_time_ms": log_data.get("response_time_ms"),
+                    "tokens_used": log_data.get("tokens_used"),
+                    "error": log_data.get("error")
+                })
+                
+                # Keep only last 100 interactions to prevent bloat
+                if len(session.interaction_logs) > 100:
+                    session.interaction_logs = session.interaction_logs[-100:]
+                
+                self.db.commit()
+                
+        except Exception as e:
+            ai_chat_logger.error(f"Error logging to database: {e}")
+    
+    def _log_usage_statistics(self, case_id: int, session_id: str, 
+                            total_tokens: int, response_time_ms: int):
+        """Log usage statistics for billing and analytics"""
+        try:
+            usage_data = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "case_id": case_id,
+                "session_id": session_id,
+                "total_tokens": total_tokens,
+                "response_time_ms": response_time_ms,
+                "ai_model": self.model,
+                "cost_estimate": self._calculate_cost_estimate(total_tokens)
+            }
+            
+            ai_chat_logger.info(f"AI_CHAT_USAGE: {json.dumps(usage_data)}")
+            
+        except Exception as e:
+            ai_chat_logger.error(f"Error logging usage statistics: {e}")
+    
+    def _calculate_cost_estimate(self, tokens: int) -> float:
+        """Calculate estimated cost based on token usage"""
+        # Rough estimates for OpenAI pricing (as of 2024)
+        if self.model == "gpt-4":
+            return tokens * 0.00003  # $0.03 per 1K tokens
+        elif self.model == "gpt-3.5-turbo":
+            return tokens * 0.000002  # $0.002 per 1K tokens
+        else:
+            return tokens * 0.00001  # Default estimate
     
     def get_case_context(self, case_id: int) -> Dict[str, Any]:
         """Get comprehensive case context for AI chat"""
@@ -131,12 +259,34 @@ class AIChatService:
             print(f"Error getting case context: {e}")
             return {"error": f"Failed to get case context: {str(e)}"}
     
-    def generate_ai_response(self, case_id: int, user_message: str, chat_history: List[Dict] = None) -> Dict[str, Any]:
+    def generate_ai_response(self, case_id: int, user_message: str, chat_history: List[Dict] = None, 
+                           session_id: str = None, user_id: str = None) -> Dict[str, Any]:
         """Generate AI response based on case context and user message"""
+        start_time = datetime.utcnow()
+        response_time_ms = None
+        tokens_used = None
+        ai_response = None
+        error = None
+        
         try:
+            # Log session analytics
+            self._log_session_analytics(session_id, case_id, "message_sent", {
+                "user_message_length": len(user_message),
+                "chat_history_length": len(chat_history) if chat_history else 0
+            })
+            
             # Get case context
             case_context = self.get_case_context(case_id)
             if "error" in case_context:
+                error = case_context["error"]
+                self._log_chat_interaction(
+                    case_id=case_id,
+                    user_message=user_message,
+                    ai_response=None,
+                    session_id=session_id,
+                    user_id=user_id,
+                    error=error
+                )
                 return case_context
             
             # Build system prompt
@@ -167,21 +317,71 @@ class AIChatService:
                 stream=False
             )
             
+            # Calculate response time and token usage
+            end_time = datetime.utcnow()
+            response_time_ms = int((end_time - start_time).total_seconds() * 1000)
+            tokens_used = response.usage.total_tokens if response.usage else None
+            
             ai_response = response.choices[0].message.content
+            
+            # Log successful interaction
+            self._log_chat_interaction(
+                case_id=case_id,
+                user_message=user_message,
+                ai_response=ai_response,
+                session_id=session_id,
+                user_id=user_id,
+                response_time_ms=response_time_ms,
+                tokens_used=tokens_used
+            )
+            
+            # Log usage statistics
+            if tokens_used:
+                self._log_usage_statistics(case_id, session_id, tokens_used, response_time_ms)
+                
+                # Track usage for billing
+                self.usage_service.track_ai_usage(
+                    user_id=user_id,
+                    session_id=session_id,
+                    endpoint="/api/ai-chat/message",
+                    ai_model=self.model,
+                    prompt_tokens=response.usage.prompt_tokens if response.usage else 0,
+                    completion_tokens=response.usage.completion_tokens if response.usage else 0,
+                    response_time_ms=response_time_ms,
+                    query=user_message
+                )
             
             return {
                 "success": True,
                 "response": ai_response,
                 "case_context": case_context,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.utcnow().isoformat(),
+                "response_time_ms": response_time_ms,
+                "tokens_used": tokens_used
             }
             
         except Exception as e:
-            print(f"Error generating AI response: {e}")
+            error = f"Failed to generate AI response: {str(e)}"
+            end_time = datetime.utcnow()
+            response_time_ms = int((end_time - start_time).total_seconds() * 1000)
+            
+            # Log error interaction
+            self._log_chat_interaction(
+                case_id=case_id,
+                user_message=user_message,
+                ai_response=None,
+                session_id=session_id,
+                user_id=user_id,
+                response_time_ms=response_time_ms,
+                error=error
+            )
+            
+            ai_chat_logger.error(f"Error generating AI response: {e}")
             return {
                 "success": False,
-                "error": f"Failed to generate AI response: {str(e)}",
-                "timestamp": datetime.utcnow().isoformat()
+                "error": error,
+                "timestamp": datetime.utcnow().isoformat(),
+                "response_time_ms": response_time_ms
             }
     
     def _get_region_name(self, region_code: str) -> str:
@@ -270,11 +470,31 @@ Always base your responses on the specific case details provided and Ghanaian la
         
         return "\n".join(formatted)
     
-    def generate_case_summary(self, case_id: int) -> Dict[str, Any]:
+    def generate_case_summary(self, case_id: int, session_id: str = None, user_id: str = None) -> Dict[str, Any]:
         """Generate a comprehensive case summary for quick reference"""
+        start_time = datetime.utcnow()
+        response_time_ms = None
+        tokens_used = None
+        summary = None
+        error = None
+        
         try:
+            # Log summary generation analytics
+            self._log_session_analytics(session_id, case_id, "summary_requested", {
+                "case_title": "Case Summary Generation"
+            })
+            
             case_context = self.get_case_context(case_id)
             if "error" in case_context:
+                error = case_context["error"]
+                self._log_chat_interaction(
+                    case_id=case_id,
+                    user_message="Generate case summary",
+                    ai_response=None,
+                    session_id=session_id,
+                    user_id=user_id,
+                    error=error
+                )
                 return case_context
             
             system_prompt = f"""You are a legal expert. Provide a comprehensive summary of this case in 3-4 paragraphs covering:
@@ -298,16 +518,69 @@ Court: {case_context.get('court_type', 'N/A')}"""
                 temperature=0.7
             )
             
+            # Calculate response time and token usage
+            end_time = datetime.utcnow()
+            response_time_ms = int((end_time - start_time).total_seconds() * 1000)
+            tokens_used = response.usage.total_tokens if response.usage else None
+            
+            summary = response.choices[0].message.content
+            
+            # Log successful summary generation
+            self._log_chat_interaction(
+                case_id=case_id,
+                user_message="Generate case summary",
+                ai_response=summary,
+                session_id=session_id,
+                user_id=user_id,
+                response_time_ms=response_time_ms,
+                tokens_used=tokens_used
+            )
+            
+            # Log usage statistics
+            if tokens_used:
+                self._log_usage_statistics(case_id, session_id, tokens_used, response_time_ms)
+                
+                # Track usage for billing
+                self.usage_service.track_ai_usage(
+                    user_id=user_id,
+                    session_id=session_id,
+                    endpoint="/api/ai-chat/case-summary",
+                    ai_model=self.model,
+                    prompt_tokens=response.usage.prompt_tokens if response.usage else 0,
+                    completion_tokens=response.usage.completion_tokens if response.usage else 0,
+                    response_time_ms=response_time_ms,
+                    query="Generate case summary"
+                )
+            
             return {
                 "success": True,
-                "summary": response.choices[0].message.content,
-                "timestamp": datetime.utcnow().isoformat()
+                "summary": summary,
+                "timestamp": datetime.utcnow().isoformat(),
+                "response_time_ms": response_time_ms,
+                "tokens_used": tokens_used
             }
             
         except Exception as e:
-            print(f"Error generating case summary: {e}")
+            error = f"Failed to generate case summary: {str(e)}"
+            end_time = datetime.utcnow()
+            response_time_ms = int((end_time - start_time).total_seconds() * 1000)
+            
+            # Log error
+            self._log_chat_interaction(
+                case_id=case_id,
+                user_message="Generate case summary",
+                ai_response=None,
+                session_id=session_id,
+                user_id=user_id,
+                response_time_ms=response_time_ms,
+                error=error
+            )
+            
+            ai_chat_logger.error(f"Error generating case summary: {e}")
             return {
                 "success": False,
-                "error": f"Failed to generate case summary: {str(e)}"
+                "error": error,
+                "timestamp": datetime.utcnow().isoformat(),
+                "response_time_ms": response_time_ms
             }
 

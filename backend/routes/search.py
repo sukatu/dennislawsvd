@@ -22,6 +22,7 @@ from typing import List, Optional, Dict, Any
 import logging
 import math
 import time
+from services.usage_tracking_service import UsageTrackingService
 
 router = APIRouter()
 
@@ -228,6 +229,21 @@ async def unified_search(
     has_prev = page > 1
     
     search_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+    
+    # Track usage for billing
+    try:
+        usage_service = UsageTrackingService(db)
+        usage_service.track_search_usage(
+            user_id=current_user.id if current_user else None,
+            session_id=None,  # Could be extracted from headers
+            query=query or "",
+            endpoint="/api/search/unified",
+            results_count=total_results,
+            response_time_ms=int(search_time),
+            filters_applied={"search_type": search_type, "page": page, "limit": limit}
+        )
+    except Exception as e:
+        logging.error(f"Error tracking search usage: {e}")
     
     return UnifiedSearchResponse(
         results=paginated_results,

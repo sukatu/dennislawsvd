@@ -97,6 +97,10 @@ class User(Base):
     # access_logs = relationship("AccessLog", back_populates="user", lazy="dynamic")
     # activity_logs = relationship("ActivityLog", back_populates="user", lazy="dynamic")
     # audit_logs = relationship("AuditLog", back_populates="user", lazy="dynamic")
+    
+    # Usage tracking relationships
+    usage_records = relationship("UsageTracking", back_populates="user", lazy="dynamic")
+    billing_summaries = relationship("BillingSummary", back_populates="user", lazy="dynamic")
     # error_logs = relationship("ErrorLog", foreign_keys="ErrorLog.user_id", back_populates="user", lazy="dynamic")
     # security_logs = relationship("SecurityLog", back_populates="user", lazy="dynamic")
     # cases = relationship("Case", back_populates="user")
