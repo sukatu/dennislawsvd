@@ -145,6 +145,7 @@ const Settings = () => {
     usage: {},
     limits: {}
   });
+  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [notificationStats, setNotificationStats] = useState({
     total: 0,
@@ -159,6 +160,59 @@ const Settings = () => {
     recent_events: [],
     security_score: 0
   });
+
+  // Load user data from backend
+  const loadUserData = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch('http://localhost:8000/api/profile/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUserData(userData);
+        setFormData({
+          first_name: userData.first_name || '',
+          last_name: userData.last_name || '',
+          email: userData.email || '',
+          phone_number: userData.phone_number || '',
+          organization: userData.organization || '',
+          job_title: userData.job_title || '',
+          bio: userData.bio || '',
+          language: userData.language || 'en',
+          timezone: userData.timezone || 'UTC',
+          email_notifications: userData.email_notifications !== false,
+          sms_notifications: userData.sms_notifications === true
+        });
+      } else {
+        console.error('Error loading user data:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
+
+  // Load subscription plans from backend
+  const loadSubscriptionPlans = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch('http://localhost:8000/api/subscription/plans', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const plans = await response.json();
+        setSubscriptionPlans(plans);
+      }
+    } catch (error) {
+      console.error('Error loading subscription plans:', error);
+    }
+  };
 
   // Load subscription data from backend
   const loadSubscriptionData = async () => {
@@ -199,7 +253,7 @@ const Settings = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setNotifications(data);
+        setNotifications(data.notifications || []);
       }
     } catch (error) {
       console.error('Error loading notifications:', error);
@@ -244,31 +298,17 @@ const Settings = () => {
     }
   };
 
-  // Check authentication status
+  // Check authentication status and load data
   useEffect(() => {
     const authStatus = localStorage.getItem('isAuthenticated');
-    const user = localStorage.getItem('userData');
     
-    if (authStatus === 'true' && user) {
+    if (authStatus === 'true') {
       setIsAuthenticated(true);
-      const parsedUser = JSON.parse(user);
-      setUserData(parsedUser);
-      setFormData({
-        first_name: parsedUser.first_name || '',
-        last_name: parsedUser.last_name || '',
-        email: parsedUser.email || '',
-        phone_number: parsedUser.phone_number || '',
-        organization: parsedUser.organization || '',
-        job_title: parsedUser.job_title || '',
-        bio: parsedUser.bio || '',
-        language: parsedUser.language || 'en',
-        timezone: parsedUser.timezone || 'UTC',
-        email_notifications: parsedUser.email_notifications !== false,
-        sms_notifications: parsedUser.sms_notifications === true
-      });
       
       // Load all data from backend
+      loadUserData();
       loadSubscriptionData();
+      loadSubscriptionPlans();
       loadNotifications();
       loadNotificationStats();
       loadSecuritySettings();
@@ -291,7 +331,7 @@ const Settings = () => {
     showInfo('Saving Profile', 'Updating your profile information...');
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/profile', {
+      const response = await fetch('http://localhost:8000/api/profile/me', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -418,20 +458,25 @@ const Settings = () => {
     showInfo('Updating Notifications', 'Marking all notifications as read...');
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/notifications/mark-all-read', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        showSuccess('Notifications Updated', 'All notifications marked as read');
-        loadNotifications();
-        loadNotificationStats();
-      }
+      
+      // Mark each notification as read individually
+      const unreadNotifications = notifications.filter(n => !n.is_read);
+      const promises = unreadNotifications.map(notification => 
+        fetch(`http://localhost:8000/api/notifications/${notification.id}/read`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+      );
+      
+      await Promise.all(promises);
+      showSuccess('Notifications Updated', 'All notifications marked as read');
+      loadNotifications();
+      loadNotificationStats();
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
+      showError('Update Failed', 'Error marking notifications as read. Please try again.');
     }
   };
 
@@ -783,73 +828,58 @@ const Settings = () => {
                 </div>
 
                 {/* Upgrade Options */}
-                {!subscriptionData.is_premium && (
+                {!subscriptionData.is_premium && subscriptionPlans.length > 0 && (
                   <div className="bg-white rounded-lg shadow-sm border border-slate-200">
                     <div className="px-6 py-4 border-b border-slate-200">
                       <h2 className="text-lg font-semibold text-slate-900">Upgrade Your Plan</h2>
                     </div>
                     <div className="p-6">
                       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        <div className="border border-slate-200 rounded-lg p-6">
-                          <h3 className="text-lg font-semibold text-slate-900 mb-2">Professional</h3>
-                          <p className="text-3xl font-bold text-slate-900 mb-4">$29<span className="text-lg font-normal text-slate-600">/month</span></p>
-                          <ul className="space-y-2 mb-6">
-                            <li className="flex items-center gap-2 text-sm text-slate-600">
-                              <Check className="h-4 w-4 text-green-500" />
-                              Unlimited searches
-                            </li>
-                            <li className="flex items-center gap-2 text-sm text-slate-600">
-                              <Check className="h-4 w-4 text-green-500" />
-                              Advanced filters
-                            </li>
-                            <li className="flex items-center gap-2 text-sm text-slate-600">
-                              <Check className="h-4 w-4 text-green-500" />
-                              Priority support
-                            </li>
-                            <li className="flex items-center gap-2 text-sm text-slate-600">
-                              <Check className="h-4 w-4 text-green-500" />
-                              Export capabilities
-                            </li>
-                          </ul>
-                          <button 
-                            onClick={() => handleUpgradeSubscription('professional')}
-                            className="w-full bg-sky-600 text-white py-2 px-4 rounded-lg hover:bg-sky-700 transition-colors"
-                          >
-                            Upgrade to Professional
-                          </button>
-                        </div>
-
-                        <div className="border border-amber-200 rounded-lg p-6 bg-amber-50">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-lg font-semibold text-slate-900">Enterprise</h3>
-                            <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">Popular</span>
-                          </div>
-                          <p className="text-3xl font-bold text-slate-900 mb-4">$99<span className="text-lg font-normal text-slate-600">/month</span></p>
-                          <ul className="space-y-2 mb-6">
-                            <li className="flex items-center gap-2 text-sm text-slate-600">
-                              <Check className="h-4 w-4 text-green-500" />
-                              Everything in Professional
-                            </li>
-                            <li className="flex items-center gap-2 text-sm text-slate-600">
-                              <Check className="h-4 w-4 text-green-500" />
-                              API access
-                            </li>
-                            <li className="flex items-center gap-2 text-sm text-slate-600">
-                              <Check className="h-4 w-4 text-green-500" />
-                              Custom integrations
-                            </li>
-                            <li className="flex items-center gap-2 text-sm text-slate-600">
-                              <Check className="h-4 w-4 text-green-500" />
-                              Dedicated support
-                            </li>
-                          </ul>
-                          <button 
-                            onClick={() => handleUpgradeSubscription('enterprise')}
-                            className="w-full bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-colors"
-                          >
-                            Upgrade to Enterprise
-                          </button>
-                        </div>
+                        {subscriptionPlans
+                          .filter(plan => plan.id !== 'free' && !plan.is_current)
+                          .map((plan) => (
+                            <div 
+                              key={plan.id}
+                              className={`border rounded-lg p-6 ${
+                                plan.is_popular 
+                                  ? 'border-amber-200 bg-amber-50' 
+                                  : 'border-slate-200'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 mb-2">
+                                <h3 className="text-lg font-semibold text-slate-900">{plan.name}</h3>
+                                {plan.is_popular && (
+                                  <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">Popular</span>
+                                )}
+                              </div>
+                              <p className="text-3xl font-bold text-slate-900 mb-4">
+                                ${plan.price}
+                                <span className="text-lg font-normal text-slate-600">/{plan.billing_cycle}</span>
+                              </p>
+                              <p className="text-sm text-slate-600 mb-4">{plan.description}</p>
+                              <ul className="space-y-2 mb-6">
+                                {plan.features.map((feature, index) => (
+                                  <li key={index} className="flex items-center gap-2 text-sm text-slate-600">
+                                    <Check className="h-4 w-4 text-green-500" />
+                                    {feature.name}
+                                    {feature.limit && (
+                                      <span className="text-xs text-slate-500">({feature.limit} {feature.limit === 1000 ? 'calls/month' : 'per month'})</span>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                              <button 
+                                onClick={() => handleUpgradeSubscription(plan.id)}
+                                className={`w-full text-white py-2 px-4 rounded-lg transition-colors ${
+                                  plan.is_popular 
+                                    ? 'bg-amber-600 hover:bg-amber-700' 
+                                    : 'bg-sky-600 hover:bg-sky-700'
+                                }`}
+                              >
+                                Upgrade to {plan.name}
+                              </button>
+                            </div>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -926,7 +956,7 @@ const Settings = () => {
                     <h2 className="text-lg font-semibold text-slate-900">Recent Notifications</h2>
                   </div>
                   <div className="divide-y divide-slate-200">
-                    {notifications.slice(0, 10).map((notification) => (
+                    {(notifications || []).slice(0, 10).map((notification) => (
                       <div key={notification.id} className="p-4 hover:bg-slate-50">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -962,7 +992,7 @@ const Settings = () => {
                         </div>
                       </div>
                     ))}
-                    {notifications.length === 0 && (
+                    {(notifications || []).length === 0 && (
                       <div className="p-8 text-center text-slate-500">
                         <Bell className="h-12 w-12 mx-auto mb-4 text-slate-300" />
                         <p>No notifications yet</p>
