@@ -705,7 +705,8 @@ const CaseDetails = () => {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigate(-1)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center justify-center p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700 hover:text-gray-900 border border-gray-200 hover:border-gray-300"
+                title="Go back"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
