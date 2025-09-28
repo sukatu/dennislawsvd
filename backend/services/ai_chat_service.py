@@ -184,15 +184,42 @@ class AIChatService:
                 "timestamp": datetime.utcnow().isoformat()
             }
     
+    def _get_region_name(self, region_code: str) -> str:
+        """Convert region code to full region name"""
+        region_mapping = {
+            'gar': 'Greater Accra Region',
+            'ash': 'Ashanti Region', 
+            'wst': 'Western Region',
+            'est': 'Eastern Region',
+            'vol': 'Volta Region',
+            'cen': 'Central Region',
+            'brg': 'Brong-Ahafo Region',
+            'nth': 'Northern Region',
+            'upp': 'Upper East Region',
+            'uww': 'Upper West Region'
+        }
+        return region_mapping.get(region_code.lower(), region_code)
+
     def _build_system_prompt(self, case_context: Dict[str, Any]) -> str:
         """Build comprehensive system prompt for AI chat"""
+        region = case_context.get('region', 'N/A')
+        town = case_context.get('town', 'N/A')
+        
+        # Convert region code to full name if it's a code
+        if region and region != 'N/A' and len(region) <= 4:
+            region = self._get_region_name(region)
+        
         return f"""You are an expert legal AI assistant specializing in Ghanaian law and financial legal matters. You are analyzing the following case and providing expert legal and financial insights.
+
+IMPORTANT: Always use the specific region and town information provided in the case details below. Do not make assumptions about the location based on court type or other information.
 
 CASE INFORMATION:
 Title: {case_context.get('title', 'N/A')}
 Case Number: {case_context.get('suit_reference_number', 'N/A')}
 Date: {case_context.get('date', 'N/A')}
 Court: {case_context.get('court_type', 'N/A')} - {case_context.get('court_division', 'N/A')}
+Region: {region}
+Town: {town}
 Area of Law: {case_context.get('area_of_law', 'N/A')}
 Status: {case_context.get('status', 'N/A')}
 
