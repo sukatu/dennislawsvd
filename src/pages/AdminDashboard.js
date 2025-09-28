@@ -48,6 +48,10 @@ import {
   Target,
   Zap,
   Globe,
+  BookOpen,
+  Code,
+  FileCode,
+  HelpCircle,
   Scale
 } from 'lucide-react';
 import UserManagement from '../components/admin/UserManagement';
@@ -68,6 +72,7 @@ import TenantManagement from '../components/admin/TenantManagement';
 import CourtManagement from '../components/admin/CourtManagement';
 import ProfileManagement from '../components/admin/ProfileManagement';
 import AIAnalytics from '../components/admin/AIAnalytics';
+import Documentation from '../components/admin/Documentation';
 import LogsViewer from '../components/LogsViewer';
 import { apiGet } from '../utils/api';
 
@@ -354,6 +359,7 @@ const AdminDashboard = () => {
     { id: 'tenants', name: 'Organizations', icon: Globe },
     { id: 'courts', name: 'Courts', icon: MapPin },
     { id: 'ai-analytics', name: 'AI Analytics', icon: Zap },
+    { id: 'documentation', name: 'Documentation', icon: BookOpen },
     { id: 'logs', name: 'System Logs', icon: Activity },
     { id: 'roles', name: 'Roles & Permissions', icon: Shield },
     { id: 'settings', name: 'Settings', icon: Settings }
@@ -395,6 +401,8 @@ const AdminDashboard = () => {
         return <CourtManagement />;
       case 'ai-analytics':
         return <AIAnalytics />;
+      case 'documentation':
+        return <Documentation />;
       case 'logs':
         return <LogsViewer />;
       case 'roles':
