@@ -1967,28 +1967,40 @@ $results = $api->search('mahama');`}
                     <code className="text-sm font-mono text-slate-700">GET /api/employees/</code>
                     <p className="text-xs text-slate-500">List employees with pagination</p>
                   </div>
-                  <Copy className="h-4 w-4 text-slate-400" />
+                  <Copy 
+                    className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                    onClick={() => copyToClipboard('GET /api/employees/', 'employees-list')}
+                  />
                 </div>
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div>
                     <code className="text-sm font-mono text-slate-700">POST /api/employees/</code>
                     <p className="text-xs text-slate-500">Create new employee</p>
                   </div>
-                  <Copy className="h-4 w-4 text-slate-400" />
+                  <Copy 
+                    className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                    onClick={() => copyToClipboard('POST /api/employees/', 'employees-create')}
+                  />
                 </div>
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div>
                     <code className="text-sm font-mono text-slate-700">GET /api/employees/{id}</code>
                     <p className="text-xs text-slate-500">Get employee details</p>
                   </div>
-                  <Copy className="h-4 w-4 text-slate-400" />
+                  <Copy 
+                    className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                    onClick={() => copyToClipboard('GET /api/employees/{id}', 'employees-get')}
+                  />
                 </div>
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div>
                     <code className="text-sm font-mono text-slate-700">PUT /api/employees/{id}</code>
                     <p className="text-xs text-slate-500">Update employee</p>
                   </div>
-                  <Copy className="h-4 w-4 text-slate-400" />
+                  <Copy 
+                    className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                    onClick={() => copyToClipboard('PUT /api/employees/{id}', 'employees-update')}
+                  />
                 </div>
               </div>
             </div>
@@ -2083,15 +2095,24 @@ $results = $api->search('mahama');`}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
                     <code className="text-sm font-mono text-slate-700">POST /api/files/upload</code>
-                    <Copy className="h-4 w-4 text-slate-400" />
+                    <Copy 
+                      className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                      onClick={() => copyToClipboard('POST /api/files/upload', 'files-upload')}
+                    />
                   </div>
                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
                     <code className="text-sm font-mono text-slate-700">GET /api/files/download/{filename}</code>
-                    <Copy className="h-4 w-4 text-slate-400" />
+                    <Copy 
+                      className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                      onClick={() => copyToClipboard('GET /api/files/download/{filename}', 'files-download')}
+                    />
                   </div>
                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
                     <code className="text-sm font-mono text-slate-700">DELETE /api/files/{filename}</code>
-                    <Copy className="h-4 w-4 text-slate-400" />
+                    <Copy 
+                      className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                      onClick={() => copyToClipboard('DELETE /api/files/{filename}', 'files-delete')}
+                    />
                   </div>
                 </div>
               </div>
@@ -2100,15 +2121,24 @@ $results = $api->search('mahama');`}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
                     <code className="text-sm font-mono text-slate-700">GET /api/file-repository/</code>
-                    <Copy className="h-4 w-4 text-slate-400" />
+                    <Copy 
+                      className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                      onClick={() => copyToClipboard('GET /api/file-repository/', 'repo-list')}
+                    />
                   </div>
                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
                     <code className="text-sm font-mono text-slate-700">POST /api/file-repository/folder</code>
-                    <Copy className="h-4 w-4 text-slate-400" />
+                    <Copy 
+                      className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                      onClick={() => copyToClipboard('POST /api/file-repository/folder', 'repo-folder-create')}
+                    />
                   </div>
                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
                     <code className="text-sm font-mono text-slate-700">GET /api/file-repository/folder/{path}</code>
-                    <Copy className="h-4 w-4 text-slate-400" />
+                    <Copy 
+                      className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
+                      onClick={() => copyToClipboard('GET /api/file-repository/folder/{path}', 'repo-folder-get')}
+                    />
                   </div>
                 </div>
               </div>
