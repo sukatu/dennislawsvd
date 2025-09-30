@@ -70,7 +70,7 @@ const Documentation = () => {
               <div className="bg-white rounded-lg p-4 border border-blue-200">
                 <Database className="h-8 w-8 text-blue-600 mb-2" />
                 <h4 className="font-semibold text-blue-900">Database</h4>
-                <p className="text-sm text-blue-700">11,911+ Cases, 6,331+ People, 34 Banks, 49 Insurance Companies, 4,829+ Companies</p>
+                <p className="text-sm text-blue-700">11,911+ Cases, 6,340+ People, 34 Banks, 49 Insurance Companies, 4,829+ Companies, 10+ Employees</p>
               </div>
               <div className="bg-white rounded-lg p-4 border border-blue-200">
                 <Zap className="h-8 w-8 text-blue-600 mb-2" />
@@ -104,6 +104,14 @@ const Documentation = () => {
                 <li className="flex items-center text-slate-700">
                   <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
                   Real-time analytics and reporting
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  Employee management with LinkedIn-style profiles
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  File repository for document management
                 </li>
                 <li className="flex items-center text-slate-700">
                   <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
@@ -1901,6 +1909,208 @@ $results = $api->search('mahama');`}
                 <BarChart3 className="h-8 w-8 text-green-600 mb-2" />
                 <h4 className="font-semibold text-slate-900 mb-2">Analytics</h4>
                 <p className="text-sm text-slate-700">Understand usage analytics and reporting features</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'employee-management',
+      title: 'Employee Management',
+      icon: Users,
+      content: (
+        <div className="space-y-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-3">Employee Management System</h3>
+            <p className="text-blue-800 mb-4">
+              LinkedIn-style employee profiles with comprehensive tracking of employment history, skills, education, and legal cases.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Key Features</h3>
+              <ul className="space-y-2">
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  LinkedIn-style employee profiles
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  Employment history tracking
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  Skills and education management
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  CV upload and management
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  Legal cases association
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  Automatic people database sync
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">API Endpoints</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div>
+                    <code className="text-sm font-mono text-slate-700">GET /api/employees/</code>
+                    <p className="text-xs text-slate-500">List employees with pagination</p>
+                  </div>
+                  <Copy className="h-4 w-4 text-slate-400" />
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div>
+                    <code className="text-sm font-mono text-slate-700">POST /api/employees/</code>
+                    <p className="text-xs text-slate-500">Create new employee</p>
+                  </div>
+                  <Copy className="h-4 w-4 text-slate-400" />
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div>
+                    <code className="text-sm font-mono text-slate-700">GET /api/employees/{id}</code>
+                    <p className="text-xs text-slate-500">Get employee details</p>
+                  </div>
+                  <Copy className="h-4 w-4 text-slate-400" />
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div>
+                    <code className="text-sm font-mono text-slate-700">PUT /api/employees/{id}</code>
+                    <p className="text-xs text-slate-500">Update employee</p>
+                  </div>
+                  <Copy className="h-4 w-4 text-slate-400" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Data Synchronization</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                <h4 className="font-semibold text-green-900">100% Sync Rate</h4>
+                <p className="text-sm text-green-700">All employees automatically synced to people database</p>
+              </div>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <RefreshCw className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                <h4 className="font-semibold text-blue-900">Real-time Updates</h4>
+                <p className="text-sm text-blue-700">Changes sync immediately across systems</p>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <Shield className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                <h4 className="font-semibold text-purple-900">Data Integrity</h4>
+                <p className="text-sm text-purple-700">Bidirectional updates maintain consistency</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'file-repository',
+      title: 'File Repository',
+      icon: FolderOpen,
+      content: (
+        <div className="space-y-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-3">File Repository System</h3>
+            <p className="text-blue-800 mb-4">
+              Comprehensive file management system for uploads, downloads, organization, and analytics across the entire application.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">File Management</h3>
+              <ul className="space-y-2">
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  Multi-format support (PDF, DOC, DOCX, TXT, images)
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  Organized folder structure
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  File validation and size restrictions
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  Secure authentication-based access
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  Drag-and-drop upload interface
+                </li>
+                <li className="flex items-center text-slate-700">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  File search and filtering
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Repository Structure</h3>
+              <div className="bg-slate-50 rounded-lg p-4">
+                <pre className="text-sm text-slate-700 font-mono">
+{`uploads/
+├── cvs/                    # Employee CV files
+├── cases/                  # Legal case documents
+├── avatars/               # User profile pictures
+└── general/               # General file uploads`}
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">API Endpoints</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <h4 className="font-semibold text-slate-900">File Operations</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                    <code className="text-sm font-mono text-slate-700">POST /api/files/upload</code>
+                    <Copy className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                    <code className="text-sm font-mono text-slate-700">GET /api/files/download/{filename}</code>
+                    <Copy className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                    <code className="text-sm font-mono text-slate-700">DELETE /api/files/{filename}</code>
+                    <Copy className="h-4 w-4 text-slate-400" />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <h4 className="font-semibold text-slate-900">Repository Management</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                    <code className="text-sm font-mono text-slate-700">GET /api/file-repository/</code>
+                    <Copy className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                    <code className="text-sm font-mono text-slate-700">POST /api/file-repository/folder</code>
+                    <Copy className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                    <code className="text-sm font-mono text-slate-700">GET /api/file-repository/folder/{path}</code>
+                    <Copy className="h-4 w-4 text-slate-400" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

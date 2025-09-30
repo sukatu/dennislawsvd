@@ -16,13 +16,16 @@
 
 The Juridence Legal Database System is a comprehensive legal database providing access to:
 - **11,911+ Legal Cases** with detailed information
-- **6,331+ People** with case statistics and risk analysis
+- **6,340+ People** with case statistics and risk analysis
 - **34 Banks** with financial data and services
 - **49 Insurance Companies** with coverage information
 - **4,829+ Companies** with corporate data and directors
+- **10+ Employees** with LinkedIn-style profiles and employment history
 
 ### Key Features
 - 🔍 **Unified Search** across all legal entities
+- 👥 **Employee Management** with LinkedIn-style profiles
+- 📂 **File Repository** for document management
 - 🤖 **AI-Powered Analysis** using GPT-4
 - 📊 **Real-time Analytics** and reporting
 - 🔐 **Secure API** with role-based access

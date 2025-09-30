@@ -12,16 +12,25 @@ A comprehensive legal database system providing access to case law, legal entiti
 
 ### 📊 **Comprehensive Legal Database**
 - **11,911+ Legal Cases** with detailed information
-- **6,331+ People** with case statistics and risk analysis  
+- **6,340+ People** with case statistics and risk analysis  
 - **34 Banks** with financial data and services
 - **49 Insurance Companies** with coverage information
 - **4,829+ Companies** with corporate data and directors
+- **10+ Employees** with LinkedIn-style profiles and employment history
 
 ### 🔍 **Advanced Search & Discovery**
 - **Unified Search** across all legal entities
 - **Quick Search** with autocomplete suggestions
 - **Advanced Filters** by date, court, entity type
 - **Real-time Results** with pagination support
+
+### 👥 **Employee Management System**
+- **LinkedIn-style Profiles** with comprehensive employee data
+- **Employment History** tracking across organizations
+- **CV Upload & Management** with file repository system
+- **Skills & Education** tracking with dynamic forms
+- **Legal Cases** associated with employees
+- **Automatic People Sync** - employees automatically added to people database
 
 ### 🤖 **AI-Powered Analysis**
 - **GPT-4 Integration** for case analysis
@@ -34,6 +43,8 @@ A comprehensive legal database system providing access to case law, legal entiti
 - **Usage Analytics** and performance metrics
 - **AI Usage Tracking** with cost analysis
 - **Custom Reports** and data exports
+- **Employee Analytics** with employment statistics
+- **File Repository Analytics** with upload/download tracking
 
 ### 🔐 **Enterprise Security**
 - **Role-based Access Control** (RBAC)
@@ -172,6 +183,8 @@ Authorization: Bearer your-api-key-here
 | **Banks** | `/api/banks/search` | Search banks |
 | **Companies** | `/api/companies/search` | Search companies |
 | **Insurance** | `/api/insurance/search` | Search insurance |
+| **Employees** | `/api/employees/` | Employee management |
+| **File Repository** | `/api/files/` | File upload and management |
 | **AI** | `/api/ai-chat/message` | AI chat interface |
 
 ### Example Usage
@@ -247,6 +260,8 @@ api_key = service.generate_api_key(
 - **👥 User Management** - User administration and permissions
 - **🔑 API Key Management** - Developer access control
 - **📁 Content Management** - Cases, people, banks, companies
+- **👨‍💼 Employee Management** - LinkedIn-style employee profiles
+- **📂 File Repository** - File upload and management system
 - **🤖 AI Analytics** - AI usage and performance tracking
 - **📚 Documentation** - Built-in system documentation
 - **⚙️ System Settings** - Configuration and preferences

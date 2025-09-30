@@ -7,10 +7,12 @@
 4. [Frontend Components](#frontend-components)
 5. [Authentication & Security](#authentication--security)
 6. [AI Integration](#ai-integration)
-7. [Analytics & Reporting](#analytics--reporting)
-8. [Deployment Architecture](#deployment-architecture)
-9. [Performance Metrics](#performance-metrics)
-10. [Monitoring & Logging](#monitoring--logging)
+7. [Employee Management System](#employee-management-system)
+8. [File Repository System](#file-repository-system)
+9. [Analytics & Reporting](#analytics--reporting)
+10. [Deployment Architecture](#deployment-architecture)
+11. [Performance Metrics](#performance-metrics)
+12. [Monitoring & Logging](#monitoring--logging)
 
 ## System Architecture
 
@@ -489,6 +491,142 @@ def generate_ai_response(message: str, case_id: int, session_id: str):
 - **Cost Estimation**: Real-time cost calculation
 - **Usage Patterns**: Analytics for optimization
 - **Model Performance**: Response time and quality metrics
+
+## Employee Management System
+
+### Overview
+The Employee Management System provides LinkedIn-style employee profiles with comprehensive tracking of employment history, skills, education, and legal cases.
+
+### Key Features
+
+#### Employee Profiles
+- **Personal Information**: Name, contact details, demographics
+- **Professional Data**: Job title, department, employment status
+- **Employment History**: Dynamic tracking of career progression
+- **Education History**: Academic qualifications and certifications
+- **Skills & Languages**: Comprehensive skill tracking
+- **CV Management**: File upload and storage system
+- **Legal Cases**: Associated legal proceedings
+
+#### Data Synchronization
+- **Automatic People Sync**: Employees automatically added to people database
+- **Real-time Updates**: Changes sync immediately across systems
+- **Data Integrity**: 100% synchronization rate maintained
+- **Bidirectional Updates**: Changes in either system reflect in both
+
+#### File Management
+- **CV Upload**: Support for PDF, DOC, DOCX, TXT files
+- **File Validation**: Size and type restrictions
+- **Secure Storage**: Organized file structure with unique naming
+- **Download Access**: Secure file retrieval system
+
+### Database Schema
+
+#### Employee Table
+```sql
+CREATE TABLE employees (
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    job_title VARCHAR(200),
+    current_employer_name VARCHAR(200),
+    current_employer_type VARCHAR(20),
+    employment_status VARCHAR(20) DEFAULT 'active',
+    employee_type VARCHAR(20) DEFAULT 'full_time',
+    skills JSON,
+    languages JSON,
+    cv_file VARCHAR(500),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+#### Employment History Table
+```sql
+CREATE TABLE employment_history (
+    id SERIAL PRIMARY KEY,
+    employee_id INTEGER REFERENCES employees(id),
+    company_name VARCHAR(200) NOT NULL,
+    job_title VARCHAR(200),
+    start_date DATE,
+    end_date DATE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### API Endpoints
+
+#### Employee Management
+- `GET /api/employees/` - List employees with pagination
+- `POST /api/employees/` - Create new employee
+- `GET /api/employees/{id}` - Get employee details
+- `PUT /api/employees/{id}` - Update employee
+- `DELETE /api/employees/{id}` - Delete employee
+
+#### File Management
+- `POST /api/employees/{id}/upload-cv` - Upload CV file
+- `GET /api/files/download-cv/{filename}` - Download CV file
+- `DELETE /api/files/{filename}` - Delete file
+
+#### Analytics
+- `GET /api/employees/analytics/overview` - Employee statistics
+- `GET /api/employees/analytics/employer/{type}/{name}` - Employer-specific analytics
+
+## File Repository System
+
+### Overview
+The File Repository System provides comprehensive file management capabilities for the entire application, including upload, download, organization, and analytics.
+
+### Key Features
+
+#### File Management
+- **Multi-format Support**: PDF, DOC, DOCX, TXT, images
+- **Organized Storage**: Folder-based file organization
+- **File Validation**: Size and type restrictions
+- **Secure Access**: Authentication-based file access
+- **Metadata Tracking**: File information and usage analytics
+
+#### Repository Structure
+```
+uploads/
+├── cvs/                    # Employee CV files
+├── cases/                  # Legal case documents
+├── avatars/               # User profile pictures
+└── general/               # General file uploads
+```
+
+#### File Operations
+- **Upload**: Drag-and-drop or click-to-upload interface
+- **Download**: Secure file retrieval with proper headers
+- **Delete**: Safe file removal with confirmation
+- **Organize**: Folder creation and file organization
+- **Search**: File search by name, type, and metadata
+
+### API Endpoints
+
+#### File Operations
+- `POST /api/files/upload` - Upload file
+- `GET /api/files/download/{filename}` - Download file
+- `DELETE /api/files/{filename}` - Delete file
+- `GET /api/files/list` - List files with pagination
+- `POST /api/files/create-folder` - Create folder
+
+#### Repository Management
+- `GET /api/file-repository/` - Get repository structure
+- `GET /api/file-repository/folder/{path}` - Get folder contents
+- `POST /api/file-repository/folder` - Create new folder
+- `DELETE /api/file-repository/folder/{path}` - Delete folder
+
+### Frontend Components
+
+#### File Repository Interface
+- **Folder Navigation**: Tree-like folder structure
+- **File Grid**: Visual file display with thumbnails
+- **Upload Interface**: Drag-and-drop file upload
+- **Search & Filter**: File search and filtering capabilities
+- **Bulk Operations**: Multi-file selection and operations
 
 ## Analytics & Reporting
 
