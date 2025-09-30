@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogIn, Lock, Mail, Eye, EyeOff, Shield } from 'lucide-react';
+import { apiPost } from '../utils/api';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -34,26 +35,11 @@ const Login = () => {
     setError('');
 
     try {
-      // Determine if we're connecting to server or local
-      const isServer = window.location.hostname !== 'localhost';
-      const baseUrl = isServer ? 'http://62.171.137.28' : 'http://localhost:8000';
-      const authEndpoint = isServer ? '/api/auth/login' : '/auth/login';
-      
-      // Prepare request data based on endpoint
-      const requestData = isServer 
-        ? { username: formData.email, password: formData.password }
-        : { email: formData.email, password: formData.password };
+      // Prepare request data
+      const requestData = { email: formData.email, password: formData.password };
 
-      // Call the backend API
-      const response = await fetch(`${baseUrl}${authEndpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData)
-      });
-
-      const data = await response.json();
+      // Call the backend API using the utility
+      const { response, data } = await apiPost('/auth/login', requestData, { includeAuth: false });
 
       if (response.ok) {
         // Store auth state
@@ -92,26 +78,11 @@ const Login = () => {
     setError('');
 
     try {
-      // Determine if we're connecting to server or local
-      const isServer = window.location.hostname !== 'localhost';
-      const baseUrl = isServer ? 'http://62.171.137.28' : 'http://localhost:8000';
-      const authEndpoint = isServer ? '/api/auth/login' : '/auth/login';
-      
-      // Prepare admin credentials based on environment
-      const adminCredentials = isServer 
-        ? { username: 'admin', password: 'admin123' } // Server admin
-        : { email: 'admin@juridence.com', password: 'admin123' }; // Local admin
+      // Admin credentials
+      const adminCredentials = { email: 'admin@juridence.com', password: 'admin123' };
 
-      // Call the backend API for admin login
-      const response = await fetch(`${baseUrl}${authEndpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(adminCredentials)
-      });
-
-      const data = await response.json();
+      // Call the backend API using the utility
+      const { response, data } = await apiPost('/auth/login', adminCredentials, { includeAuth: false });
 
       if (response.ok) {
         // Store auth state
