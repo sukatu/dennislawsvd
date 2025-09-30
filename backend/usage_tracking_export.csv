@@ -1,0 +1,15 @@
+id,user_id,session_id,endpoint,method,resource_type,tokens_used,api_calls,response_time_ms,data_processed,estimated_cost,cost_per_token,cost_per_api_call,query,filters_applied,results_count,ai_model,prompt_tokens,completion_tokens,ip_address,user_agent,referer,created_at
+1,,,/api/ai-chat/case-summary,POST,ai_chat,503,1,3294,,9.395000000000001e-07,1.5e-06,0.0005,Generate case summary,,,gpt-3.5-turbo,133,370,,,,2025-09-28 10:33:49.519336+00:00
+2,1,,/api/ai-chat/case-summary,POST,ai_chat,570,1,4114,,1.0735e-06,1.5e-06,0.0005,Generate case summary,,,gpt-3.5-turbo,133,437,,,,2025-09-28 10:34:15.008420+00:00
+3,9,,/api/search/unified,GET,search,0,1,62,,0.028000000000000004,0.0,0.01,mahama,"{'search_type': 'all', 'page': 1, 'limit': 1000}",18,,,,,,,2025-09-28 10:35:03.263930+00:00
+4,9,,/api/search/unified,GET,search,0,1,39,,0.028000000000000004,0.0,0.01,mahama,"{'search_type': 'all', 'page': 1, 'limit': 1000}",18,,,,,,,2025-09-28 10:35:03.512562+00:00
+5,,,/api/ai-chat/message,POST,ai_chat,1179,1,4042,,1.8715000000000002e-06,1.5e-06,0.0005,What's the case outcome,,,gpt-3.5-turbo,973,206,,,,2025-09-28 10:35:19.572756+00:00
+6,9,,/api/search/unified,GET,search,0,1,49,,0.028000000000000004,0.0,0.01,Mahama,"{'search_type': 'all', 'page': 1, 'limit': 1000}",18,,,,,,,2025-09-28 10:45:37.414559+00:00
+7,9,,/api/search/unified,GET,search,0,1,35,,0.028000000000000004,0.0,0.01,Mahama,"{'search_type': 'all', 'page': 1, 'limit': 1000}",18,,,,,,,2025-09-28 10:45:37.486980+00:00
+8,,,/api/ai-chat/message,POST,ai_chat,987,1,1047,,1.4885000000000002e-06,1.5e-06,0.0005,What the region,,,gpt-3.5-turbo,971,16,,,,2025-09-28 10:45:49.323354+00:00
+9,1,a9f7c598-fb09-4d45-ac17-24d73826dbaa,/api/ai-chat/message,POST,ai_chat,1015,1,11329,,1.532e-06,1.5e-06,0.0005,Town,,,gpt-3.5-turbo,996,19,,,,2025-09-28 10:46:06.839639+00:00
+10,1,a9f7c598-fb09-4d45-ac17-24d73826dbaa,/api/ai-chat/message,POST,ai_chat,1037,1,2728,,1.5605e-06,1.5e-06,0.0005,Year of the case,,,gpt-3.5-turbo,1027,10,,,,2025-09-28 10:46:32.020133+00:00
+11,9,,/api/search/unified,GET,search,0,1,73,,0.028000000000000004,0.0,0.01,mahama,"{'search_type': 'all', 'page': 1, 'limit': 5}",18,,,,,,,2025-09-28 15:30:55.721242+00:00
+12,,,/api/ai-chat/message,POST,ai_chat,916,1,1599,,1.379e-06,1.5e-06,0.0005,What's the year of the case,,,gpt-3.5-turbo,906,10,,,,2025-09-30 08:05:12.154161+00:00
+13,1,eccfe5ad-89c0-436b-aea0-ecff2aca4a4f,/api/ai-chat/message,POST,ai_chat,986,1,1652,,1.5064999999999999e-06,1.5e-06,0.0005,"Case outcome, won or lost?",,,gpt-3.5-turbo,931,55,,,,2025-09-30 08:05:37.553828+00:00
+14,9,,/api/search/unified,GET,search,0,1,61,,0.028000000000000004,0.0,0.01,Mahama,"{'search_type': 'all', 'page': 1, 'limit': 1000}",18,,,,,,,2025-09-30 08:47:57.733809+00:00

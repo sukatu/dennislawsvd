@@ -91,7 +91,16 @@ async def get_people(
                 person_dict['case_types'] = ''
                 
             if person_dict.get('languages') and isinstance(person_dict['languages'], list):
-                person_dict['languages'] = ', '.join(person_dict['languages'])
+                # Handle both string and dict formats for languages
+                language_strings = []
+                for lang in person_dict['languages']:
+                    if isinstance(lang, dict):
+                        # Extract language name from dict format
+                        language_strings.append(lang.get('language', str(lang)))
+                    else:
+                        # Already a string
+                        language_strings.append(str(lang))
+                person_dict['languages'] = ', '.join(language_strings)
             elif person_dict.get('languages') is None:
                 person_dict['languages'] = ''
             

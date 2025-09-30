@@ -1,0 +1,2 @@
+id,user_id,name,key_hash,key_prefix,permissions,rate_limit,is_active,last_used,expires_at,created_at,updated_at,revoked_at
+1,7,Desirae Garcia,XlSQ76PcsK8uRky5rGr2weuQGb52hvjs,S0atOtWD,,,True,,2026-09-18 02:34:02+00:00,2025-09-18 02:34:02+00:00,2025-09-18 02:34:02+00:00,

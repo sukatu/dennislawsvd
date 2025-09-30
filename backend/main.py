@@ -36,6 +36,9 @@ from routes import court_types
 from routes import tenant
 from routes import courts
 from routes import ai_chat
+from routes import employees
+from routes import file_upload
+from routes import file_repository
 from config import settings
 
 # Application lifespan
@@ -121,6 +124,9 @@ app.include_router(court_types.router, prefix="/api", tags=["court_types"])
 app.include_router(tenant.router, prefix="/api/tenant", tags=["tenant"])
 app.include_router(courts.router, prefix="/api/courts", tags=["courts"])
 app.include_router(ai_chat.router, prefix="/api", tags=["ai-chat"])
+app.include_router(employees.router, tags=["employees"])
+app.include_router(file_upload.router, prefix="/api/files", tags=["file_upload"])
+app.include_router(file_repository.router, tags=["file-repository"])
 
 # Root endpoint
 @app.get("/")
