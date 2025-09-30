@@ -49,6 +49,7 @@ import {
   Zap,
   Globe,
   BookOpen,
+  FolderOpen,
   Code,
   FileCode,
   HelpCircle,
@@ -61,6 +62,7 @@ import CaseHearingManagement from '../components/admin/CaseHearingManagement';
 import JudgeManagement from '../components/admin/JudgeManagement';
 import CourtTypeManagement from '../components/admin/CourtTypeManagement';
 import PeopleManagement from '../components/admin/PeopleManagement';
+import EmployeeManagement from '../pages/EmployeeManagement';
 import BankManagement from '../components/admin/BankManagement';
 import InsuranceManagement from '../components/admin/InsuranceManagement';
 import CompanyManagement from '../components/admin/CompanyManagement';
@@ -73,6 +75,7 @@ import CourtManagement from '../components/admin/CourtManagement';
 import ProfileManagement from '../components/admin/ProfileManagement';
 import AIAnalytics from '../components/admin/AIAnalytics';
 import Documentation from '../components/admin/Documentation';
+import FileRepository from '../pages/FileRepository';
 import LogsViewer from '../components/LogsViewer';
 import { apiGet } from '../utils/api';
 
@@ -139,6 +142,7 @@ const AdminDashboard = () => {
     }
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
 
   // Check authentication and admin status
   useEffect(() => {
@@ -187,8 +191,9 @@ const AdminDashboard = () => {
 
   const loadDashboardStats = async () => {
     try {
+      setIsLoadingStats(true);
       // Load statistics from various endpoints using authenticated API
-      const [adminData, usersData, casesData, peopleData, banksData, insuranceData, companiesData, paymentsData] = await Promise.all([
+      const [adminData, usersData, casesData, peopleData, banksData, insuranceData, companiesData, paymentsData, employeeAnalytics] = await Promise.allSettled([
         apiGet('/api/admin/stats'),
         apiGet('/api/admin/users/stats'),
         apiGet('/api/admin/cases/stats'),
@@ -196,34 +201,56 @@ const AdminDashboard = () => {
         apiGet('/api/admin/banks/stats'),
         apiGet('/api/admin/insurance/stats'),
         apiGet('/api/admin/companies/stats'),
-        apiGet('/api/admin/payments/stats')
+        apiGet('/api/admin/payments/stats'),
+        apiGet('/api/employees/analytics/overview')
       ]);
 
+      // Extract data from settled promises
+      const adminDataResult = adminData.status === 'fulfilled' ? adminData.value : {};
+      const usersDataResult = usersData.status === 'fulfilled' ? usersData.value : {};
+      const casesDataResult = casesData.status === 'fulfilled' ? casesData.value : {};
+      const peopleDataResult = peopleData.status === 'fulfilled' ? peopleData.value : {};
+      const banksDataResult = banksData.status === 'fulfilled' ? banksData.value : {};
+      const insuranceDataResult = insuranceData.status === 'fulfilled' ? insuranceData.value : {};
+      const companiesDataResult = companiesData.status === 'fulfilled' ? companiesData.value : {};
+      const paymentsDataResult = paymentsData.status === 'fulfilled' ? paymentsData.value : {};
+      const employeeAnalyticsResult = employeeAnalytics.status === 'fulfilled' ? employeeAnalytics.value : {
+        total_employees: 0,
+        active_employees: 0,
+        recent_hires: 0,
+        status_breakdown: {},
+        type_breakdown: {},
+        employer_type_breakdown: {},
+        top_employers: []
+      };
+
       // Calculate additional metrics
-      const totalRevenue = paymentsData.total_revenue || 0;
+      const totalRevenue = paymentsDataResult.total_revenue || 0;
       const monthlyRevenue = totalRevenue * 0.08; // Approximate monthly revenue
       const monthlyGrowth = 12.5; // Mock growth percentage
-      const caseResolutionRate = casesData.resolved_cases ? (casesData.resolved_cases / casesData.total_cases) * 100 : 0;
-      const avgCaseValue = totalRevenue / (casesData.total_cases || 1);
+      const caseResolutionRate = casesDataResult.resolved_cases ? (casesDataResult.resolved_cases / casesDataResult.total_cases) * 100 : 0;
+      const avgCaseValue = totalRevenue / (casesDataResult.total_cases || 1);
 
       setStats({
-        totalUsers: adminData.total_users || 0,
-        totalCases: adminData.total_cases || 0,
-        totalPeople: adminData.total_people || 0,
-        totalBanks: adminData.total_banks || 0,
-        totalInsurance: adminData.total_insurance || 0,
-        totalCompanies: adminData.total_companies || 0,
-        totalPayments: adminData.total_payments || 0,
-        activeSubscriptions: adminData.active_subscriptions || 0,
+        totalUsers: adminDataResult.total_users || 0,
+        totalCases: adminDataResult.total_cases || 0,
+        totalPeople: adminDataResult.total_people || 0,
+        totalBanks: adminDataResult.total_banks || 0,
+        totalInsurance: adminDataResult.total_insurance || 0,
+        totalCompanies: adminDataResult.total_companies || 0,
+        totalPayments: adminDataResult.total_payments || 0,
+        activeSubscriptions: adminDataResult.active_subscriptions || 0,
         // Enhanced stats
         totalRevenue: totalRevenue,
-        avgRiskScore: peopleData.avg_risk_score || 0,
-        highRiskCount: peopleData.high_risk_count || 0,
-        verifiedCount: peopleData.verified_count || 0,
-        totalBranches: (banksData.total_branches || 0) + (insuranceData.total_branches || 0),
-        totalEmployees: companiesData.total_employees || 0,
-        avgRating: ((banksData.avg_rating || 0) + (insuranceData.avg_rating || 0) + (companiesData.avg_rating || 0)) / 3,
-        pendingPayments: paymentsData.pending_payments || 0,
+        avgRiskScore: peopleDataResult.avg_risk_score || 0,
+        highRiskCount: peopleDataResult.high_risk_count || 0,
+        verifiedCount: peopleDataResult.verified_count || 0,
+        totalBranches: (banksDataResult.total_branches || 0) + (insuranceDataResult.total_branches || 0),
+        totalEmployees: employeeAnalyticsResult.total_employees || 0,
+        // Employee analytics
+        employeeAnalytics: employeeAnalyticsResult,
+        avgRating: ((banksDataResult.avg_rating || 0) + (insuranceDataResult.avg_rating || 0) + (companiesDataResult.avg_rating || 0)) / 3,
+        pendingPayments: paymentsDataResult.pending_payments || 0,
         systemHealth: 'healthy',
         // New comprehensive analytics
         monthlyRevenue: monthlyRevenue,
@@ -231,19 +258,19 @@ const AdminDashboard = () => {
         caseResolutionRate: caseResolutionRate,
         avgCaseValue: avgCaseValue,
         riskDistribution: {
-          low: Math.floor((peopleData.total_people || 0) * 0.6),
-          medium: Math.floor((peopleData.total_people || 0) * 0.25),
-          high: Math.floor((peopleData.total_people || 0) * 0.12),
-          critical: Math.floor((peopleData.total_people || 0) * 0.03)
+          low: Math.floor((peopleDataResult.total_people || 0) * 0.6),
+          medium: Math.floor((peopleDataResult.total_people || 0) * 0.25),
+          high: Math.floor((peopleDataResult.total_people || 0) * 0.12),
+          critical: Math.floor((peopleDataResult.total_people || 0) * 0.03)
         },
-        regionDistribution: casesData.region_distribution || {
+        regionDistribution: casesDataResult.region_distribution || {
           'Greater Accra': 45,
           'Ashanti': 25,
           'Western': 15,
           'Eastern': 10,
           'Others': 5
         },
-        courtTypeDistribution: casesData.court_type_distribution || {
+        courtTypeDistribution: casesDataResult.court_type_distribution || {
           'High Court': 40,
           'Supreme Court': 25,
           'Court of Appeal': 20,
@@ -272,6 +299,8 @@ const AdminDashboard = () => {
       });
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
+    } finally {
+      setIsLoadingStats(false);
     }
   };
 
@@ -351,6 +380,7 @@ const AdminDashboard = () => {
     { id: 'judges', name: 'Judges', icon: Scale },
     { id: 'court-types', name: 'Court Types', icon: Building2 },
     { id: 'people', name: 'People', icon: UserCheck },
+    { id: 'employees', name: 'Employees', icon: Users },
     { id: 'banks', name: 'Banks', icon: Building2 },
     { id: 'insurance', name: 'Insurance', icon: Shield },
     { id: 'companies', name: 'Companies', icon: Database },
@@ -360,6 +390,7 @@ const AdminDashboard = () => {
     { id: 'courts', name: 'Courts', icon: MapPin },
     { id: 'ai-analytics', name: 'AI Analytics', icon: Zap },
     { id: 'documentation', name: 'Documentation', icon: BookOpen },
+    { id: 'file-repository', name: 'File Repository', icon: FolderOpen },
     { id: 'logs', name: 'System Logs', icon: Activity },
     { id: 'roles', name: 'Roles & Permissions', icon: Shield },
     { id: 'settings', name: 'Settings', icon: Settings }
@@ -368,7 +399,7 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewTab stats={stats} onRefresh={handleRefresh} isRefreshing={isRefreshing} />;
+        return <OverviewTab stats={stats} onRefresh={handleRefresh} isRefreshing={isRefreshing} isLoadingStats={isLoadingStats} />;
       case 'profile':
         return <ProfileManagement />;
       case 'users':
@@ -385,6 +416,8 @@ const AdminDashboard = () => {
         return <CourtTypeManagement />;
       case 'people':
         return <PeopleManagement />;
+      case 'employees':
+        return <EmployeeManagement />;
       case 'banks':
         return <BankManagement />;
       case 'insurance':
@@ -403,6 +436,8 @@ const AdminDashboard = () => {
         return <AIAnalytics />;
       case 'documentation':
         return <Documentation />;
+      case 'file-repository':
+        return <FileRepository />;
       case 'logs':
         return <LogsViewer />;
       case 'roles':
@@ -410,7 +445,7 @@ const AdminDashboard = () => {
       case 'settings':
         return <SettingsManagement />;
       default:
-        return <OverviewTab stats={stats} onRefresh={handleRefresh} isRefreshing={isRefreshing} />;
+        return <OverviewTab stats={stats} onRefresh={handleRefresh} isRefreshing={isRefreshing} isLoadingStats={isLoadingStats} />;
     }
   };
 
@@ -425,10 +460,10 @@ const AdminDashboard = () => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-lg transform transition-all duration-300 ease-in-out lg:translate-x-0 ${
+      <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-lg transform transition-all duration-300 ease-in-out lg:translate-x-0 flex flex-col ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } ${isSidebarCollapsed ? 'w-16' : 'w-64'}`}>
-        <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 flex-shrink-0">
           <div className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-full bg-sky-500 flex items-center justify-center">
               <Settings className="h-4 w-4 text-white" />
@@ -445,8 +480,70 @@ const AdminDashboard = () => {
           </button>
         </div>
 
-        <nav className="mt-4 px-2">
-          {navigationItems.map((item) => {
+        <nav className="mt-4 px-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 hover:scrollbar-thumb-slate-400">
+          {/* Core Management */}
+          {!isSidebarCollapsed && (
+            <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+              Core Management
+            </div>
+          )}
+          {navigationItems.slice(0, 6).map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setIsSidebarOpen(false);
+                }}
+                className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg mb-1 transition-colors ${
+                  activeTab === item.id
+                    ? 'bg-sky-100 text-sky-700'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+                title={isSidebarCollapsed ? item.name : ''}
+              >
+                <Icon className={`h-5 w-5 ${isSidebarCollapsed ? '' : 'mr-3'}`} />
+                {!isSidebarCollapsed && item.name}
+              </button>
+            );
+          })}
+
+          {/* Data Management */}
+          {!isSidebarCollapsed && (
+            <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-4">
+              Data Management
+            </div>
+          )}
+          {navigationItems.slice(6, 12).map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setIsSidebarOpen(false);
+                }}
+                className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg mb-1 transition-colors ${
+                  activeTab === item.id
+                    ? 'bg-sky-100 text-sky-700'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+                title={isSidebarCollapsed ? item.name : ''}
+              >
+                <Icon className={`h-5 w-5 ${isSidebarCollapsed ? '' : 'mr-3'}`} />
+                {!isSidebarCollapsed && item.name}
+              </button>
+            );
+          })}
+
+          {/* System & Tools */}
+          {!isSidebarCollapsed && (
+            <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-4">
+              System & Tools
+            </div>
+          )}
+          {navigationItems.slice(12).map((item) => {
             const Icon = item.icon;
             return (
               <button
@@ -469,7 +566,7 @@ const AdminDashboard = () => {
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200">
+        <div className="p-4 border-t border-slate-200 flex-shrink-0">
           <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'space-x-3'} mb-3`}>
             <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center">
               <span className="text-sm font-medium text-slate-600">
@@ -541,7 +638,7 @@ const AdminDashboard = () => {
 };
 
 // Enhanced Overview Tab with comprehensive analytics and charts
-const OverviewTab = ({ stats, onRefresh, isRefreshing }) => {
+const OverviewTab = ({ stats, onRefresh, isRefreshing, isLoadingStats }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'success': return 'text-green-600';
@@ -713,6 +810,83 @@ const OverviewTab = ({ stats, onRefresh, isRefreshing }) => {
             </div>
             <div className="p-3 bg-violet-100 rounded-full">
               <Database className="h-8 w-8 text-violet-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Employee Analytics Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600">Total Employees</p>
+              <p className="text-3xl font-bold text-slate-900">
+                {isLoadingStats ? '...' : (stats.employeeAnalytics?.total_employees || 0)}
+              </p>
+              <div className="flex items-center mt-2">
+                <Users className="h-4 w-4 text-blue-600" />
+                <span className="text-sm text-blue-600 font-medium">Workforce</span>
+              </div>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-full">
+              <Users className="h-8 w-8 text-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600">Active Employees</p>
+              <p className="text-3xl font-bold text-slate-900">
+                {isLoadingStats ? '...' : (stats.employeeAnalytics?.active_employees || 0)}
+              </p>
+              <div className="flex items-center mt-2">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="text-sm text-green-600 font-medium">Currently Working</span>
+              </div>
+            </div>
+            <div className="p-3 bg-green-100 rounded-full">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow border-l-4 border-purple-500">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600">Recent Hires</p>
+              <p className="text-3xl font-bold text-slate-900">
+                {isLoadingStats ? '...' : (stats.employeeAnalytics?.recent_hires || 0)}
+              </p>
+              <div className="flex items-center mt-2">
+                <Calendar className="h-4 w-4 text-purple-600" />
+                <span className="text-sm text-purple-600 font-medium">Last 30 Days</span>
+              </div>
+            </div>
+            <div className="p-3 bg-purple-100 rounded-full">
+              <Calendar className="h-8 w-8 text-purple-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow border-l-4 border-orange-500">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600">Top Employer</p>
+              <p className="text-lg font-bold text-slate-900">
+                {isLoadingStats ? '...' : (stats.employeeAnalytics?.top_employers?.[0]?.name || 'N/A')}
+              </p>
+              <div className="flex items-center mt-2">
+                <Building2 className="h-4 w-4 text-orange-600" />
+                <span className="text-sm text-orange-600 font-medium">
+                  {isLoadingStats ? '...' : (stats.employeeAnalytics?.top_employers?.[0]?.count || 0)} employees
+                </span>
+              </div>
+            </div>
+            <div className="p-3 bg-orange-100 rounded-full">
+              <Building2 className="h-8 w-8 text-orange-600" />
             </div>
           </div>
         </div>
@@ -1136,6 +1310,60 @@ const OverviewTab = ({ stats, onRefresh, isRefreshing }) => {
               <ArrowUp className="h-4 w-4 text-green-600" />
               <span className="text-sm text-green-600 font-medium ml-1">+{stats.monthlyGrowth}%</span>
               <span className="text-sm text-slate-500 ml-1">vs last month</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Employee Analytics */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-slate-900">Employee Analytics</h3>
+            <Users className="h-5 w-5 text-slate-400" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-600 font-medium">Employment Status</p>
+              <div className="mt-2 space-y-1">
+                {stats.employeeAnalytics?.status_breakdown ? Object.entries(stats.employeeAnalytics.status_breakdown).map(([status, count]) => (
+                  <div key={status} className="flex justify-between text-sm">
+                    <span className="capitalize">{status}</span>
+                    <span className="font-semibold">{count}</span>
+                  </div>
+                )) : <p className="text-sm text-gray-500">No data</p>}
+              </div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <p className="text-sm text-green-600 font-medium">Employee Types</p>
+              <div className="mt-2 space-y-1">
+                {stats.employeeAnalytics?.type_breakdown ? Object.entries(stats.employeeAnalytics.type_breakdown).map(([type, count]) => (
+                  <div key={type} className="flex justify-between text-sm">
+                    <span className="capitalize">{type.replace('_', ' ')}</span>
+                    <span className="font-semibold">{count}</span>
+                  </div>
+                )) : <p className="text-sm text-gray-500">No data</p>}
+              </div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <p className="text-sm text-purple-600 font-medium">Employer Types</p>
+              <div className="mt-2 space-y-1">
+                {stats.employeeAnalytics?.employer_type_breakdown ? Object.entries(stats.employeeAnalytics.employer_type_breakdown).map(([type, count]) => (
+                  <div key={type} className="flex justify-between text-sm">
+                    <span className="capitalize">{type}</span>
+                    <span className="font-semibold">{count}</span>
+                  </div>
+                )) : <p className="text-sm text-gray-500">No data</p>}
+              </div>
+            </div>
+            <div className="text-center p-4 bg-orange-50 rounded-lg">
+              <p className="text-sm text-orange-600 font-medium">Top Employers</p>
+              <div className="mt-2 space-y-1">
+                {stats.employeeAnalytics?.top_employers?.slice(0, 3).map((employer, index) => (
+                  <div key={index} className="flex justify-between text-sm">
+                    <span className="truncate">{employer.name}</span>
+                    <span className="font-semibold">{employer.count}</span>
+                  </div>
+                )) || <p className="text-sm text-gray-500">No data</p>}
+              </div>
             </div>
           </div>
         </div>

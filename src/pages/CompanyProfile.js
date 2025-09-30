@@ -28,6 +28,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import RequestDetailsModal from '../components/RequestDetailsModal';
+import CompanyEmployees from '../components/CompanyEmployees';
 
 const CompanyProfile = () => {
   const { id } = useParams();
@@ -40,6 +41,7 @@ const CompanyProfile = () => {
     overview: true,
     contact: true,
     management: true,
+    employees: true,
     cases: true,
     analytics: true
   });
@@ -518,6 +520,25 @@ const CompanyProfile = () => {
                   />
                   <InfoRow label="Employee Count" value={companyData.employee_count} icon={Users} />
                   <InfoRow label="Annual Revenue" value={formatCurrency(companyData.annual_revenue)} icon={TrendingUp} />
+                </div>
+              )}
+            </div>
+
+            {/* Employees */}
+            <div className="bg-white rounded-lg shadow-sm border">
+              <SectionHeader
+                title="Employees"
+                icon={Users}
+                isExpanded={expandedSections.employees}
+                onToggle={() => toggleSection('employees')}
+              />
+              {expandedSections.employees && (
+                <div className="border-t border-gray-200">
+                  <CompanyEmployees
+                    companyId={parseInt(id)}
+                    companyType="company"
+                    companyName={companyData.name}
+                  />
                 </div>
               )}
             </div>

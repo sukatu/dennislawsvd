@@ -34,6 +34,9 @@ import Settings from './pages/Settings';
 import Notifications from './pages/Notifications';
 import EnhancedSearchResults from './pages/EnhancedSearchResults';
 import AdminDashboard from './pages/AdminDashboard';
+import EmployeeManagement from './pages/EmployeeManagement';
+import EmployeeProfile from './pages/EmployeeProfile';
+import PublicEmployeeProfile from './pages/PublicEmployeeProfile';
 import Subscribe from './pages/Subscribe';
 import JusticeLocator from './pages/JusticeLocator';
 
@@ -76,6 +79,9 @@ function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/employees" element={<EmployeeManagement />} />
+              <Route path="/admin/employees/:id" element={<EmployeeProfile />} />
+              <Route path="/employee/:id" element={<PublicEmployeeProfile />} />
               <Route path="/subscribe" element={<Subscribe />} />
               <Route path="/justice-locator" element={<JusticeLocator />} />
             </Routes>
