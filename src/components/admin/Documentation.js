@@ -33,7 +33,8 @@ import {
   RefreshCw,
   Clock,
   TrendingUp,
-  Activity
+  Activity,
+  FolderOpen
 } from 'lucide-react';
 
 const Documentation = () => {
@@ -1984,7 +1985,7 @@ $results = $api->search('mahama');`}
                 </div>
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div>
-                    <code className="text-sm font-mono text-slate-700">GET /api/employees/{id}</code>
+                    <code className="text-sm font-mono text-slate-700">GET /api/employees/&#123;id&#125;</code>
                     <p className="text-xs text-slate-500">Get employee details</p>
                   </div>
                   <Copy 
@@ -1994,7 +1995,7 @@ $results = $api->search('mahama');`}
                 </div>
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div>
-                    <code className="text-sm font-mono text-slate-700">PUT /api/employees/{id}</code>
+                    <code className="text-sm font-mono text-slate-700">PUT /api/employees/&#123;id&#125;</code>
                     <p className="text-xs text-slate-500">Update employee</p>
                   </div>
                   <Copy 
@@ -2101,14 +2102,14 @@ $results = $api->search('mahama');`}
                     />
                   </div>
                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
-                    <code className="text-sm font-mono text-slate-700">GET /api/files/download/{filename}</code>
+                    <code className="text-sm font-mono text-slate-700">GET /api/files/download/&#123;filename&#125;</code>
                     <Copy 
                       className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
                       onClick={() => copyToClipboard('GET /api/files/download/{filename}', 'files-download')}
                     />
                   </div>
                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
-                    <code className="text-sm font-mono text-slate-700">DELETE /api/files/{filename}</code>
+                    <code className="text-sm font-mono text-slate-700">DELETE /api/files/&#123;filename&#125;</code>
                     <Copy 
                       className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
                       onClick={() => copyToClipboard('DELETE /api/files/{filename}', 'files-delete')}
@@ -2134,7 +2135,7 @@ $results = $api->search('mahama');`}
                     />
                   </div>
                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded">
-                    <code className="text-sm font-mono text-slate-700">GET /api/file-repository/folder/{path}</code>
+                    <code className="text-sm font-mono text-slate-700">GET /api/file-repository/folder/&#123;path&#125;</code>
                     <Copy 
                       className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" 
                       onClick={() => copyToClipboard('GET /api/file-repository/folder/{path}', 'repo-folder-get')}
