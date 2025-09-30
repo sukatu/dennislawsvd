@@ -34,13 +34,18 @@ import {
   Clock,
   TrendingUp,
   Activity,
-  FolderOpen
+  FolderOpen,
+  MessageCircle
 } from 'lucide-react';
+import AIChat from '../AIChat';
 
 const Documentation = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [expandedItems, setExpandedItems] = useState({});
   const [copiedCode, setCopiedCode] = useState('');
+  
+  // AI Chat state
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
   const toggleExpanded = (itemId) => {
     setExpandedItems(prev => ({
@@ -2239,6 +2244,25 @@ $results = $api->search('mahama');`}
           </div>
         </div>
       </div>
+      
+      {/* Floating AI Assistant Button */}
+      <button
+        onClick={() => setIsAIChatOpen(true)}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center group"
+        title="Open AI Documentation Assistant"
+      >
+        <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
+        <span className="sr-only">AI Documentation Assistant</span>
+      </button>
+
+      {/* AI Chat Component */}
+      <AIChat
+        caseId={null} // No specific case for documentation
+        caseTitle="Documentation Assistant"
+        isOpen={isAIChatOpen}
+        onClose={() => setIsAIChatOpen(false)}
+        onMinimize={() => setIsAIChatOpen(false)}
+      />
     </div>
   );
 };
