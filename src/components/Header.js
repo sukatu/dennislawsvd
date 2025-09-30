@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogIn, UserPlus, LogOut, User, Settings, ChevronDown, Bell, Search, Clock, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus, LogOut, User, Settings, ChevronDown, Bell, Clock, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
@@ -393,11 +393,6 @@ const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-3">
-            {/* Search Button */}
-            <button className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-              <Search className="h-5 w-5" />
-            </button>
-
             {/* Theme Toggle */}
             <ThemeToggle />
 
