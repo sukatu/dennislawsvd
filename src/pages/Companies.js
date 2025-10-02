@@ -82,7 +82,7 @@ const Companies = () => {
         params.append('query', searchTerm);
       }
 
-      const response = await fetch(`http://localhost:8000/api/companies/search?${params}`, {
+      const response = await fetch(`/api/companies/search?${params}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -97,10 +97,10 @@ const Companies = () => {
             try {
               // Fetch both case statistics and analytics for this company
               const [statsResponse, analyticsResponse] = await Promise.all([
-                fetch(`http://localhost:8000/api/companies/${company.id}/case-statistics`, {
+                fetch(`/api/companies/${company.id}/case-statistics`, {
                   headers: { 'Content-Type': 'application/json' }
                 }),
-                fetch(`http://localhost:8000/api/companies/${company.id}/analytics`, {
+                fetch(`/api/companies/${company.id}/analytics`, {
                   headers: { 'Content-Type': 'application/json' }
                 })
               ]);

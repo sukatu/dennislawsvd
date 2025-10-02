@@ -6,7 +6,7 @@
 const getApiBaseUrl = () => {
   // If we're in production (server), use relative URLs
   if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return ''; // Use relative URLs for server deployment
+    return '/api'; // Use relative URLs for server deployment
   }
   // For local development, use localhost
   return process.env.REACT_APP_API_URL || 'http://localhost:8000';

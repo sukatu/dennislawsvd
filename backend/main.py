@@ -97,7 +97,7 @@ app.dependency_overrides[get_current_user] = get_real_admin_user
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Include routers
-app.include_router(auth.router)
+app.include_router(auth.router, prefix="/api", tags=["authentication"])
 app.include_router(profile.router, prefix="/api", tags=["profile"])
 app.include_router(people.router, prefix="/api/people", tags=["people"])
 app.include_router(banks.router, prefix="/api/banks", tags=["banks"])

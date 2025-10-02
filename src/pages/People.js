@@ -215,7 +215,7 @@ const People = () => {
       setLoadingStatus('Getting total count...');
       setLoadingProgress(5);
       
-      const countResponse = await fetch(`http://localhost:8000/api/people/search?page=1&limit=1`, { headers });
+      const countResponse = await fetch(`/api/people/search?page=1&limit=1`, { headers });
       if (!countResponse.ok) {
         throw new Error(`Count API failed: ${countResponse.status}`);
       }
@@ -239,7 +239,7 @@ const People = () => {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
           
-          const response = await fetch(`http://localhost:8000/api/people/search?page=${page}&limit=${batchSize}`, { 
+          const response = await fetch(`/api/people/search?page=${page}&limit=${batchSize}`, { 
             headers,
             signal: controller.signal
           });
@@ -351,7 +351,7 @@ const People = () => {
           }
 
           setIsLoading(true);
-          const response = await fetch(`http://localhost:8000/api/people/search?page=${currentPage}&limit=${itemsPerPage}`, {
+          const response = await fetch(`/api/people/search?page=${currentPage}&limit=${itemsPerPage}`, {
             headers
           });
 
@@ -473,7 +473,7 @@ const People = () => {
       }
 
       setIsLoading(true);
-      const response = await fetch(`http://localhost:8000/api/people/search?page=1&limit=${itemsPerPage}`, {
+      const response = await fetch(`/api/people/search?page=1&limit=${itemsPerPage}`, {
         headers
       });
 
@@ -570,7 +570,7 @@ const People = () => {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:8000/api/people/search?query=${encodeURIComponent(searchQuery)}&page=${currentPage}&limit=${itemsPerPage}`, {
+      const response = await fetch(`/api/people/search?query=${encodeURIComponent(searchQuery)}&page=${currentPage}&limit=${itemsPerPage}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -618,7 +618,7 @@ const People = () => {
     const loadAllPeople = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`http://localhost:8000/api/people/search?page=${currentPage}&limit=${itemsPerPage}`, {
+        const response = await fetch(`/api/people/search?page=${currentPage}&limit=${itemsPerPage}`, {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -684,7 +684,7 @@ const People = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:8000/api/people/search?query=${encodeURIComponent(query)}&limit=5`, {
+      const response = await fetch(`/api/people/search?query=${encodeURIComponent(query)}&limit=5`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

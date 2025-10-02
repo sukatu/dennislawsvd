@@ -28,7 +28,7 @@ const Home = () => {
     setIsLoadingSuggestions(true);
     try {
       // Use unified search endpoint for all entity types
-      const url = `http://localhost:8000/api/search/quick?query=${encodeURIComponent(query)}&limit=10`;
+      const url = `/api/search/quick?query=${encodeURIComponent(query)}&limit=10`;
       
       const response = await fetch(url, {
         headers: {

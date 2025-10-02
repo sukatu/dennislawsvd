@@ -80,7 +80,7 @@ const Banks = () => {
         params.append('name', searchTerm);
       }
 
-      const response = await fetch(`http://localhost:8000/api/banks/search?${params}`, {
+      const response = await fetch(`/api/banks/search?${params}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -95,10 +95,10 @@ const Banks = () => {
             try {
               // Fetch both case statistics and analytics for this bank
               const [statsResponse, analyticsResponse] = await Promise.all([
-                fetch(`http://localhost:8000/api/banks/${bank.id}/case-statistics`, {
+                fetch(`/api/banks/${bank.id}/case-statistics`, {
                   headers: { 'Content-Type': 'application/json' }
                 }),
-                fetch(`http://localhost:8000/api/banks/${bank.id}/analytics`, {
+                fetch(`/api/banks/${bank.id}/analytics`, {
                   headers: { 'Content-Type': 'application/json' }
                 })
               ]);

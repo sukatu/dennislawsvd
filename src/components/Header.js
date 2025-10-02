@@ -77,7 +77,7 @@ const Header = () => {
       const token = localStorage.getItem('accessToken');
       if (!token) return;
 
-      const response = await fetch('http://localhost:8000/api/notifications/stats', {
+      const response = await fetch('/api/notifications/stats', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -101,7 +101,7 @@ const Header = () => {
       const token = localStorage.getItem('accessToken');
       if (!token) return;
 
-      const response = await fetch('http://localhost:8000/api/notifications/?limit=10', {
+      const response = await fetch('/api/notifications/?limit=10', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -209,7 +209,7 @@ const Header = () => {
       const token = localStorage.getItem('accessToken');
       if (!token) return;
 
-      const response = await fetch(`http://localhost:8000/api/notifications/${notificationId}/read`, {
+      const response = await fetch(`/api/notifications/${notificationId}/read`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -249,7 +249,7 @@ const Header = () => {
       
       if (!userId) return;
 
-      const response = await fetch(`http://localhost:8000/api/notifications/mark-all-read?user_id=${userId}`, {
+      const response = await fetch(`/api/notifications/mark-all-read?user_id=${userId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -513,7 +513,7 @@ const Header = () => {
                   >
                     {userProfilePicture ? (
                       <img
-                        src={userProfilePicture.startsWith('http') ? userProfilePicture : `http://localhost:8000${userProfilePicture}`}
+                        src={userProfilePicture.startsWith('http') ? userProfilePicture : `/api${userProfilePicture}`}
                         alt={userName || 'User'}
                         className="w-8 h-8 rounded-full object-cover border-2 border-slate-200 dark:border-slate-600 shadow-lg"
                         onError={(e) => {

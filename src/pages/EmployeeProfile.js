@@ -21,7 +21,7 @@ const EmployeeProfile = () => {
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch(`http://localhost:8000/api/employees/${employeeId}`, {
+      const response = await fetch(`/api/employees/${employeeId}`, {
         headers: {
           'Content-Type': 'application/json'
         }

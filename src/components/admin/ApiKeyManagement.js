@@ -58,13 +58,13 @@ const ApiKeyManagement = () => {
 
       if (userFilter) params.append('user_id', userFilter);
 
-      const response = await fetch(`http://localhost:8000/api/admin/api-keys?${params}`);
+      const response = await fetch(`/api/admin/api-keys?${params}`);
       const data = await response.json();
 
       if (response.ok) {
-        setApiKeys(data || []);
-        setTotalPages(Math.ceil(data.length / 10)); // Simplified pagination
-        setTotalKeys(data.length);
+        setApiKeys(data.api_keys || []);
+        setTotalPages(Math.ceil((data.total || 0) / 10)); // Use total from response
+        setTotalKeys(data.total || 0);
       } else {
         console.error('Error loading API keys:', data.detail);
       }
@@ -77,7 +77,7 @@ const ApiKeyManagement = () => {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/admin/users?limit=100');
+      const response = await fetch('/api/admin/users?limit=100');
       const data = await response.json();
 
       if (response.ok) {
@@ -147,7 +147,7 @@ const ApiKeyManagement = () => {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch('http://localhost:8000/api/admin/api-keys', {
+      const response = await fetch('/api/admin/api-keys', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ const ApiKeyManagement = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/api-keys/${selectedKey.id}`, {
+      const response = await fetch(`/api/admin/api-keys/${selectedKey.id}`, {
         method: 'DELETE'
       });
 
