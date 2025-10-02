@@ -8,12 +8,17 @@ backend/middleware/__pycache__/
 build/
 dist/
 
-# Environment variables
+# Environment variables (NEVER commit these)
 .env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.staging
+.env.server
+backend/.env
+backend/.env.*
 
 # Database
 *.db
@@ -229,3 +234,22 @@ csv_exports/
 deploy/
 *.tar.gz
 ecosystem.config.js
+
+# Local development files (never push to server)
+local_*
+*_local.*
+dev_*
+development_*
+
+# Credentials and secrets
+credentials.json
+secrets.json
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Server deployment scripts
+deploy_to_server.sh
+server_setup.sh
