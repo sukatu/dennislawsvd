@@ -221,6 +221,10 @@ tmp/
 uploads/*
 !uploads/.gitkeep
 
+# CSV exports (too large for GitHub)
+csv_exports/
+*.csv
+
 # Server-specific files
 deploy/
 *.tar.gz
