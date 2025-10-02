@@ -92,7 +92,7 @@ const BankDetail = () => {
       setError(null);
       
 
-      const url = `http://localhost:8000/api/banks/${bankId}`;
+      const url = `/api/banks/${bankId}`;
       
       const response = await fetch(url, {
         headers: {
@@ -202,7 +202,7 @@ const BankDetail = () => {
   const loadBankAnalytics = async (bankId) => {
     try {
       setAnalyticsLoading(true);
-      const response = await fetch(`http://localhost:8000/api/banks/${bankId}/analytics`, {
+      const response = await fetch(`/api/banks/${bankId}/analytics`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -227,7 +227,7 @@ const BankDetail = () => {
   const loadBankCaseStats = async (bankId) => {
     try {
       setCaseStatsLoading(true);
-      const response = await fetch(`http://localhost:8000/api/banks/${bankId}/case-statistics`, {
+      const response = await fetch(`/api/banks/${bankId}/case-statistics`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -252,7 +252,7 @@ const BankDetail = () => {
   const loadBankEmployees = async (bankName) => {
     try {
       setEmployeesLoading(true);
-      const response = await fetch(`http://localhost:8000/api/employees/by-employer/bank/${encodeURIComponent(bankName)}`, {
+      const response = await fetch(`/api/employees/by-employer/bank/${encodeURIComponent(bankName)}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -338,7 +338,7 @@ const BankDetail = () => {
     try {
       setCasesLoading(true);
 
-      const url = `http://localhost:8000/api/banks/${bankId}/related-cases?limit=100`;
+      const url = `/api/banks/${bankId}/related-cases?limit=100`;
       
       const response = await fetch(url, {
         headers: {

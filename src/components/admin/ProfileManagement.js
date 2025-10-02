@@ -86,7 +86,7 @@ const ProfileManagement = () => {
         throw new Error('No authentication token found. Please log in again.');
       }
       
-      const response = await fetch('http://localhost:8000/api/profile/me', {
+      const response = await fetch('/api/profile/me', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ const ProfileManagement = () => {
     try {
       setUsersLoading(true);
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/profile/users', {
+      const response = await fetch('/api/profile/users', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -209,7 +209,7 @@ const ProfileManagement = () => {
         throw new Error('No authentication token found. Please log in again.');
       }
       
-      const response = await fetch('http://localhost:8000/api/profile/me', {
+      const response = await fetch('/api/profile/me', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -246,7 +246,7 @@ const ProfileManagement = () => {
     try {
       setIsSaving(true);
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/profile/change-password', {
+      const response = await fetch('/api/profile/change-password', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -321,7 +321,7 @@ const ProfileManagement = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('http://localhost:8000/api/profile/upload-avatar', {
+      const response = await fetch('/api/profile/upload-avatar', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -369,7 +369,7 @@ const ProfileManagement = () => {
     try {
       setIsSaving(true);
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/profile/avatar', {
+      const response = await fetch('/api/profile/avatar', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -422,7 +422,7 @@ const ProfileManagement = () => {
     try {
       setIsSaving(true);
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`http://localhost:8000/api/profile/users/${userToDelete.id}`, {
+      const response = await fetch(`/api/profile/users/${userToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -450,7 +450,7 @@ const ProfileManagement = () => {
     try {
       setIsSaving(true);
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`http://localhost:8000/api/profile/users/${user.id}/toggle-status`, {
+      const response = await fetch(`/api/profile/users/${user.id}/toggle-status`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -483,7 +483,7 @@ const ProfileManagement = () => {
   // Quick login function for testing
   const handleQuickLogin = async () => {
     try {
-      const response = await fetch('http://localhost:8000/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

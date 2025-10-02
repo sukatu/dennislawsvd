@@ -544,7 +544,7 @@ const PeopleManagement = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (riskLevelFilter) params.append('risk_level', riskLevelFilter);
 
-      const url = `http://localhost:8000/api/admin/people?${params}`;
+      const url = `/api/admin/people?${params}`;
       
       const response = await fetch(url);
       const data = await response.json();
@@ -565,7 +565,7 @@ const PeopleManagement = () => {
 
   const loadAnalytics = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/admin/people/stats');
+      const response = await fetch('/api/admin/people/stats');
       const data = await response.json();
       if (response.ok) {
         setAnalytics(data);
@@ -598,7 +598,7 @@ const PeopleManagement = () => {
       setAnalyticsLoading(true);
       
       // Load person analytics
-      const analyticsResponse = await fetch(`http://localhost:8000/api/person/${personId}/analytics`);
+      const analyticsResponse = await fetch(`/api/person/${personId}/analytics`);
       if (analyticsResponse.ok) {
         const analyticsData = await analyticsResponse.json();
         setPersonAnalytics(analyticsData);
@@ -607,7 +607,7 @@ const PeopleManagement = () => {
       }
       
       // Load case statistics
-      const statsResponse = await fetch(`http://localhost:8000/api/person-case-statistics/person/${personId}`);
+      const statsResponse = await fetch(`/api/person-case-statistics/person/${personId}`);
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();
         setPersonCaseStats(statsData);
@@ -630,7 +630,7 @@ const PeopleManagement = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/people/${selectedPerson.id}`, {
+      const response = await fetch(`/api/admin/people/${selectedPerson.id}`, {
         method: 'DELETE'
       });
 
@@ -660,8 +660,8 @@ const PeopleManagement = () => {
   const handleSavePerson = async (personData) => {
     try {
       const url = editingPerson 
-        ? `http://localhost:8000/api/admin/people/${editingPerson.id}`
-        : 'http://localhost:8000/api/admin/people';
+        ? `/api/admin/people/${editingPerson.id}`
+        : '/api/admin/people';
       
       const method = editingPerson ? 'PUT' : 'POST';
       

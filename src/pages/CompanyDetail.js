@@ -30,7 +30,7 @@ const CompanyDetail = () => {
 
       try {
         const token = localStorage.getItem('accessToken') || 'test-token-123';
-        const response = await fetch(`http://localhost:8000/api/companies/${id}`, {
+        const response = await fetch(`/api/companies/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

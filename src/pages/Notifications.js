@@ -14,7 +14,7 @@ const Notifications = () => {
     const fetchNotifications = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:8000/api/notifications/');
+        const response = await fetch('/api/notifications/');
         if (response.ok) {
           const data = await response.json();
           setNotifications(data.notifications || []);
@@ -62,7 +62,7 @@ const Notifications = () => {
 
   const markAsRead = async (notificationId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/notifications/${notificationId}/read`, {
+      const response = await fetch(`/api/notifications/${notificationId}/read`, {
         method: 'PUT'
       });
       if (response.ok) {
@@ -81,7 +81,7 @@ const Notifications = () => {
 
   const markAsUnread = async (notificationId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/notifications/${notificationId}/unread`, {
+      const response = await fetch(`/api/notifications/${notificationId}/unread`, {
         method: 'PUT'
       });
       if (response.ok) {
@@ -100,7 +100,7 @@ const Notifications = () => {
 
   const markAllAsRead = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/notifications/mark-all-read?user_id=1', {
+      const response = await fetch('/api/notifications/mark-all-read?user_id=1', {
         method: 'PUT'
       });
       if (response.ok) {
@@ -115,7 +115,7 @@ const Notifications = () => {
 
   const deleteNotification = async (notificationId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/notifications/${notificationId}`, {
+      const response = await fetch(`/api/notifications/${notificationId}`, {
         method: 'DELETE'
       });
       if (response.ok) {

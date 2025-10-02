@@ -93,7 +93,7 @@ const JudgeManagement = () => {
       if (filterCourtType) params.append('court_type', filterCourtType);
       if (filterRegion) params.append('region', filterRegion);
 
-      const response = await fetch(`http://localhost:8000/api/admin/judges?${params}`, {
+      const response = await fetch(`/api/admin/judges?${params}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -120,8 +120,8 @@ const JudgeManagement = () => {
 
     try {
       const url = editingJudge 
-        ? `http://localhost:8000/api/admin/judges/${editingJudge.id}`
-        : `http://localhost:8000/api/admin/judges`;
+        ? `/api/admin/judges/${editingJudge.id}`
+        : `/api/admin/judges`;
       
       const method = editingJudge ? 'PUT' : 'POST';
       
@@ -172,7 +172,7 @@ const JudgeManagement = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/judges/${judge.id}`, {
+      const response = await fetch(`/api/admin/judges/${judge.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'

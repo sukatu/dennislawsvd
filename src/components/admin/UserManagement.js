@@ -72,7 +72,7 @@ const UserManagement = () => {
       if (roleFilter) params.append('role', roleFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const response = await fetch(`http://localhost:8000/api/admin/users?${params}`);
+      const response = await fetch(`/api/admin/users?${params}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -155,7 +155,7 @@ const UserManagement = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:8000/api/admin/users/${selectedUser.id}/reset-password`, {
+      const response = await fetch(`/api/admin/users/${selectedUser.id}/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -242,8 +242,8 @@ const UserManagement = () => {
 
     try {
       const url = editingUser 
-        ? `http://localhost:8000/api/admin/users/${editingUser.id}`
-        : 'http://localhost:8000/api/admin/users';
+        ? `/api/admin/users/${editingUser.id}`
+        : '/api/admin/users';
       
       const method = editingUser ? 'PUT' : 'POST';
       
@@ -276,7 +276,7 @@ const UserManagement = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/users/${selectedUser.id}`, {
+      const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
         method: 'DELETE'
       });
 

@@ -83,7 +83,7 @@ const CompanyManagement = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (companyTypeFilter) params.append('company_type', companyTypeFilter);
 
-      const response = await fetch(`http://localhost:8000/api/admin/companies?${params}`);
+      const response = await fetch(`/api/admin/companies?${params}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -106,7 +106,7 @@ const CompanyManagement = () => {
 
   const loadAnalytics = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/admin/companies/stats');
+      const response = await fetch('/api/admin/companies/stats');
       const data = await response.json();
       if (response.ok) {
         setAnalytics(data);
@@ -138,7 +138,7 @@ const CompanyManagement = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/companies/${selectedCompany.id}`, {
+      const response = await fetch(`/api/admin/companies/${selectedCompany.id}`, {
         method: 'DELETE'
       });
 
@@ -168,8 +168,8 @@ const CompanyManagement = () => {
   const handleSaveCompany = async (companyData) => {
     try {
       const url = editingCompany 
-        ? `http://localhost:8000/api/admin/companies/${editingCompany.id}`
-        : 'http://localhost:8000/api/admin/companies/';
+        ? `/api/admin/companies/${editingCompany.id}`
+        : '/api/admin/companies/';
       
       const method = editingCompany ? 'PUT' : 'POST';
       

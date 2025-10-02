@@ -165,7 +165,7 @@ const Settings = () => {
   const loadUserData = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/profile/me', {
+      const response = await fetch('/api/profile/me', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -199,7 +199,7 @@ const Settings = () => {
   const loadSubscriptionPlans = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/subscription/plans', {
+      const response = await fetch('/api/subscription/plans', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -218,7 +218,7 @@ const Settings = () => {
   const loadSubscriptionData = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/subscription/current', {
+      const response = await fetch('/api/subscription/current', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -245,7 +245,7 @@ const Settings = () => {
   const loadNotifications = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/notifications/', {
+      const response = await fetch('/api/notifications/', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -264,7 +264,7 @@ const Settings = () => {
   const loadNotificationStats = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/notifications/stats', {
+      const response = await fetch('/api/notifications/stats', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -283,7 +283,7 @@ const Settings = () => {
   const loadSecuritySettings = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/security/settings', {
+      const response = await fetch('/api/security/settings', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -331,7 +331,7 @@ const Settings = () => {
     showInfo('Saving Profile', 'Updating your profile information...');
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/profile/me', {
+      const response = await fetch('/api/profile/me', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -380,7 +380,7 @@ const Settings = () => {
     showInfo('Upgrading Subscription', 'Processing your subscription upgrade...');
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/subscription/upgrade', {
+      const response = await fetch('/api/subscription/upgrade', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -409,7 +409,7 @@ const Settings = () => {
     // Note: In a real app, you'd want a proper confirmation modal instead of just a warning notification
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/subscription/cancel', {
+      const response = await fetch('/api/subscription/cancel', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -435,7 +435,7 @@ const Settings = () => {
     showInfo('Updating Notification', 'Marking notification as read...');
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`http://localhost:8000/api/notifications/${notificationId}`, {
+      const response = await fetch(`/api/notifications/${notificationId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -462,7 +462,7 @@ const Settings = () => {
       // Mark each notification as read individually
       const unreadNotifications = notifications.filter(n => !n.is_read);
       const promises = unreadNotifications.map(notification => 
-        fetch(`http://localhost:8000/api/notifications/${notification.id}/read`, {
+        fetch(`/api/notifications/${notification.id}/read`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -484,7 +484,7 @@ const Settings = () => {
   const handleChangePassword = async (passwordData) => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/security/change-password', {
+      const response = await fetch('/api/security/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

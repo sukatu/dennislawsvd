@@ -96,7 +96,7 @@ const PersonProfile = () => {
         setIsLoading(true);
         const token = localStorage.getItem('accessToken') || 'test-token-123';
         
-        const response = await fetch(`http://localhost:8000/api/people/${id}`, {
+        const response = await fetch(`/api/people/${id}`, {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -153,7 +153,7 @@ const PersonProfile = () => {
       
       try {
         setAnalyticsLoading(true);
-        const response = await fetch(`http://localhost:8000/api/person/${id}/analytics`, {
+        const response = await fetch(`/api/person/${id}/analytics`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ const PersonProfile = () => {
       
       try {
         setCaseStatsLoading(true);
-        const response = await fetch(`http://localhost:8000/api/person-case-statistics/person/${id}`, {
+        const response = await fetch(`/api/person-case-statistics/person/${id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -266,7 +266,7 @@ const PersonProfile = () => {
     const loadRelatedCases = async () => {
       try {
         const token = localStorage.getItem('accessToken') || 'test-token-123';
-        const response = await fetch(`http://localhost:8000/api/case-search/search?query=${encodeURIComponent(personData?.full_name || '')}&limit=50`, {
+        const response = await fetch(`/api/case-search/search?query=${encodeURIComponent(personData?.full_name || '')}&limit=50`, {
           headers: {
             'Content-Type': 'application/json'
           }

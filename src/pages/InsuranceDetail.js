@@ -106,10 +106,10 @@ const InsuranceDetail = () => {
 
       let url;
       if (companyId) {
-        url = `http://localhost:8000/api/insurance/${companyId}`;
+        url = `/api/insurance/${companyId}`;
       } else if (companyName) {
         // Search for insurance company by name
-        url = `http://localhost:8000/api/insurance/search?name=${encodeURIComponent(companyName)}&limit=1`;
+        url = `/api/insurance/search?name=${encodeURIComponent(companyName)}&limit=1`;
       }
 
 

@@ -61,7 +61,7 @@ const SettingsManagement = () => {
       });
       
       // Use direct backend URL for now
-      const baseUrl = 'http://localhost:8000';
+      const baseUrl = '/api';
       const response = await fetch(`${baseUrl}/api/admin/settings?${params}`);
       
       if (!response.ok) {
@@ -92,7 +92,7 @@ const SettingsManagement = () => {
   const loadStats = async () => {
     try {
       // Use direct backend URL for now
-      const baseUrl = 'http://localhost:8000';
+      const baseUrl = '/api';
       const response = await fetch(`${baseUrl}/api/admin/settings/stats`);
       
       if (!response.ok) {
@@ -131,7 +131,7 @@ const SettingsManagement = () => {
       setError(null);
       setSuccess(null);
       
-      const baseUrl = 'http://localhost:8000';
+      const baseUrl = '/api';
       const url = editingSetting 
         ? `${baseUrl}/api/admin/settings/${editingSetting.id}`
         : `${baseUrl}/api/admin/settings`;
@@ -172,7 +172,7 @@ const SettingsManagement = () => {
       setError(null);
       setSuccess(null);
       
-      const baseUrl = 'http://localhost:8000';
+      const baseUrl = '/api';
       const response = await fetch(`${baseUrl}/api/admin/settings/${settingId}`, {
         method: 'DELETE',
       });
@@ -218,7 +218,7 @@ const SettingsManagement = () => {
       setError(null);
       setSuccess(null);
       
-      const baseUrl = 'http://localhost:8000';
+      const baseUrl = '/api';
       const deletePromises = selectedSettings.map(id => 
         fetch(`${baseUrl}/api/admin/settings/${id}`, { method: 'DELETE' })
       );

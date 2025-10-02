@@ -56,7 +56,7 @@ const AIChat = ({ caseId, caseTitle, isOpen, onClose, onMinimize }) => {
       
       if (sessionId) {
         // Continue existing session
-        response = await fetch(`http://localhost:8000/api/ai-chat/sessions/${sessionId}/messages`, {
+        response = await fetch(`/api/ai-chat/sessions/${sessionId}/messages`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ const AIChat = ({ caseId, caseTitle, isOpen, onClose, onMinimize }) => {
         });
       } else {
         // Start new session
-        response = await fetch(`http://localhost:8000/api/ai-chat/sessions/${caseId}/start`, {
+        response = await fetch(`/api/ai-chat/sessions/${caseId}/start`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const AIChat = ({ caseId, caseTitle, isOpen, onClose, onMinimize }) => {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/ai-chat/case-summary`, {
+      const response = await fetch(`/api/ai-chat/case-summary`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

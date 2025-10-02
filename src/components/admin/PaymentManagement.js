@@ -57,7 +57,7 @@ const PaymentManagement = () => {
         data = await apiGet(`/api/admin/payments?${params}`);
       } catch (apiError) {
         // Fallback to direct fetch without authentication
-        const response = await fetch(`http://localhost:8000/api/admin/payments?${params}`);
+        const response = await fetch(`/api/admin/payments?${params}`);
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
         }
@@ -82,7 +82,7 @@ const PaymentManagement = () => {
         data = await apiGet('/api/admin/payments/stats');
       } catch (apiError) {
         // Fallback to direct fetch without authentication
-        const response = await fetch('http://localhost:8000/api/admin/payments/stats');
+        const response = await fetch('/api/admin/payments/stats');
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
         }

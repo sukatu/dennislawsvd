@@ -118,7 +118,7 @@ const PeopleResults = () => {
         await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
         
         // Make actual API call to people search
-        const response = await fetch(`http://localhost:8000/api/people/search?query=${encodeURIComponent(searchQuery)}&limit=50`, {
+        const response = await fetch(`/api/people/search?query=${encodeURIComponent(searchQuery)}&limit=50`, {
           headers: {
             'Authorization': `Bearer test-token-123`,
             'Content-Type': 'application/json'

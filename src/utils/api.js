@@ -9,7 +9,7 @@ const getApiBaseUrl = () => {
     return '/api'; // Use relative URLs for server deployment
   }
   // For local development, use localhost
-  return process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  return process.env.REACT_APP_API_URL || '/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();

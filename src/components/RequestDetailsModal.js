@@ -33,7 +33,7 @@ const RequestDetailsModal = ({ isOpen, onClose, caseData, entityType, entityName
         is_urgent: false
       };
 
-      const response = await fetch('http://localhost:8000/api/request-details/submit', {
+      const response = await fetch('/api/request-details/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

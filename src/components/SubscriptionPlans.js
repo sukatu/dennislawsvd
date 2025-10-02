@@ -12,7 +12,7 @@ const SubscriptionPlans = ({ onSelectPlan, currentPlan, isLoading = false }) => 
 
   const fetchPlans = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/tenant/plans?is_active=true');
+      const response = await fetch('/api/tenant/plans?is_active=true');
       const data = await response.json();
       setPlans(data.plans || []);
     } catch (error) {

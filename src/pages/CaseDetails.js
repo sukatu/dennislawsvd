@@ -102,7 +102,7 @@ const CaseDetails = () => {
       const token = localStorage.getItem('accessToken') || 'test-token-123';
       
       // Load case details first
-      const caseResponse = await fetch(`http://localhost:8000/api/case-search/${caseId}/details`, {
+      const caseResponse = await fetch(`/api/case-search/${caseId}/details`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -225,7 +225,7 @@ const CaseDetails = () => {
       if (foundInsurance) {
         
         // Search for cases related to this insurance company
-        const searchResponse = await fetch(`http://localhost:8000/api/case-search/search?query=${encodeURIComponent(foundInsurance)}&limit=8`, {
+        const searchResponse = await fetch(`/api/case-search/search?query=${encodeURIComponent(foundInsurance)}&limit=8`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('accessToken') || 'test-token-123'}`,
             'Content-Type': 'application/json'
@@ -254,7 +254,7 @@ const CaseDetails = () => {
     try {
       const token = localStorage.getItem('accessToken') || 'test-token-123';
       
-      const relatedResponse = await fetch(`http://localhost:8000/api/case-search/${caseId}/related-cases?limit=8`, {
+      const relatedResponse = await fetch(`/api/case-search/${caseId}/related-cases?limit=8`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

@@ -63,7 +63,7 @@ const TenantManagement = () => {
         plan: planFilter !== 'all' ? planFilter : ''
       });
 
-      const response = await fetch(`http://localhost:8000/api/tenant/tenants?${params}`);
+      const response = await fetch(`/api/tenant/tenants?${params}`);
       const data = await response.json();
       
       setTenants(data.tenants || []);
@@ -77,7 +77,7 @@ const TenantManagement = () => {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/tenant/tenants/stats');
+      const response = await fetch('/api/tenant/tenants/stats');
       const data = await response.json();
       setStats(data);
     } catch (error) {
@@ -121,7 +121,7 @@ const TenantManagement = () => {
   const handleDeleteTenant = async (tenantId) => {
     if (window.confirm('Are you sure you want to delete this organization?')) {
       try {
-        const response = await fetch(`http://localhost:8000/api/tenant/tenants/${tenantId}`, {
+        const response = await fetch(`/api/tenant/tenants/${tenantId}`, {
           method: 'DELETE'
         });
         
@@ -141,7 +141,7 @@ const TenantManagement = () => {
   const handleToggleStatus = async (tenantId, currentStatus) => {
     try {
       const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-      const response = await fetch(`http://localhost:8000/api/tenant/tenants/${tenantId}`, {
+      const response = await fetch(`/api/tenant/tenants/${tenantId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -590,8 +590,8 @@ const TenantModal = ({ tenant, type, onClose, onSave }) => {
     
     try {
       const url = type === 'create' 
-        ? 'http://localhost:8000/api/tenant/tenants'
-        : `http://localhost:8000/api/tenant/tenants/${tenant.id}`;
+        ? '/api/tenant/tenants'
+        : `/api/tenant/tenants/${tenant.id}`;
       
       const method = type === 'create' ? 'POST' : 'PUT';
       

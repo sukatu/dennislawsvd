@@ -83,7 +83,7 @@ const InsuranceManagement = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (insuranceTypeFilter) params.append('insurance_type', insuranceTypeFilter);
 
-      const response = await fetch(`http://localhost:8000/api/admin/insurance?${params}`);
+      const response = await fetch(`/api/admin/insurance?${params}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -106,7 +106,7 @@ const InsuranceManagement = () => {
 
   const loadAnalytics = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/admin/insurance/stats');
+      const response = await fetch('/api/admin/insurance/stats');
       const data = await response.json();
       if (response.ok) {
         setAnalytics(data);
@@ -138,7 +138,7 @@ const InsuranceManagement = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/insurance/${selectedInsurance.id}`, {
+      const response = await fetch(`/api/admin/insurance/${selectedInsurance.id}`, {
         method: 'DELETE'
       });
 
@@ -168,8 +168,8 @@ const InsuranceManagement = () => {
   const handleSaveInsurance = async (insuranceData) => {
     try {
       const url = editingInsurance 
-        ? `http://localhost:8000/api/admin/insurance/${editingInsurance.id}`
-        : 'http://localhost:8000/api/admin/insurance/';
+        ? `/api/admin/insurance/${editingInsurance.id}`
+        : '/api/admin/insurance/';
       
       const method = editingInsurance ? 'PUT' : 'POST';
       

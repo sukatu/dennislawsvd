@@ -40,7 +40,7 @@ const CaseSearchResults = () => {
         ...filters
       });
       
-      const response = await fetch(`http://localhost:8000/api/case-search/search?${params}`, {
+      const response = await fetch(`/api/case-search/search?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

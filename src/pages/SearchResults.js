@@ -50,7 +50,7 @@ const SearchResults = () => {
       }
 
       // Make actual API call
-      const response = await fetch(`http://localhost:8000/api/search/unified?query=${encodeURIComponent(query)}&page=${currentPage}&limit=1000`);
+      const response = await fetch(`/api/search/unified?query=${encodeURIComponent(query)}&page=${currentPage}&limit=1000`);
       
       if (response.ok) {
         const data = await response.json();
@@ -247,7 +247,7 @@ const SearchResults = () => {
                   <div className="flex-shrink-0">
                     {result.logo_url ? (
                       <img
-                        src={`http://localhost:8000${result.logo_url}`}
+                        src={`/api${result.logo_url}`}
                         alt={`${result.name} logo`}
                         className="h-12 w-12 rounded-lg object-cover"
                       />

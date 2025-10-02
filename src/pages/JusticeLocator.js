@@ -53,7 +53,7 @@ const JusticeLocator = () => {
         is_active: 'true'
       });
 
-      const response = await fetch(`http://localhost:8000/api/courts/?${params}`);
+      const response = await fetch(`/api/courts/?${params}`);
       if (response.ok) {
         const data = await response.json();
         setCourts(data.courts);
@@ -76,9 +76,9 @@ const JusticeLocator = () => {
   const loadFilterOptions = async () => {
     try {
       const [regionsRes, citiesRes, typesRes] = await Promise.all([
-        fetch('http://localhost:8000/api/courts/regions'),
-        fetch('http://localhost:8000/api/courts/cities'),
-        fetch('http://localhost:8000/api/courts/types')
+        fetch('/api/courts/regions'),
+        fetch('/api/courts/cities'),
+        fetch('/api/courts/types')
       ]);
 
       if (regionsRes.ok) {
@@ -211,7 +211,7 @@ const JusticeLocator = () => {
     const loadGoogleMapsAPI = async () => {
       try {
         // Fetch API key from backend
-        const response = await fetch('http://localhost:8000/api/admin/google-maps-api-key');
+        const response = await fetch('/api/admin/google-maps-api-key');
         if (!response.ok) {
           throw new Error('Failed to fetch Google Maps API key');
         }

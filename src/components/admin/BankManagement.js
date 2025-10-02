@@ -83,7 +83,7 @@ const BankManagement = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (bankTypeFilter) params.append('bank_type', bankTypeFilter);
 
-      const response = await fetch(`http://localhost:8000/api/admin/banks?${params}`);
+      const response = await fetch(`/api/admin/banks?${params}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -106,7 +106,7 @@ const BankManagement = () => {
 
   const loadAnalytics = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/admin/banks/stats');
+      const response = await fetch('/api/admin/banks/stats');
       const data = await response.json();
       if (response.ok) {
         setAnalytics(data);
@@ -138,7 +138,7 @@ const BankManagement = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/banks/${selectedBank.id}`, {
+      const response = await fetch(`/api/admin/banks/${selectedBank.id}`, {
         method: 'DELETE'
       });
 
@@ -168,8 +168,8 @@ const BankManagement = () => {
   const handleSaveBank = async (bankData) => {
     try {
       const url = editingBank 
-        ? `http://localhost:8000/api/admin/banks/${editingBank.id}`
-        : 'http://localhost:8000/api/admin/banks/';
+        ? `/api/admin/banks/${editingBank.id}`
+        : '/api/admin/banks/';
       
       const method = editingBank ? 'PUT' : 'POST';
       

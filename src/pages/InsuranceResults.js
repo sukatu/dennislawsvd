@@ -25,7 +25,7 @@ const InsuranceResults = () => {
     setError(null);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/insurance/search?query=${encodeURIComponent(query)}&page=${currentPage}&limit=20`);
+      const response = await fetch(`/api/insurance/search?query=${encodeURIComponent(query)}&page=${currentPage}&limit=20`);
       
       if (response.ok) {
         const data = await response.json();
@@ -113,7 +113,7 @@ const InsuranceResults = () => {
                   <div className="flex-shrink-0">
                     {company.logo_url ? (
                       <img
-                        src={`http://localhost:8000${company.logo_url}`}
+                        src={`/api${company.logo_url}`}
                         alt={`${company.name} logo`}
                         className="h-16 w-16 rounded-lg object-cover"
                       />

@@ -112,7 +112,7 @@ const CourtManagement = () => {
         ...(filterStatus && { is_active: filterStatus === 'active' })
       });
 
-      const response = await fetch(`http://localhost:8000/api/courts/?${params}`, {
+      const response = await fetch(`/api/courts/?${params}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -135,8 +135,8 @@ const CourtManagement = () => {
   const loadFilterOptions = async () => {
     try {
       const [regionsRes, typesRes] = await Promise.all([
-        fetch('http://localhost:8000/api/courts/regions'),
-        fetch('http://localhost:8000/api/courts/types')
+        fetch('/api/courts/regions'),
+        fetch('/api/courts/types')
       ]);
 
       if (regionsRes.ok) {
@@ -173,8 +173,8 @@ const CourtManagement = () => {
     
     try {
       const url = selectedCourt 
-        ? `http://localhost:8000/api/courts/${selectedCourt.id}`
-        : 'http://localhost:8000/api/courts/';
+        ? `/api/courts/${selectedCourt.id}`
+        : '/api/courts/';
       
       const method = selectedCourt ? 'PUT' : 'POST';
       
@@ -286,7 +286,7 @@ const CourtManagement = () => {
     if (!courtToDelete) return;
     
     try {
-      const response = await fetch(`http://localhost:8000/api/courts/${courtToDelete.id}`, {
+      const response = await fetch(`/api/courts/${courtToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'

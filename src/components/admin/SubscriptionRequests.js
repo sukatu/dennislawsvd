@@ -51,7 +51,7 @@ const SubscriptionRequests = () => {
         data = await apiGet(`/api/tenant/subscription-requests?${params}`);
       } catch (apiError) {
         // Fallback to direct fetch without authentication
-        const response = await fetch(`http://localhost:8000/api/tenant/subscription-requests?${params}`);
+        const response = await fetch(`/api/tenant/subscription-requests?${params}`);
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
         }

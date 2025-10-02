@@ -84,7 +84,7 @@ const CourtTypeManagement = () => {
       if (filterLevel) params.append('level', filterLevel);
       if (filterRegion) params.append('region', filterRegion);
 
-      const response = await fetch(`http://localhost:8000/api/admin/court-types?${params}`, {
+      const response = await fetch(`/api/admin/court-types?${params}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -111,8 +111,8 @@ const CourtTypeManagement = () => {
 
     try {
       const url = editingCourtType 
-        ? `http://localhost:8000/api/admin/court-types/${editingCourtType.id}`
-        : `http://localhost:8000/api/admin/court-types`;
+        ? `/api/admin/court-types/${editingCourtType.id}`
+        : `/api/admin/court-types`;
       
       const method = editingCourtType ? 'PUT' : 'POST';
       
@@ -162,7 +162,7 @@ const CourtTypeManagement = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/court-types/${courtType.id}`, {
+      const response = await fetch(`/api/admin/court-types/${courtType.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'

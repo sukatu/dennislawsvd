@@ -23,7 +23,7 @@ const Subscribe = () => {
       setIsLoading(true);
       
       // Create tenant
-      const tenantResponse = await fetch('http://localhost:8000/api/tenant/tenants', {
+      const tenantResponse = await fetch('/api/tenant/tenants', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ const Subscribe = () => {
         notes: `Subscription request for ${tenantData.name}`
       };
 
-      const response = await fetch('http://localhost:8000/api/tenant/subscription-requests', {
+      const response = await fetch('/api/tenant/subscription-requests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -453,7 +453,7 @@ const CaseManagement = () => {
       if (courtTypeFilter) params.append('court_type', courtTypeFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const response = await fetch(`http://localhost:8000/api/admin/cases?${params}`);
+      const response = await fetch(`/api/admin/cases?${params}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -472,7 +472,7 @@ const CaseManagement = () => {
 
   const loadCaseStats = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/admin/cases/stats');
+      const response = await fetch('/api/admin/cases/stats');
       const data = await response.json();
 
       if (response.ok) {
@@ -511,7 +511,7 @@ const CaseManagement = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/cases/${selectedCase.id}`, {
+      const response = await fetch(`/api/admin/cases/${selectedCase.id}`, {
         method: 'DELETE'
       });
 
@@ -579,7 +579,7 @@ const CaseManagement = () => {
       const formData = new FormData();
       formData.append('file', uploadedFile);
       
-      const response = await fetch('http://localhost:8000/api/admin/cases/upload', {
+      const response = await fetch('/api/admin/cases/upload', {
         method: 'POST',
         body: formData,
       });
@@ -658,8 +658,8 @@ const CaseManagement = () => {
 
 
       const url = editingCase 
-        ? `http://localhost:8000/api/admin/cases/${editingCase.id}`
-        : 'http://localhost:8000/api/admin/cases';
+        ? `/api/admin/cases/${editingCase.id}`
+        : '/api/admin/cases';
       
       const method = editingCase ? 'PUT' : 'POST';
       

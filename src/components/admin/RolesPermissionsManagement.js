@@ -97,7 +97,7 @@ const RolesPermissionsManagement = () => {
   // Load users for dropdown
   const loadUsers = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/admin/users?limit=100');
+      const response = await fetch('/api/admin/users?limit=100');
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users || []);
@@ -207,7 +207,7 @@ const RolesPermissionsManagement = () => {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/admin/roles/stats');
+      const response = await fetch('/api/admin/roles/stats');
       if (response.ok) {
         const data = await response.json();
         setStats(data);
@@ -226,7 +226,7 @@ const RolesPermissionsManagement = () => {
         ...(rolesSearch && { search: rolesSearch })
       });
       
-      const response = await fetch(`http://localhost:8000/api/admin/roles/roles?${params}`);
+      const response = await fetch(`/api/admin/roles/roles?${params}`);
       if (response.ok) {
         const data = await response.json();
         setRoles(data.roles || []);
@@ -250,7 +250,7 @@ const RolesPermissionsManagement = () => {
         ...(permissionsCategory && { category: permissionsCategory })
       });
       
-      const response = await fetch(`http://localhost:8000/api/admin/roles/permissions?${params}`);
+      const response = await fetch(`/api/admin/roles/permissions?${params}`);
       if (response.ok) {
         const data = await response.json();
         setPermissions(data.permissions || []);
@@ -272,7 +272,7 @@ const RolesPermissionsManagement = () => {
         limit: 10
       });
       
-      const response = await fetch(`http://localhost:8000/api/admin/roles/user-roles?${params}`);
+      const response = await fetch(`/api/admin/roles/user-roles?${params}`);
       if (response.ok) {
         const data = await response.json();
         setUserRoles(data.user_roles || []);
@@ -290,8 +290,8 @@ const RolesPermissionsManagement = () => {
     try {
       setLoading(true);
       const url = editingRole 
-        ? `http://localhost:8000/api/admin/roles/roles/${editingRole.id}`
-        : 'http://localhost:8000/api/admin/roles/roles';
+        ? `/api/admin/roles/roles/${editingRole.id}`
+        : '/api/admin/roles/roles';
       const method = editingRole ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -331,8 +331,8 @@ const RolesPermissionsManagement = () => {
     try {
       setLoading(true);
       const url = editingPermission 
-        ? `http://localhost:8000/api/admin/roles/permissions/${editingPermission.id}`
-        : 'http://localhost:8000/api/admin/roles/permissions';
+        ? `/api/admin/roles/permissions/${editingPermission.id}`
+        : '/api/admin/roles/permissions';
       const method = editingPermission ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -380,7 +380,7 @@ const RolesPermissionsManagement = () => {
       
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/api/admin/roles/roles/${roleId}`, {
+        const response = await fetch(`/api/admin/roles/roles/${roleId}`, {
           method: 'DELETE',
         });
 
@@ -411,7 +411,7 @@ const RolesPermissionsManagement = () => {
       
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/api/admin/roles/permissions/${permissionId}`, {
+        const response = await fetch(`/api/admin/roles/permissions/${permissionId}`, {
           method: 'DELETE',
         });
 
@@ -435,7 +435,7 @@ const RolesPermissionsManagement = () => {
   const handleAssignUserRole = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/admin/roles/user-roles', {
+      const response = await fetch('/api/admin/roles/user-roles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -483,7 +483,7 @@ const RolesPermissionsManagement = () => {
       
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/api/admin/roles/user-roles/${userRoleId}`, {
+        const response = await fetch(`/api/admin/roles/user-roles/${userRoleId}`, {
           method: 'DELETE',
         });
 

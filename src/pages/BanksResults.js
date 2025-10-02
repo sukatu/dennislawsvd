@@ -25,7 +25,7 @@ const BanksResults = () => {
     setError(null);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/banks/search?query=${encodeURIComponent(query)}&page=${currentPage}&limit=20`);
+      const response = await fetch(`/api/banks/search?query=${encodeURIComponent(query)}&page=${currentPage}&limit=20`);
       
       if (response.ok) {
         const data = await response.json();
@@ -113,7 +113,7 @@ const BanksResults = () => {
                   <div className="flex-shrink-0">
                     {bank.logo_url ? (
                       <img
-                        src={`http://localhost:8000${bank.logo_url}`}
+                        src={`/api${bank.logo_url}`}
                         alt={`${bank.name} logo`}
                         className="h-16 w-16 rounded-lg object-cover"
                       />

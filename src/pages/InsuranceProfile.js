@@ -132,7 +132,7 @@ const InsuranceProfile = () => {
       setError(null);
       
 
-      const url = `http://localhost:8000/api/insurance/${insuranceId}`;
+      const url = `/api/insurance/${insuranceId}`;
       
       const response = await fetch(url, {
         headers: {
@@ -242,7 +242,7 @@ const InsuranceProfile = () => {
   const loadInsuranceAnalytics = async (insuranceId) => {
     try {
       setAnalyticsLoading(true);
-      const response = await fetch(`http://localhost:8000/api/insurance/${insuranceId}/analytics`, {
+      const response = await fetch(`/api/insurance/${insuranceId}/analytics`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -267,7 +267,7 @@ const InsuranceProfile = () => {
   const loadInsuranceCaseStats = async (insuranceId) => {
     try {
       setCaseStatsLoading(true);
-      const response = await fetch(`http://localhost:8000/api/insurance/${insuranceId}/case-statistics`, {
+      const response = await fetch(`/api/insurance/${insuranceId}/case-statistics`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -338,7 +338,7 @@ const InsuranceProfile = () => {
     try {
       setCasesLoading(true);
 
-      const url = `http://localhost:8000/api/insurance/${insuranceId}/related-cases?limit=100`;
+      const url = `/api/insurance/${insuranceId}/related-cases?limit=100`;
       
       const response = await fetch(url, {
         headers: {

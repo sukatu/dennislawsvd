@@ -124,7 +124,7 @@ const CaseHearingManagement = () => {
       if (filterRemark) params.append('remark', filterRemark);
       if (groupByCase) params.append('group_by_case', 'true');
       
-      const response = await fetch(`http://localhost:8000/api/admin/case-hearings?${params}`, {
+      const response = await fetch(`/api/admin/case-hearings?${params}`, {
         headers: {
           // 'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -171,7 +171,7 @@ const CaseHearingManagement = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:8000/api/admin/case-hearings/search/cases?q=${encodeURIComponent(searchTerm)}&limit=100`, {
+      const response = await fetch(`/api/admin/case-hearings/search/cases?q=${encodeURIComponent(searchTerm)}&limit=100`, {
         headers: {
           // 'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -194,7 +194,7 @@ const CaseHearingManagement = () => {
   const fetchCourts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/admin/court-types/search/active?query=&limit=100`, {
+      const response = await fetch(`/api/admin/court-types/search/active?query=&limit=100`, {
         headers: {
           // 'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -217,7 +217,7 @@ const CaseHearingManagement = () => {
   const fetchJudges = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/admin/judges/search/active?query=&limit=100`, {
+      const response = await fetch(`/api/admin/judges/search/active?query=&limit=100`, {
         headers: {
           // 'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -241,7 +241,7 @@ const CaseHearingManagement = () => {
   const fetchModalCourts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/admin/court-types/search/active?query=&limit=100`, {
+      const response = await fetch(`/api/admin/court-types/search/active?query=&limit=100`, {
         headers: {
           // 'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -264,7 +264,7 @@ const CaseHearingManagement = () => {
   const fetchModalJudges = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/admin/judges/search/active?query=&limit=100`, {
+      const response = await fetch(`/api/admin/judges/search/active?query=&limit=100`, {
         headers: {
           // 'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -292,7 +292,7 @@ const CaseHearingManagement = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/admin/case-hearings/search/cases?q=${encodeURIComponent(searchTerm)}&limit=100`, {
+      const response = await fetch(`/api/admin/case-hearings/search/cases?q=${encodeURIComponent(searchTerm)}&limit=100`, {
         headers: {
           // 'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -375,8 +375,8 @@ const CaseHearingManagement = () => {
       };
       
       const url = editingHearing 
-        ? `http://localhost:8000/api/admin/case-hearings/${editingHearing.id}`
-        : `http://localhost:8000/api/admin/case-hearings`;
+        ? `/api/admin/case-hearings/${editingHearing.id}`
+        : `/api/admin/case-hearings`;
       
       const method = editingHearing ? 'PUT' : 'POST';
       
@@ -451,7 +451,7 @@ const CaseHearingManagement = () => {
       try {
         const token = localStorage.getItem('token');
         
-        const response = await fetch(`http://localhost:8000/api/admin/case-hearings/${hearingId}`, {
+        const response = await fetch(`/api/admin/case-hearings/${hearingId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,

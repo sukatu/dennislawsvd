@@ -80,7 +80,7 @@ const CompanyProfile = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:8000/api/companies/${id}`, {
+      const response = await fetch(`/api/companies/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -106,7 +106,7 @@ const CompanyProfile = () => {
     try {
       setCasesLoading(true);
 
-      const url = `http://localhost:8000/api/companies/${companyId}/related-cases?limit=100`;
+      const url = `/api/companies/${companyId}/related-cases?limit=100`;
       
       const response = await fetch(url, {
         headers: {
