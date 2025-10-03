@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle, History, MapPin, Globe } from 'lucide-react';
 import RequestDetailsModal from '../components/RequestDetailsModal';
+import { apiGet } from '../utils/api';
 
 const BankDetail = () => {
   const { id } = useParams();
@@ -252,33 +253,21 @@ const BankDetail = () => {
   const loadBankEmployees = async (bankName) => {
     try {
       setEmployeesLoading(true);
-      const response = await fetch(`/api/employees/by-employer/bank/${encodeURIComponent(bankName)}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const data = await apiGet(`/employees/by-employer/bank/${encodeURIComponent(bankName)}`);
+      setEmployees(data.employees || []);
+      
+      // Calculate statistics
+      const total = data.total || 0;
+      const active = data.employees?.filter(emp => emp.employment_status === 'active').length || 0;
+      const onLeave = data.employees?.filter(emp => emp.employment_status === 'inactive').length || 0;
+      const departments = new Set(data.employees?.map(emp => emp.department).filter(Boolean)).size || 0;
+        
+      setEmployeeStats({
+        total,
+        active,
+        onLeave,
+        departments
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setEmployees(data.employees || []);
-        
-        // Calculate statistics
-        const total = data.total || 0;
-        const active = data.employees?.filter(emp => emp.employment_status === 'active').length || 0;
-        const onLeave = data.employees?.filter(emp => emp.employment_status === 'inactive').length || 0;
-        const departments = new Set(data.employees?.map(emp => emp.department).filter(Boolean)).size || 0;
-        
-        setEmployeeStats({
-          total,
-          active,
-          onLeave,
-          departments
-        });
-      } else {
-        console.error('Failed to load bank employees:', response.status);
-        setEmployees([]);
-        setEmployeeStats({ total: 0, active: 0, onLeave: 0, departments: 0 });
-      }
     } catch (error) {
       console.error('Error loading bank employees:', error);
       setEmployees([]);

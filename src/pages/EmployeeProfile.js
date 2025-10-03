@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail, Phone, MapPin, Calendar, Briefcase, GraduationCap, Award, FileText, User, Building2, Globe, Linkedin, Twitter, Facebook, Download, Edit, Trash2, Plus, Star, Clock, Shield, AlertCircle } from 'lucide-react';
+import { apiGet } from '../utils/api';
 
 const EmployeeProfile = () => {
   const { id } = useParams();
@@ -21,22 +22,11 @@ const EmployeeProfile = () => {
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch(`/api/employees/${employeeId}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setEmployee(data);
-      } else {
-        console.error('Failed to load employee profile:', response.status);
-        setError('Failed to load employee profile');
-      }
+      const data = await apiGet(`/employees/${employeeId}`);
+      setEmployee(data);
     } catch (error) {
       console.error('Error loading employee profile:', error);
-      setError('Error loading employee profile');
+      setError('Employee Not Found');
     } finally {
       setIsLoading(false);
     }

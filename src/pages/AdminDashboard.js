@@ -63,6 +63,7 @@ import JudgeManagement from '../components/admin/JudgeManagement';
 import CourtTypeManagement from '../components/admin/CourtTypeManagement';
 import PeopleManagement from '../components/admin/PeopleManagement';
 import EmployeeManagement from '../pages/EmployeeManagement';
+import GazetteManagement from '../pages/GazetteManagement';
 import BankManagement from '../components/admin/BankManagement';
 import InsuranceManagement from '../components/admin/InsuranceManagement';
 import CompanyManagement from '../components/admin/CompanyManagement';
@@ -194,15 +195,15 @@ const AdminDashboard = () => {
       setIsLoadingStats(true);
       // Load statistics from various endpoints using authenticated API
       const [adminData, usersData, casesData, peopleData, banksData, insuranceData, companiesData, paymentsData, employeeAnalytics] = await Promise.allSettled([
-        apiGet('/api/admin/stats'),
-        apiGet('/api/admin/users/stats'),
-        apiGet('/api/admin/cases/stats'),
-        apiGet('/api/admin/people/stats'),
-        apiGet('/api/admin/banks/stats'),
-        apiGet('/api/admin/insurance/stats'),
-        apiGet('/api/admin/companies/stats'),
-        apiGet('/api/admin/payments/stats'),
-        apiGet('/api/employees/analytics/overview')
+        apiGet('/admin/stats'),
+        apiGet('/admin/users/stats'),
+        apiGet('/admin/cases/stats'),
+        apiGet('/admin/people/stats'),
+        apiGet('/admin/banks/stats'),
+        apiGet('/admin/insurance/stats'),
+        apiGet('/admin/companies/stats'),
+        apiGet('/admin/payments/stats'),
+        apiGet('/employees/analytics/overview')
       ]);
 
       // Extract data from settled promises
@@ -381,6 +382,7 @@ const AdminDashboard = () => {
     { id: 'court-types', name: 'Court Types', icon: Building2 },
     { id: 'people', name: 'People', icon: UserCheck },
     { id: 'employees', name: 'Employees', icon: Users },
+    { id: 'gazette', name: 'Gazette', icon: FileText },
     { id: 'banks', name: 'Banks', icon: Building2 },
     { id: 'insurance', name: 'Insurance', icon: Shield },
     { id: 'companies', name: 'Companies', icon: Database },
@@ -418,6 +420,8 @@ const AdminDashboard = () => {
         return <PeopleManagement />;
       case 'employees':
         return <EmployeeManagement />;
+      case 'gazette':
+        return <GazetteManagement />;
       case 'banks':
         return <BankManagement />;
       case 'insurance':

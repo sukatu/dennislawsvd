@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, func, desc, asc
+from sqlalchemy import and_, or_, func, desc, asc, String
 from database import get_db
 from models.people import People
 from models.banks import Banks
 from models.insurance import Insurance
 from models.companies import Companies
 from models.user import User
+from models.gazette import Gazette
 from schemas.search import (
     UnifiedSearchRequest,
     UnifiedSearchResponse,
@@ -58,7 +59,9 @@ async def unified_search(
                     func.lower(People.email).like(search_term),
                     func.lower(People.address).like(search_term),
                     func.lower(People.city).like(search_term),
-                    func.lower(People.region).like(search_term)
+                    func.lower(People.region).like(search_term),
+                    # Search in previous_names (alias names) JSON array
+                    func.cast(People.previous_names, String).ilike(search_term)
                 )
             )
         
@@ -280,7 +283,9 @@ async def quick_search(
         or_(
             func.lower(People.full_name).like(search_term),
             func.lower(People.first_name).like(search_term),
-            func.lower(People.last_name).like(search_term)
+            func.lower(People.last_name).like(search_term),
+            # Search in previous_names (alias names) JSON array
+            func.cast(People.previous_names, String).ilike(search_term)
         )
     ).limit(limit).all()
     
@@ -352,6 +357,32 @@ async def quick_search(
             city=company.city,
             region=company.region,
             logo_url=company.logo_url
+        ))
+    
+    # Search gazette entries (names)
+    gazettes = db.query(Gazette).filter(
+        Gazette.is_public == True,
+        or_(
+            func.lower(Gazette.old_name).like(search_term),
+            func.lower(Gazette.new_name).like(search_term),
+            func.lower(Gazette.title).like(search_term),
+            func.lower(Gazette.reference_number).like(search_term)
+        )
+    ).limit(limit // 5).all()
+    
+    for gazette in gazettes:
+        # Determine the primary name to display
+        display_name = gazette.new_name or gazette.old_name or gazette.title
+        gazette_type = gazette.gazette_type.replace('_', ' ').title() if gazette.gazette_type else 'Gazette Entry'
+        
+        suggestions.append(SearchResultItem(
+            id=gazette.id,
+            name=display_name,
+            type="gazette",
+            description=f"{gazette_type} • {gazette.gazette_number or 'N/A'}",
+            city=gazette.court_location,
+            region=gazette.jurisdiction,
+            person_id=gazette.person_id
         ))
     
     return QuickSearchResponse(

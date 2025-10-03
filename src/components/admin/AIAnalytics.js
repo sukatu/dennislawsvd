@@ -41,7 +41,7 @@ const AIAnalytics = () => {
       setLoading(true);
       setError(null);
       
-      const response = await apiGet(`/api/ai-chat/analytics/usage?days=${selectedPeriod}`);
+      const response = await apiGet(`/ai-chat/analytics/usage?days=${selectedPeriod}`);
       setAnalytics(response);
     } catch (err) {
       console.error('Error loading AI analytics:', err);
@@ -56,7 +56,7 @@ const AIAnalytics = () => {
       setLoading(true);
       setError(null);
       
-      const response = await apiGet(`/api/ai-chat/analytics/users?days=${selectedPeriod}`);
+      const response = await apiGet(`/ai-chat/analytics/users?days=${selectedPeriod}`);
       console.log('User analytics response:', response); // Debug log
       setUserAnalytics(response);
     } catch (err) {
@@ -69,7 +69,7 @@ const AIAnalytics = () => {
 
   const loadSessionDetails = async (sessionId) => {
     try {
-      const response = await apiGet(`/api/ai-chat/analytics/session/${sessionId}`);
+      const response = await apiGet(`/ai-chat/analytics/session/${sessionId}`);
       setSessionDetails(response);
     } catch (err) {
       console.error('Error loading session details:', err);
@@ -156,7 +156,7 @@ const AIAnalytics = () => {
       <div className="text-center py-8">
         <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-gray-900 mb-2">No AI Analytics Data</h3>
-        <p className="text-gray-600">No AI chat sessions found for the selected period.</p>
+        <p className="text-gray-600">No JuridenceAI chat sessions found for the selected period.</p>
       </div>
     );
   }
@@ -189,7 +189,7 @@ const AIAnalytics = () => {
     plugins: {
       title: {
         display: true,
-        text: 'Daily AI Chat Usage'
+        text: 'Daily JuridenceAI Usage'
       },
       legend: {
         position: 'top'
@@ -257,8 +257,8 @@ const AIAnalytics = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">AI Chat Analytics</h2>
-          <p className="text-gray-600">Monitor AI chat usage, performance, and user engagement</p>
+          <h2 className="text-2xl font-bold text-gray-900">JuridenceAI Analytics</h2>
+          <p className="text-gray-600">Monitor JuridenceAI usage, performance, and user engagement</p>
         </div>
         <div className="flex items-center space-x-4">
           <select
@@ -406,7 +406,7 @@ const AIAnalytics = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">Most Active Cases</h3>
-          <p className="text-sm text-gray-600">Cases with the most AI chat sessions</p>
+          <p className="text-sm text-gray-600">Cases with the most JuridenceAI sessions</p>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -735,7 +735,7 @@ const AIAnalytics = () => {
             <div className="text-center py-8">
               <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No User Data</h3>
-              <p className="text-gray-600">No user-specific AI chat data found for the selected period.</p>
+              <p className="text-gray-600">No user-specific JuridenceAI data found for the selected period.</p>
             </div>
           )}
         </div>

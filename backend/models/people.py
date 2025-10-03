@@ -52,6 +52,17 @@ class People(Base):
     education_level = Column(String(50), nullable=True)
     languages = Column(JSON, nullable=True)  # Array of languages spoken
     
+    # Gazette-related fields (synchronized from gazette entries)
+    place_of_birth = Column(String(200), nullable=True, index=True)
+    old_place_of_birth = Column(String(200), nullable=True)
+    new_place_of_birth = Column(String(200), nullable=True)
+    old_date_of_birth = Column(DateTime, nullable=True)
+    new_date_of_birth = Column(DateTime, nullable=True)
+    effective_date_of_change = Column(DateTime, nullable=True)
+    gazette_remarks = Column(Text, nullable=True)  # Remarks from gazette entries
+    gazette_source = Column(String(200), nullable=True)  # Source gazette information
+    gazette_reference = Column(String(100), nullable=True, index=True)  # Gazette reference number
+    
     # Search and Verification
     is_verified = Column(Boolean, default=False, index=True)
     verification_date = Column(DateTime, nullable=True)
@@ -74,6 +85,9 @@ class People(Base):
     
     # Relationship with analytics
     analytics = relationship("PersonAnalytics", back_populates="person", uselist=False)
+    
+    # Relationship with gazette entries
+    gazette_entries = relationship("Gazette", back_populates="person", lazy="dynamic")
     
     def __repr__(self):
         return f"<People(id={self.id}, name='{self.full_name}', risk_level='{self.risk_level}')>"

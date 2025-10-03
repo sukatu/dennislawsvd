@@ -106,7 +106,7 @@ const InsuranceManagement = () => {
 
   const loadAnalytics = async () => {
     try {
-      const response = await fetch('/api/admin/insurance/stats');
+      const response = await fetch('/admin/insurance/stats');
       const data = await response.json();
       if (response.ok) {
         setAnalytics(data);

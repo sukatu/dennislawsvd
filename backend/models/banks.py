@@ -73,3 +73,4 @@ class Banks(Base):
     # Relationships
     analytics = relationship("BankAnalytics", back_populates="bank", uselist=False)
     case_statistics = relationship("BankCaseStatistics", back_populates="bank", uselist=False)
+    gazette_entries = relationship("Gazette", back_populates="bank", lazy="dynamic")

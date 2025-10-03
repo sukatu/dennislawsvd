@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, func, desc, asc
+from sqlalchemy import and_, or_, func, desc, asc, String
 from database import get_db
 from models.people import People
 from models.user import User
@@ -79,7 +79,9 @@ async def search_people(
                     func.lower(People.region).like(search_term),
                     func.lower(People.occupation).like(search_term),
                     func.lower(People.employer).like(search_term),
-                    func.lower(People.organization).like(search_term)
+                    func.lower(People.organization).like(search_term),
+                    # Search in previous_names (alias names) JSON array
+                    func.cast(People.previous_names, String).ilike(search_term)
                 )
             )
         
@@ -261,6 +263,16 @@ async def create_person(
         db.add(person)
         db.commit()
         db.refresh(person)
+        
+        # Generate analytics for the new person
+        try:
+            from services.auto_analytics_generator import AutoAnalyticsGenerator
+            generator = AutoAnalyticsGenerator(db)
+            generator.generate_analytics_for_person(person.id)
+            logging.info(f"Analytics generated for new person {person.id}")
+        except Exception as analytics_error:
+            logging.warning(f"Failed to generate analytics for person {person.id}: {str(analytics_error)}")
+            # Don't fail the person creation if analytics generation fails
         
         return person
         

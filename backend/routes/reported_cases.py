@@ -108,6 +108,28 @@ async def get_case_detail(
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
     
+    # Trigger on-demand AI analysis if case hasn't been analyzed
+    try:
+        from backend.services.on_demand_ai_analysis import analyze_case_if_needed
+        
+        # Check if case needs analysis
+        is_analyzed, _ = analyze_case_if_needed(case_id)
+        
+        if is_analyzed.get("status") == "success":
+            # Refresh case data to get updated AI analysis
+            db.refresh(case)
+        elif is_analyzed.get("status") == "already_analyzed":
+            # Case already analyzed, no action needed
+            pass
+        else:
+            # Analysis failed, but continue with case data
+            pass
+            
+    except Exception as e:
+        # If AI analysis fails, continue with case data
+        print(f"AI analysis failed for case {case_id}: {e}")
+        pass
+    
     return case
 
 @router.get("/", response_model=ReportedCaseSearchResponse)

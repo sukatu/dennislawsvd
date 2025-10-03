@@ -39,6 +39,11 @@ from routes import ai_chat
 from routes import employees
 from routes import file_upload
 from routes import file_repository
+from routes import gazette
+from routes import gazette_import
+from routes import contact_requests
+from routes import ai_case_analysis
+from routes import analytics_generator
 from config import settings
 
 # Application lifespan
@@ -127,6 +132,11 @@ app.include_router(ai_chat.router, prefix="/api", tags=["ai-chat"])
 app.include_router(employees.router, tags=["employees"])
 app.include_router(file_upload.router, prefix="/api/files", tags=["file_upload"])
 app.include_router(file_repository.router, tags=["file-repository"])
+app.include_router(gazette.router, prefix="/api", tags=["gazette"])
+app.include_router(gazette_import.router, prefix="/api/gazette", tags=["gazette-import"])
+app.include_router(contact_requests.router, prefix="/api/subscription", tags=["contact-requests"])
+app.include_router(ai_case_analysis.router, prefix="/api", tags=["ai-case-analysis"])
+app.include_router(analytics_generator.router, prefix="/api", tags=["analytics-generator"])
 
 # Root endpoint
 @app.get("/")

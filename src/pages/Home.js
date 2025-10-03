@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Shield, Clock, Users, Database, Building2, Banknote, Building, User } from 'lucide-react';
+import { Search, Shield, Clock, Users, Database, Building2, Banknote, Building, User, FileText } from 'lucide-react';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -106,6 +106,24 @@ const Home = () => {
       case 'companies':
         navigate(`/company-profile/${suggestion.id}`);
         break;
+      case 'gazette':
+        // For gazette entries, navigate to the person profile if linked, or search for the person
+        if (suggestion.person_id) {
+          navigate(`/person-profile/${suggestion.person_id}`);
+        } else {
+          // If no person linked, search for the person by name
+          // Extract the actual name by removing common prefixes like "Mrs.", "Mr.", "Miss", etc.
+          let searchName = suggestion.name;
+          const prefixes = ['Mrs.', 'Mr.', 'Miss', 'Ms.', 'Dr.', 'Prof.', 'Rev.'];
+          for (const prefix of prefixes) {
+            if (searchName.startsWith(prefix + ' ')) {
+              searchName = searchName.substring(prefix.length + 1);
+              break;
+            }
+          }
+          navigate(`/people-results?search=${encodeURIComponent(searchName)}`);
+        }
+        break;
       default:
         // Default to people results for backward compatibility
         navigate(`/people-results?search=${encodeURIComponent(suggestion.name)}`);
@@ -147,8 +165,8 @@ const Home = () => {
   const features = [
     {
       icon: <Search className="h-6 w-6 text-sky-600" />,
-      title: "People Name Search",
-      description: "Search people by name with detailed profiles and comprehensive information from our legal database."
+      title: "People & Gazette Name Search",
+      description: "Search people by name and gazette entries with detailed profiles and comprehensive information from our legal database."
     },
     {
       icon: <Shield className="h-6 w-6 text-sky-600" />,
@@ -234,7 +252,7 @@ const Home = () => {
                   <div className="flex-1 relative">
                     <input
                       type="text"
-                      placeholder={isAuthenticated ? "Search for people, banks, insurance, companies..." : "Please login to search..."}
+                      placeholder={isAuthenticated ? "Search for people, banks, insurance, companies, gazette names..." : "Please login to search..."}
                       value={searchQuery}
                       onChange={handleInputChange}
                       onFocus={() => searchQuery.length > 0 && setShowSuggestions(true)}
@@ -262,6 +280,8 @@ const Home = () => {
                                   return <Shield className="h-4 w-4 text-purple-500" />;
                                 case 'companies':
                                   return <Building className="h-4 w-4 text-orange-500" />;
+                                case 'gazette':
+                                  return <FileText className="h-4 w-4 text-indigo-500" />;
                                 default:
                                   return <Users className="h-4 w-4 text-gray-500" />;
                               }

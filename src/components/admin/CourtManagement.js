@@ -135,8 +135,8 @@ const CourtManagement = () => {
   const loadFilterOptions = async () => {
     try {
       const [regionsRes, typesRes] = await Promise.all([
-        fetch('/api/courts/regions'),
-        fetch('/api/courts/types')
+        fetch('/courts/regions'),
+        fetch('/courts/types')
       ]);
 
       if (regionsRes.ok) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogIn, UserPlus, LogOut, User, Settings, ChevronDown, Bell, Clock, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { Menu, X, LogOut, Settings, ChevronDown, Bell, Clock, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
 const Header = () => {

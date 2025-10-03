@@ -81,3 +81,4 @@ class Insurance(Base):
     # Relationships
     analytics = relationship("InsuranceAnalytics", back_populates="insurance", uselist=False)
     case_statistics = relationship("InsuranceCaseStatistics", back_populates="insurance", uselist=False)
+    gazette_entries = relationship("Gazette", back_populates="insurance", lazy="dynamic")

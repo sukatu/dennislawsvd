@@ -75,6 +75,10 @@ const CaseDetails = () => {
   // AI Chat state
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
+  // Document modal state
+  const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+  const [isDocumentFullscreen, setIsDocumentFullscreen] = useState(false);
+
   // Get search query from URL params
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get('q') || ''; // Full person name
@@ -508,6 +512,21 @@ const CaseDetails = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showShareMenu]);
+
+  // Handle keyboard events for document modal
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && isDocumentModalOpen) {
+        setIsDocumentModalOpen(false);
+        setIsDocumentFullscreen(false);
+      }
+    };
+
+    if (isDocumentModalOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isDocumentModalOpen]);
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -995,152 +1014,50 @@ const CaseDetails = () => {
                       </div>
                       <div className="text-gray-800 leading-relaxed">
                         {(() => {
-                          const summary = caseData?.metadata?.case_summary || caseData?.case_summary || 'No AI-generated summary available for this case.';
+                          // Use the actual AI analysis data from the database
+                          const aiDetailedOutcome = caseData?.ai_detailed_outcome;
+                          const aiCaseOutcome = caseData?.ai_case_outcome;
+                          const aiFinancialImpact = caseData?.ai_financial_impact;
+                          const aiCourtOrders = caseData?.ai_court_orders;
                           
-                          if (summary === 'No AI-generated summary available for this case.') {
-                            return <div className="text-gray-500 italic">{summary}</div>;
+                          if (!aiDetailedOutcome || aiDetailedOutcome.trim() === '') {
+                            return <div className="text-gray-500 italic">No AI-generated summary available for this case.</div>;
                           }
                           
-                          // Parse the structured summary for banking-relevant information
-                          const sections = summary.split('|').map(section => section.trim());
-                          const outcome = sections.find(s => s.startsWith('OUTCOME:'))?.replace('OUTCOME:', '').trim();
-                          const facts = sections.find(s => s.startsWith('FACTS:'))?.replace('FACTS:', '').trim();
-                          
-                          // Generate comprehensive AI-based banking summary
-                          const generateBankingSummary = () => {
-                            const caseText = caseData?.decision || caseData?.judgement || '';
-                            const conclusion = caseData?.conclusion || '';
-                            const title = caseData?.title || '';
-                            const fullText = (caseText + ' ' + conclusion + ' ' + title + ' ' + (caseData?.case_summary || '')).toLowerCase();
-                            
-                            // Enhanced outcome analysis
-                            let wonLost = 'UNRESOLVED';
-                            let courtOrders = '';
-                            let financialImpact = '';
-                            let detailedOutcome = '';
-                            
-                            // Comprehensive win/loss analysis
-                            const strongWinKeywords = ['allowed', 'granted', 'upheld', 'successful', 'won', 'favorable', 'in favor', 'succeeded', 'victory', 'prevailed'];
-                            const moderateWinKeywords = ['partially allowed', 'partially granted', 'in part', 'some relief'];
-                            const strongLossKeywords = ['dismissed', 'rejected', 'denied', 'unsuccessful', 'lost', 'unfavorable', 'against', 'failed', 'defeated', 'overruled'];
-                            const moderateLossKeywords = ['partially dismissed', 'partially rejected', 'in part dismissed'];
-                            
-                            if (strongWinKeywords.some(keyword => fullText.includes(keyword))) {
-                              wonLost = 'WON';
-                            } else if (moderateWinKeywords.some(keyword => fullText.includes(keyword))) {
-                              wonLost = 'PARTIALLY WON';
-                            } else if (strongLossKeywords.some(keyword => fullText.includes(keyword))) {
-                              wonLost = 'LOST';
-                            } else if (moderateLossKeywords.some(keyword => fullText.includes(keyword))) {
-                              wonLost = 'PARTIALLY LOST';
-                            }
-                            
-                            // Enhanced court orders analysis
-                            const orderKeywords = [
-                              'ordered', 'directed', 'injunction', 'restraining', 'mandatory', 'prohibitory',
-                              'enjoined', 'restrained', 'compelled', 'required', 'commanded', 'decreed',
-                              'permanent injunction', 'temporary injunction', 'interim order', 'final order'
-                            ];
-                            
-                            const specificOrderKeywords = [
-                              'pay', 'compensate', 'refund', 'return', 'restore', 'cease', 'desist',
-                              'remove', 'demolish', 'construct', 'repair', 'maintain', 'provide'
-                            ];
-                            
-                            if (orderKeywords.some(keyword => fullText.includes(keyword))) {
-                              const hasSpecificOrders = specificOrderKeywords.some(keyword => fullText.includes(keyword));
-                              courtOrders = hasSpecificOrders ? 
-                                'Court issued specific actionable orders requiring compliance' : 
-                                'Court issued general orders or directives';
-                            } else {
-                              courtOrders = 'No specific court orders identified';
-                            }
-                            
-                            // Enhanced financial impact analysis
-                            const monetaryKeywords = [
-                              'damages', 'compensation', 'fine', 'penalty', 'costs', 'award', 'settlement',
-                              'restitution', 'reimbursement', 'refund', 'payment', 'monetary', 'financial',
-                              'ghc', 'cedis', 'dollars', 'amount', 'sum', 'value', 'price'
-                            ];
-                            
-                            const highValueKeywords = ['million', 'thousand', 'substantial', 'significant', 'large'];
-                            const lowValueKeywords = ['nominal', 'minimal', 'small', 'token'];
-                            
-                            if (monetaryKeywords.some(keyword => fullText.includes(keyword))) {
-                              if (highValueKeywords.some(keyword => fullText.includes(keyword))) {
-                                financialImpact = 'HIGH - Case involves substantial monetary amounts or significant financial implications';
-                              } else if (lowValueKeywords.some(keyword => fullText.includes(keyword))) {
-                                financialImpact = 'LOW - Case involves minimal monetary amounts or token financial implications';
-                              } else {
-                                financialImpact = 'MODERATE - Case involves monetary amounts with moderate financial implications';
-                              }
-                            } else {
-                              financialImpact = 'NONE - No clear monetary amounts or financial implications identified';
-                            }
-                            
-                            // Generate detailed outcome
-                            const outcomeKeywords = [
-                              'judgment', 'ruling', 'decision', 'verdict', 'finding', 'conclusion',
-                              'determination', 'resolution', 'settlement', 'agreement'
-                            ];
-                            
-                            if (outcomeKeywords.some(keyword => fullText.includes(keyword))) {
-                              detailedOutcome = `Case ${wonLost.toLowerCase()} with ${courtOrders.toLowerCase()}. ${financialImpact}. `;
-                              
-                              // Add specific details based on case content
-                              if (fullText.includes('contract')) {
-                                detailedOutcome += 'Contract-related dispute with legal implications for business relationships.';
-                              } else if (fullText.includes('property') || fullText.includes('land')) {
-                                detailedOutcome += 'Property/land dispute with potential asset implications.';
-                              } else if (fullText.includes('employment') || fullText.includes('labor')) {
-                                detailedOutcome += 'Employment-related matter with workplace implications.';
-                              } else if (fullText.includes('criminal') || fullText.includes('fraud')) {
-                                detailedOutcome += 'Criminal or fraud-related matter with serious legal implications.';
-                              } else {
-                                detailedOutcome += 'General legal matter with standard legal implications.';
-                              }
-                              
-                              // Add conclusion if available
-                              if (conclusion && conclusion.trim()) {
-                                const conclusionText = conclusion.replace(/<[^>]*>/g, '').trim();
-                                if (conclusionText.length > 0) {
-                                  detailedOutcome += ` Court Conclusion: ${conclusionText.substring(0, 200)}${conclusionText.length > 200 ? '...' : ''}`;
-                                }
-                              }
-                            } else {
-                              detailedOutcome = 'Case outcome details not clearly specified in available information.';
-                            }
-                            
-                            return { wonLost, courtOrders, financialImpact, detailedOutcome };
-                          };
-                          
-                          const bankingSummary = generateBankingSummary();
-                          
+                          // Display the actual AI analysis data from the database
                           return (
                             <div className="space-y-4">
+                              <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500">
+                                <h4 className="font-semibold text-purple-900 mb-2 flex items-center">
+                                  <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                                  SUMMARY
+                                </h4>
+                                <p className="text-gray-700 leading-relaxed">{aiDetailedOutcome}</p>
+                              </div>
+                              
                               <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500">
                                 <h4 className="font-semibold text-blue-900 mb-2 flex items-center">
                                   <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
                                   CASE OUTCOME
                                 </h4>
                                 <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                                  bankingSummary.wonLost === 'WON' ? 'bg-green-100 text-green-800' :
-                                  bankingSummary.wonLost === 'PARTIALLY WON' ? 'bg-green-50 text-green-700 border border-green-200' :
-                                  bankingSummary.wonLost === 'LOST' ? 'bg-red-100 text-red-800' :
-                                  bankingSummary.wonLost === 'PARTIALLY LOST' ? 'bg-red-50 text-red-700 border border-red-200' :
+                                  aiCaseOutcome === 'WON' ? 'bg-green-100 text-green-800' :
+                                  aiCaseOutcome === 'PARTIALLY_WON' ? 'bg-green-50 text-green-700 border border-green-200' :
+                                  aiCaseOutcome === 'LOST' ? 'bg-red-100 text-red-800' :
+                                  aiCaseOutcome === 'PARTIALLY_LOST' ? 'bg-red-50 text-red-700 border border-red-200' :
                                   'bg-yellow-100 text-yellow-800'
                                 }`}>
-                                  {bankingSummary.wonLost === 'WON' ? '✓ WON' : 
-                                   bankingSummary.wonLost === 'PARTIALLY WON' ? '◐ PARTIALLY WON' :
-                                   bankingSummary.wonLost === 'LOST' ? '✗ LOST' : 
-                                   bankingSummary.wonLost === 'PARTIALLY LOST' ? '◑ PARTIALLY LOST' :
+                                  {aiCaseOutcome === 'WON' ? '✓ WON' : 
+                                   aiCaseOutcome === 'PARTIALLY_WON' ? '◐ PARTIALLY WON' :
+                                   aiCaseOutcome === 'LOST' ? '✗ LOST' : 
+                                   aiCaseOutcome === 'PARTIALLY_LOST' ? '◑ PARTIALLY LOST' :
                                    '⏳ UNRESOLVED'}
                                 </div>
                                 <p className="text-gray-700 mt-2">
-                                  {bankingSummary.wonLost === 'WON' ? 'The person was fully successful in this case.' :
-                                   bankingSummary.wonLost === 'PARTIALLY WON' ? 'The person achieved partial success in this case.' :
-                                   bankingSummary.wonLost === 'LOST' ? 'The person was unsuccessful in this case.' :
-                                   bankingSummary.wonLost === 'PARTIALLY LOST' ? 'The person had partial setbacks in this case.' :
+                                  {aiCaseOutcome === 'WON' ? 'The person was fully successful in this case.' :
+                                   aiCaseOutcome === 'PARTIALLY_WON' ? 'The person achieved partial success in this case.' :
+                                   aiCaseOutcome === 'LOST' ? 'The person was unsuccessful in this case.' :
+                                   aiCaseOutcome === 'PARTIALLY_LOST' ? 'The person had partial setbacks in this case.' :
                                    'The case outcome is not clearly determined from available information.'}
                                 </p>
                               </div>
@@ -1150,7 +1067,7 @@ const CaseDetails = () => {
                                   <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
                                   COURT ORDERS
                                 </h4>
-                                <p className="text-gray-700 leading-relaxed">{bankingSummary.courtOrders}</p>
+                                <p className="text-gray-700 leading-relaxed">{aiCourtOrders || 'No specific court orders identified'}</p>
                               </div>
                               
                               <div className="bg-white p-4 rounded-lg border-l-4 border-green-500">
@@ -1159,29 +1076,66 @@ const CaseDetails = () => {
                                   FINANCIAL IMPACT
                                 </h4>
                                 <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-2 ${
-                                  bankingSummary.financialImpact.includes('HIGH') ? 'bg-red-100 text-red-800' :
-                                  bankingSummary.financialImpact.includes('MODERATE') ? 'bg-yellow-100 text-yellow-800' :
-                                  bankingSummary.financialImpact.includes('LOW') ? 'bg-green-100 text-green-800' :
+                                  aiFinancialImpact?.includes('HIGH') ? 'bg-red-100 text-red-800' :
+                                  aiFinancialImpact?.includes('MODERATE') ? 'bg-yellow-100 text-yellow-800' :
+                                  aiFinancialImpact?.includes('LOW') ? 'bg-green-100 text-green-800' :
                                   'bg-gray-100 text-gray-800'
                                 }`}>
-                                  {bankingSummary.financialImpact.split(' - ')[0]}
+                                  {aiFinancialImpact?.split(' - ')[0] || 'UNRESOLVED'}
                                 </div>
-                                <p className="text-gray-700 leading-relaxed">{bankingSummary.financialImpact}</p>
-                              </div>
-                              
-                              <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500">
-                                <h4 className="font-semibold text-purple-900 mb-2 flex items-center">
-                                  <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-                                  DETAILED OUTCOME
-                                </h4>
-                                <p className="text-gray-700 leading-relaxed">{bankingSummary.detailedOutcome}</p>
-                                {outcome && (
-                                  <div className="mt-3 p-3 bg-purple-50 rounded-lg">
-                                    <p className="text-sm text-purple-800">
-                                      <strong>Additional Details:</strong> {outcome}
-                                    </p>
+                                <p className="text-gray-700 leading-relaxed mb-3">{aiFinancialImpact || 'Financial impact not determined'}</p>
+                                
+                                {/* Extract and display monetary amounts from case data */}
+                                {(() => {
+                                  const caseText = (caseData?.decision || '') + ' ' + (caseData?.judgement || '') + ' ' + (caseData?.conclusion || '');
+                                  const monetaryPatterns = [
+                                    /(?:GHS|GH¢|¢|GHC)\s*[\d,]+(?:\.\d{2})?/gi,
+                                    /\$\s*[\d,]+(?:\.\d{2})?/gi,
+                                    /£\s*[\d,]+(?:\.\d{2})?/gi,
+                                    /€\s*[\d,]+(?:\.\d{2})?/gi,
+                                    /(?:amount|sum|value|cost|damages?|compensation|fine|penalty|award|settlement|payment|refund|restitution|reimbursement)\s*(?:of\s*)?(?:GHS|GH¢|¢|GHC|USD|\$|£|€)?\s*[\d,]+(?:\.\d{2})?/gi,
+                                    /[\d,]+(?:\.\d{2})?\s*(?:GHS|GH¢|¢|GHC|USD|\$|£|€)/gi
+                                  ];
+                                  
+                                  const amounts = [];
+                                  monetaryPatterns.forEach(pattern => {
+                                    const matches = caseText.match(pattern);
+                                    if (matches) {
+                                      amounts.push(...matches);
+                                    }
+                                  });
+                                  
+                                  // Remove duplicates and sort by amount
+                                  const uniqueAmounts = [...new Set(amounts)].sort((a, b) => {
+                                    const numA = parseFloat(a.replace(/[^\d.]/g, ''));
+                                    const numB = parseFloat(b.replace(/[^\d.]/g, ''));
+                                    return numB - numA;
+                                  });
+                                  
+                                  if (uniqueAmounts.length > 0) {
+                                    return (
+                                      <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                        <h5 className="font-semibold text-green-800 mb-2 flex items-center">
+                                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                                          MONETARY AMOUNTS IDENTIFIED:
+                                        </h5>
+                                        <div className="space-y-1">
+                                          {uniqueAmounts.slice(0, 5).map((amount, index) => (
+                                            <div key={index} className="text-sm text-green-700 font-medium">
+                                              • {amount}
+                                            </div>
+                                          ))}
+                                          {uniqueAmounts.length > 5 && (
+                                            <div className="text-xs text-green-600 italic">
+                                              ... and {uniqueAmounts.length - 5} more amounts
                                   </div>
                                 )}
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                })()}
                               </div>
                             </div>
                           );
@@ -1189,6 +1143,11 @@ const CaseDetails = () => {
                       </div>
                       <div className="mt-4 text-xs text-gray-500 italic">
                         This summary focuses on case outcomes and financial implications relevant for banking and credit assessment purposes.
+                        {caseData?.ai_summary_generated_at && (
+                          <div className="mt-1">
+                            AI Analysis generated on: {new Date(caseData.ai_summary_generated_at).toLocaleString()}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1221,7 +1180,7 @@ const CaseDetails = () => {
                 {/* Additional metadata people */}
                 {caseData.metadata && (
                   <>
-                    <ArrayDisplay label="Judges" items={formatArray(caseData.metadata.judges)} icon={Gavel} />
+                    <ArrayDisplay label="Coram" items={formatArray(caseData.metadata.judges)} icon={Gavel} />
                   </>
                 )}
               </div>
@@ -1285,30 +1244,14 @@ const CaseDetails = () => {
                             </div>
                           </td>
                           <td className="py-3 px-4 text-center">
-                            <div className="flex items-center justify-center space-x-2">
+                            <div className="flex items-center justify-center">
                     <button
-                                onClick={() => window.open('https://juridence.com', '_blank')}
+                                onClick={() => setIsDocumentModalOpen(true)}
                                 className="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                                title="View on juridence.com"
+                                title="View document content"
                     >
                                 <Eye className="w-3 h-3" />
                                 <span>View</span>
-                    </button>
-                              <button
-                                onClick={() => {
-                                  const link = document.createElement('a');
-                                  link.href = caseData?.file_url || caseData?.firebase_url || '#';
-                                  link.download = caseData?.file_name || `${caseData?.title?.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
-                                  link.target = '_blank';
-                                  document.body.appendChild(link);
-                                  link.click();
-                                  document.body.removeChild(link);
-                                }}
-                                className="inline-flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors duration-200"
-                                title="Download PDF"
-                              >
-                                <Download className="w-3 h-3" />
-                                <span>Download</span>
                               </button>
                             </div>
                           </td>
@@ -2096,7 +2039,7 @@ const CaseDetails = () => {
       )}
 
       {/* Custom CSS for animations */}
-      <style jsx>{`
+      <style jsx="true">{`
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
@@ -2161,6 +2104,61 @@ const CaseDetails = () => {
           }
         }
         
+        /* Summernote content styling */
+        .summernote-content {
+          font-family: 'Book Antiqua', serif !important;
+          font-size: 12pt !important;
+          line-height: 1.15 !important;
+          color: #000 !important;
+        }
+        
+        .summernote-content p {
+          margin-bottom: 8pt !important;
+          text-align: justify !important;
+        }
+        
+        .summernote-content .MsoNormal {
+          margin-bottom: 8pt !important;
+          text-align: justify !important;
+        }
+        
+        .summernote-content .MsoListParagraphCxSpFirst,
+        .summernote-content .MsoListParagraphCxSpMiddle,
+        .summernote-content .MsoListParagraphCxSpLast {
+          margin-bottom: 8pt !important;
+          text-align: justify !important;
+        }
+        
+        .summernote-content .MsoNoSpacing {
+          margin-bottom: 0 !important;
+        }
+        
+        .summernote-content b,
+        .summernote-content strong {
+          font-weight: bold !important;
+        }
+        
+        .summernote-content i,
+        .summernote-content em {
+          font-style: italic !important;
+        }
+        
+        .summernote-content u {
+          text-decoration: underline !important;
+        }
+        
+        .summernote-content sup {
+          vertical-align: super !important;
+          font-size: smaller !important;
+        }
+        
+        .summernote-content .MsoListParagraphCxSpFirst,
+        .summernote-content .MsoListParagraphCxSpMiddle,
+        .summernote-content .MsoListParagraphCxSpLast {
+          margin-left: 49.5pt !important;
+          text-indent: -31.5pt !important;
+        }
+        
         @keyframes zoomIn {
           from { 
             transform: scale(0.95);
@@ -2177,10 +2175,10 @@ const CaseDetails = () => {
       <button
         onClick={() => setIsAIChatOpen(true)}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center group"
-        title="Open AI Legal Assistant"
+        title="Open JuridenceAI"
       >
         <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
-        <span className="sr-only">AI Assistant</span>
+        <span className="sr-only">JuridenceAI</span>
       </button>
 
       {/* AI Chat Component */}
@@ -2191,6 +2189,89 @@ const CaseDetails = () => {
         onClose={() => setIsAIChatOpen(false)}
         onMinimize={() => setIsAIChatOpen(false)}
       />
+
+      {/* Document Content Modal */}
+      {isDocumentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className={`bg-white rounded-lg shadow-xl transition-all duration-300 ${
+            isDocumentFullscreen 
+              ? 'w-full h-full max-w-none max-h-none m-0 rounded-none' 
+              : 'w-full max-w-4xl max-h-[90vh]'
+          }`}>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <FileText className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Document Content
+                </h3>
+                {caseData?.title && (
+                  <span className="text-sm text-gray-500 truncate max-w-md">
+                    - {caseData.title}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setIsDocumentFullscreen(!isDocumentFullscreen)}
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={isDocumentFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                >
+                  {isDocumentFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                </button>
+                <button
+                  onClick={() => setIsDocumentModalOpen(false)}
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="overflow-y-auto" style={{ maxHeight: isDocumentFullscreen ? 'calc(100vh - 80px)' : 'calc(90vh - 80px)' }}>
+              <div className="p-6">
+                {caseData?.summernote ? (
+                  <div 
+                    className="prose prose-lg max-w-none summernote-content"
+                    dangerouslySetInnerHTML={{ __html: caseData.summernote }}
+                    style={{
+                      fontFamily: 'Book Antiqua, serif',
+                      fontSize: '12pt',
+                      lineHeight: '1.15',
+                      color: '#000'
+                    }}
+                  />
+                ) : (
+                  <div className="text-center py-12">
+                    <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">No Document Content Available</h4>
+                    <p className="text-gray-500">
+                      This case doesn't have any document content to display.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50">
+              <div className="text-sm text-gray-500">
+                {caseData?.summernote ? 'Document content loaded successfully' : 'No content available'}
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setIsDocumentModalOpen(false)}
+                  className="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

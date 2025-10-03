@@ -95,7 +95,7 @@ const EmployeeManagement = () => {
         ...(filters.employee_type && { employee_type: filters.employee_type })
       });
 
-      const response = await apiGet(`/api/employees?${params}`);
+      const response = await apiGet(`/employees?${params}`);
       setEmployees(response.employees);
       setPagination({
         page: response.page,
@@ -152,9 +152,9 @@ const EmployeeManagement = () => {
       
       let employee;
       if (selectedEmployee) {
-        employee = await apiPut(`/api/employees/${selectedEmployee.id}`, cleanedFormData);
+        employee = await apiPut(`/employees/${selectedEmployee.id}`, cleanedFormData);
       } else {
-        employee = await apiPost('/api/employees', cleanedFormData);
+        employee = await apiPost('/employees', cleanedFormData);
       }
       
       // Upload CV if file is selected
@@ -193,7 +193,7 @@ const EmployeeManagement = () => {
   const handleDelete = async (employeeId) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
       try {
-        await apiDelete(`/api/employees/${employeeId}`);
+        await apiDelete(`/employees/${employeeId}`);
         fetchEmployees();
       } catch (error) {
         console.error('Error deleting employee:', error);
@@ -374,7 +374,7 @@ const EmployeeManagement = () => {
       const formData = new FormData();
       formData.append('file', cvFile);
       
-      const response = await fetch(`/api/employees/${employeeId}/upload-cv`, {
+      const response = await fetch(`/employees/${employeeId}/upload-cv`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -571,7 +571,7 @@ const EmployeeManagement = () => {
                           </button>
                           {employee.cv_file && (
                             <button
-                              onClick={() => window.open(`/api/files/download-cv/${employee.cv_file.split('/').pop()}`, '_blank')}
+                              onClick={() => window.open(`/files/download-cv/${employee.cv_file.split('/').pop()}`, '_blank')}
                               className="text-green-600 hover:text-green-900"
                               title="Download CV"
                             >

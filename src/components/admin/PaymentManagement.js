@@ -79,10 +79,10 @@ const PaymentManagement = () => {
       // Try with API utility first, fallback to direct fetch if it fails
       let data;
       try {
-        data = await apiGet('/api/admin/payments/stats');
+        data = await apiGet('/admin/payments/stats');
       } catch (apiError) {
         // Fallback to direct fetch without authentication
-        const response = await fetch('/api/admin/payments/stats');
+        const response = await fetch('/admin/payments/stats');
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
         }

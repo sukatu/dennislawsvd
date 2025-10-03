@@ -97,7 +97,7 @@ const RolesPermissionsManagement = () => {
   // Load users for dropdown
   const loadUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users?limit=100');
+      const response = await fetch('/admin/users?limit=100');
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users || []);
@@ -207,7 +207,7 @@ const RolesPermissionsManagement = () => {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('/api/admin/roles/stats');
+      const response = await fetch('/admin/roles/stats');
       if (response.ok) {
         const data = await response.json();
         setStats(data);
@@ -435,7 +435,7 @@ const RolesPermissionsManagement = () => {
   const handleAssignUserRole = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/roles/user-roles', {
+      const response = await fetch('/admin/roles/user-roles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -579,7 +579,7 @@ const CaseManagement = () => {
       const formData = new FormData();
       formData.append('file', uploadedFile);
       
-      const response = await fetch('/api/admin/cases/upload', {
+      const response = await fetch('/admin/cases/upload', {
         method: 'POST',
         body: formData,
       });

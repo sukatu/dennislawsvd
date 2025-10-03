@@ -37,7 +37,9 @@ import AdminDashboard from './pages/AdminDashboard';
 import EmployeeManagement from './pages/EmployeeManagement';
 import EmployeeProfile from './pages/EmployeeProfile';
 import PublicEmployeeProfile from './pages/PublicEmployeeProfile';
+import GazetteManagement from './pages/GazetteManagement';
 import Subscribe from './pages/Subscribe';
+import SimpleSubscribe from './pages/SimpleSubscribe';
 import JusticeLocator from './pages/JusticeLocator';
 
 function App() {
@@ -82,7 +84,9 @@ function App() {
               <Route path="/admin/employees" element={<EmployeeManagement />} />
               <Route path="/admin/employees/:id" element={<EmployeeProfile />} />
               <Route path="/employee/:id" element={<PublicEmployeeProfile />} />
-              <Route path="/subscribe" element={<Subscribe />} />
+              <Route path="/gazette" element={<GazetteManagement />} />
+              <Route path="/subscribe" element={<SimpleSubscribe />} />
+              <Route path="/subscribe-full" element={<Subscribe />} />
               <Route path="/justice-locator" element={<JusticeLocator />} />
             </Routes>
           </main>

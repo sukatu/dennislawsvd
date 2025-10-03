@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { apiGet } from '../utils/api';
 
 const EmployeeProfile = ({ employeeId, onClose }) => {
@@ -6,23 +6,23 @@ const EmployeeProfile = ({ employeeId, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
-  useEffect(() => {
-    if (employeeId) {
-      fetchEmployeeProfile();
-    }
-  }, [employeeId]);
-
-  const fetchEmployeeProfile = async () => {
+  const fetchEmployeeProfile = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await apiGet(`/api/employees/${employeeId}`);
+      const response = await apiGet(`/employees/${employeeId}`);
       setEmployee(response);
     } catch (error) {
       console.error('Error fetching employee profile:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [employeeId]);
+
+  useEffect(() => {
+    if (employeeId) {
+      fetchEmployeeProfile();
+    }
+  }, [employeeId, fetchEmployeeProfile]);
 
   if (loading) {
     return (

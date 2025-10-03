@@ -42,6 +42,7 @@ def create_tables():
     from models.legal_history import LegalHistory, CaseMention, LegalSearchIndex
     from models.judges import Judges
     from models.court_types import CourtTypes
+    from models.contact_request import ContactRequest
     Base.metadata.create_all(bind=engine)
 
 # Drop all tables (use with caution)

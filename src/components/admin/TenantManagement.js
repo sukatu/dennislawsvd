@@ -77,7 +77,7 @@ const TenantManagement = () => {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('/api/tenant/tenants/stats');
+      const response = await fetch('/tenant/tenants/stats');
       const data = await response.json();
       setStats(data);
     } catch (error) {

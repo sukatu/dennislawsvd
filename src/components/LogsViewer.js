@@ -62,7 +62,7 @@ const LogsViewer = () => {
         if (value) params.append(key, value);
       });
 
-      const data = await apiGet(`/api/admin/logs/${activeTab}?${params}`);
+      const data = await apiGet(`/admin/logs/${activeTab}?${params}`);
       
       setLogs(data.logs || []);
     } catch (error) {
@@ -78,7 +78,7 @@ const LogsViewer = () => {
       if (filters.start_date) params.append('start_date', filters.start_date);
       if (filters.end_date) params.append('end_date', filters.end_date);
 
-      const data = await apiGet(`/api/admin/logs/stats?${params}`);
+      const data = await apiGet(`/admin/logs/stats?${params}`);
       setStats(data);
     } catch (error) {
       console.error('Error loading stats:', error);

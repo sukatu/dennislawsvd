@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { apiGet } from '../utils/api';
 import EmployeeProfile from './EmployeeProfile';
 
@@ -10,18 +10,12 @@ const CompanyEmployees = ({ companyId, companyType, companyName }) => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    if (companyId) {
-      fetchEmployees();
-    }
-  }, [companyId]);
-
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     try {
       setLoading(true);
       const [currentResponse, formerResponse] = await Promise.all([
-        apiGet(`/api/employees/company/${companyId}/current?company_type=${companyType}`),
-        apiGet(`/api/employees/company/${companyId}/former?company_type=${companyType}`)
+        apiGet(`/employees/company/${companyId}/current?company_type=${companyType}`),
+        apiGet(`/employees/company/${companyId}/former?company_type=${companyType}`)
       ]);
       setCurrentEmployees(currentResponse);
       setFormerEmployees(formerResponse);
@@ -30,7 +24,13 @@ const CompanyEmployees = ({ companyId, companyType, companyName }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [companyId, companyType]);
+
+  useEffect(() => {
+    if (companyId) {
+      fetchEmployees();
+    }
+  }, [companyId, fetchEmployees]);
 
   const getStatusColor = (status) => {
     switch (status) {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle, History } from 'lucide-react';
+import { ArrowLeft, Star, User, Calendar, Mail, Building2, Phone, Shield, Clock, Users, GraduationCap, Heart, AlertCircle, CheckCircle, XCircle, Eye, EyeOff, Search, Filter, ArrowUpDown, Scale, RefreshCw, ChevronLeft, ChevronRight, DollarSign, Percent, BookOpen, Calculator, AlertTriangle, History, FileText } from 'lucide-react';
 import RequestDetailsModal from '../components/RequestDetailsModal';
+import GazetteSearch from '../components/GazetteSearch';
 
 const PersonProfile = () => {
   const { id } = useParams();
@@ -26,6 +27,9 @@ const PersonProfile = () => {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null);
   const [showProfileRequestModal, setShowProfileRequestModal] = useState(false);
+  const [gazetteData, setGazetteData] = useState([]);
+  const [gazetteLoading, setGazetteLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('cases'); // 'cases' or 'names'
 
   // Court name mapping function
   const getCourtFullName = (courtCode) => {
@@ -89,6 +93,30 @@ const PersonProfile = () => {
     });
   };
 
+  // Load gazette data for the person
+  const loadGazetteData = async (personId) => {
+    try {
+      setGazetteLoading(true);
+      const response = await fetch(`/api/gazette/person/${personId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGazetteData(data.gazettes || []);
+      } else {
+        setGazetteData([]);
+      }
+    } catch (error) {
+      console.error('Error loading gazette data:', error);
+      setGazetteData([]);
+    } finally {
+      setGazetteLoading(false);
+    }
+  };
+
   // Load person data
   useEffect(() => {
     const loadPersonData = async () => {
@@ -105,6 +133,8 @@ const PersonProfile = () => {
         if (response.ok) {
           const data = await response.json();
           setPersonData(data);
+          // Load gazette data for this person
+          loadGazetteData(data.id);
         } else {
           // Fallback to mock data
           setPersonData({
@@ -130,7 +160,21 @@ const PersonProfile = () => {
             pending_cases: 0,
             favorable_outcomes: 0,
             verification_status: 'Not Verified',
-            verified_on: 'N/A'
+            verified_on: 'N/A',
+            // Gazette-related fields
+            date_of_birth: null,
+            place_of_birth: null,
+            old_name: null,
+            new_name: null,
+            alias_names: [],
+            old_place_of_birth: null,
+            new_place_of_birth: null,
+            old_date_of_birth: null,
+            new_date_of_birth: null,
+            effective_date_of_change: null,
+            gazette_remarks: null,
+            gazette_source: null,
+            gazette_reference: null
           });
         }
       } catch (error) {
@@ -503,15 +547,49 @@ const PersonProfile = () => {
                     <div className="flex items-center space-x-2 mb-1">
                       <User className="w-4 h-4 text-blue-600" />
                       <span className="text-xs font-medium text-blue-800 uppercase tracking-wide">Full Name</span>
-                </div>
+                    </div>
                     <p className="text-sm font-semibold text-blue-900">{personData?.full_name}</p>
                   </div>
                   
-                  
+                  <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <Building2 className="w-4 h-4 text-green-600" />
+                      <span className="text-xs font-medium text-green-800 uppercase tracking-wide">Address</span>
+                    </div>
+                    <p className="text-sm font-semibold text-green-900">{personData?.address || 'N/A'}</p>
+                  </div>
+
+                  <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <GraduationCap className="w-4 h-4 text-purple-600" />
+                      <span className="text-xs font-medium text-purple-800 uppercase tracking-wide">Profession</span>
+                    </div>
+                    <p className="text-sm font-semibold text-purple-900">{personData?.occupation || 'N/A'}</p>
+                  </div>
                 </div>
                 
                 <div className="space-y-4">
-                  
+                  <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <Calendar className="w-4 h-4 text-orange-600" />
+                      <span className="text-xs font-medium text-orange-800 uppercase tracking-wide">Date of Birth</span>
+                    </div>
+                    <p className="text-sm font-semibold text-orange-900">
+                      {personData?.date_of_birth ? new Date(personData.date_of_birth).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      }) : 'N/A'}
+                    </p>
+                  </div>
+
+                  <div className="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <Building2 className="w-4 h-4 text-indigo-600" />
+                      <span className="text-xs font-medium text-indigo-800 uppercase tracking-wide">Place of Birth</span>
+                    </div>
+                    <p className="text-sm font-semibold text-indigo-900">{personData?.place_of_birth || 'N/A'}</p>
+                  </div>
                   
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex items-center space-x-2 mb-1">
@@ -519,11 +597,11 @@ const PersonProfile = () => {
                       <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Gender</span>
                     </div>
                     <p className="text-sm font-semibold text-gray-900">{personData?.gender || 'N/A'}</p>
-                </div>
-                  
+                  </div>
                 </div>
               </div>
             </div>
+
 
             {/* Contact Information */}
             <div className="bg-white rounded-lg border border-slate-200 p-6">
@@ -542,141 +620,382 @@ const PersonProfile = () => {
                         </div>
                       </div>
 
-            {/* Related Cases */}
+            {/* Related Cases & Names */}
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                   <Scale className="h-5 w-5 text-blue-600" />
-                  Related Cases ({filteredCases.length} of {relatedCases.length})
+                  Related Information
                 </h2>
                 <button className="text-slate-400 hover:text-slate-600">
                   <RefreshCw className="h-5 w-5" />
-                      </button>
-              </div>
-              
-              {/* Search and Filter Controls */}
-              <div className="mb-6 space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                      <input
-                        type="text"
-                        placeholder="Search cases..."
-                        value={caseSearchQuery}
-                        onChange={(e) => setCaseSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
-                  <select
-                    value={caseSortBy}
-                    onChange={(e) => setCaseSortBy(e.target.value)}
-                    className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="date">Sort by Date</option>
-                    <option value="title">Sort by Title</option>
-                    <option value="suit_number">Sort by Suit Number</option>
-                  </select>
-                  <select
-                    value={caseSortOrder}
-                    onChange={(e) => setCaseSortOrder(e.target.value)}
-                    className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="desc">Descending</option>
-                    <option value="asc">Ascending</option>
-                  </select>
-                  <button
-                    onClick={clearFilters}
-                    className="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
-                  >
-                    Clear
-                  </button>
-                </div>
-                
+                </button>
               </div>
 
-              {/* Cases List */}
-              <div className="space-y-4">
-                {currentCases.map((case_) => (
-                  <div 
-                    key={case_.id} 
-                    className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/case-details/${case_.id}?q=${encodeURIComponent(personData?.full_name || searchQuery || '')}`, {
-                      state: { originalPersonCases: personData?.cases || [] }
-                    })}
-                  >
-                    <div className="flex items-start justify-between">
+              {/* Tabs */}
+              <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+                <button
+                  onClick={() => setActiveTab('cases')}
+                  className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                    activeTab === 'cases'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Scale className="h-4 w-4" />
+                    Cases ({filteredCases.length})
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab('names')}
+                  className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                    activeTab === 'names'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <User className="h-4 w-4" />
+                    Gazette ({gazetteData?.length || 0})
+                  </div>
+                </button>
+              </div>
+              
+              {/* Tab Content */}
+              {activeTab === 'cases' && (
+                <>
+                  {/* Search and Filter Controls */}
+                  <div className="mb-6 space-y-4">
+                    <div className="flex items-center gap-4">
                       <div className="flex-1">
-                        {/* Person Name - Prominently displayed */}
-                        <div className="mb-2">
-                          <h2 className="text-lg font-bold text-blue-900 break-words leading-tight">
-                            {personData?.full_name || searchQuery || 'Unknown Person'}
-                          </h2>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                          <input
+                            type="text"
+                            placeholder="Search cases..."
+                            value={caseSearchQuery}
+                            onChange={(e) => setCaseSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
                         </div>
-                        {/* Case Title */}
-                        <h3 className="font-semibold text-slate-900 mb-2">{case_.title}</h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm text-slate-600">
-                          <div>
-                            <span className="font-medium">Suit Number:</span> {case_.suit_reference_number || case_.suit_number || 'N/A'}
+                      </div>
+                      <select
+                        value={caseSortBy}
+                        onChange={(e) => setCaseSortBy(e.target.value)}
+                        className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="date">Sort by Date</option>
+                        <option value="title">Sort by Title</option>
+                        <option value="suit_number">Sort by Suit Number</option>
+                      </select>
+                      <select
+                        value={caseSortOrder}
+                        onChange={(e) => setCaseSortOrder(e.target.value)}
+                        className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                      </select>
+                      <button
+                        onClick={clearFilters}
+                        className="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+                      >
+                        Clear
+                      </button>
                     </div>
-                      <div>
-                            <span className="font-medium">Court:</span> {getCourtFullName(case_.court_type || case_.court) || 'N/A'}
-                      </div>
-                      <div>
-                            <span className="font-medium">Date:</span> {formatDate(case_.date)}
-                      </div>
-                      <div>
-                            <span className="font-medium">Nature:</span> {case_.area_of_law || case_.type || case_.case_type || case_.nature || 'N/A'}
+                  </div>
+
+                  {/* Cases List */}
+                  <div className="space-y-4">
+                    {currentCases.map((case_) => (
+                      <div 
+                        key={case_.id} 
+                        className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => navigate(`/case-details/${case_.id}?q=${encodeURIComponent(personData?.full_name || searchQuery || '')}`, {
+                          state: { originalPersonCases: personData?.cases || [] }
+                        })}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            {/* Person Name - Prominently displayed */}
+                            <div className="mb-2">
+                              <h2 className="text-lg font-bold text-blue-900 break-words leading-tight">
+                                {personData?.full_name || searchQuery || 'Unknown Person'}
+                              </h2>
+                            </div>
+                            {/* Case Title */}
+                            <h3 className="font-semibold text-slate-900 mb-2">{case_.title}</h3>
+                            <div className="grid grid-cols-2 gap-4 text-sm text-slate-600">
+                              <div>
+                                <span className="font-medium">Suit Number:</span> {case_.suit_reference_number || case_.suit_number || 'N/A'}
+                              </div>
+                              <div>
+                                <span className="font-medium">Court:</span> {getCourtFullName(case_.court_type || case_.court) || 'N/A'}
+                              </div>
+                              <div>
+                                <span className="font-medium">Date:</span> {formatDate(case_.date)}
+                              </div>
+                              <div>
+                                <span className="font-medium">Nature:</span> {case_.area_of_law || case_.type || case_.case_type || case_.nature || 'N/A'}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="ml-4 flex gap-2">
+                            <button 
+                              onClick={(e) => handleRequestDetails(case_, e)}
+                              className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                            >
+                              Request Details
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fullName = personData?.full_name || searchQuery || '';
+                                const originalSearch = searchQuery || '';
+                                navigate(`/case-details/${case_.id}?q=${encodeURIComponent(fullName)}&search=${encodeURIComponent(originalSearch)}`);
+                              }}
+                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            >
+                              View Case
+                            </button>
                           </div>
                         </div>
                       </div>
-                      <div className="ml-4 flex gap-2">
-                        <button 
-                          onClick={(e) => handleRequestDetails(case_, e)}
-                          className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                    ))}
+                  </div>
+                  
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="mt-6 flex items-center justify-between">
+                      <div className="text-sm text-slate-600">
+                        Page {currentPage} of {totalPages}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="px-3 py-2 text-slate-600 hover:text-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                          Request Details
+                          <ChevronLeft className="h-4 w-4" />
                         </button>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const fullName = personData?.full_name || searchQuery || '';
-                            const originalSearch = searchQuery || '';
-                            navigate(`/case-details/${case_.id}?q=${encodeURIComponent(fullName)}&search=${encodeURIComponent(originalSearch)}`);
-                          }}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="px-3 py-2 text-slate-600 hover:text-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                          View Case
+                          <ChevronRight className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-6 flex items-center justify-between">
-                  <div className="text-sm text-slate-600">
-                    Page {currentPage} of {totalPages}
+                  )}
+                </>
+              )}
+
+              {/* Related Names Tab */}
+              {activeTab === 'names' && (
+                <div className="space-y-4">
+                  {gazetteLoading ? (
+                    <div className="space-y-3">
+                      <div className="animate-pulse">
+                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      </div>
                     </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="px-3 py-2 text-slate-600 hover:text-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="px-3 py-2 text-slate-600 hover:text-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                  </div>
+                  ) : gazetteData && gazetteData.length > 0 ? (
+                    <div className="space-y-4">
+                      {gazetteData.map((gazette, index) => (
+                        <div key={gazette.id} className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <User className="h-5 w-5 text-blue-600" />
+                              <span className="text-sm font-medium text-slate-700">
+                                Gazette Entry #{gazette.item_number || gazette.id}
+                              </span>
+                            </div>
+                            <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                              {gazette.gazette_type?.replace('_', ' ')}
+                            </span>
+                          </div>
+                          
+                          {/* Name Changes */}
+                          {(gazette.old_name || gazette.new_name) && (
+                            <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                              <div className="space-y-2">
+                                {gazette.old_name && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Previous Name:</span>
+                                    <span className="text-sm font-medium text-gray-900">{gazette.old_name}</span>
+                                  </div>
+                                )}
+                                {gazette.new_name && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-blue-600">New Name:</span>
+                                    <span className="text-sm font-medium text-blue-900">{gazette.new_name}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Date of Birth Changes */}
+                          {(gazette.old_date_of_birth || gazette.new_date_of_birth) && (
+                            <div className="mb-3 p-3 bg-blue-50 rounded-lg">
+                              <div className="space-y-2">
+                                {gazette.old_date_of_birth && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Previous Date of Birth:</span>
+                                    <span className="text-sm font-medium text-gray-900">
+                                      {new Date(gazette.old_date_of_birth).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                      })}
+                                    </span>
+                                  </div>
+                                )}
+                                {gazette.new_date_of_birth && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-blue-600">New Date of Birth:</span>
+                                    <span className="text-sm font-medium text-blue-900">
+                                      {new Date(gazette.new_date_of_birth).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                      })}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Place of Birth Changes */}
+                          {(gazette.old_place_of_birth || gazette.new_place_of_birth) && (
+                            <div className="mb-3 p-3 bg-green-50 rounded-lg">
+                              <div className="space-y-2">
+                                {gazette.old_place_of_birth && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Previous Place of Birth:</span>
+                                    <span className="text-sm font-medium text-gray-900">{gazette.old_place_of_birth}</span>
+                                  </div>
+                                )}
+                                {gazette.new_place_of_birth && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-green-600">New Place of Birth:</span>
+                                    <span className="text-sm font-medium text-green-900">{gazette.new_place_of_birth}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Marriage Officer Appointment */}
+                          {gazette.gazette_type === 'APPOINTMENT_OF_MARRIAGE_OFFICERS' && (
+                            <div className="mb-3 p-3 bg-purple-50 rounded-lg">
+                              <div className="space-y-2">
+                                {gazette.officer_name && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Officer Name:</span>
+                                    <span className="text-sm font-medium text-gray-900">{gazette.officer_name}</span>
+                                  </div>
+                                )}
+                                {gazette.officer_title && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Title:</span>
+                                    <span className="text-sm font-medium text-gray-900">{gazette.officer_title}</span>
+                                  </div>
+                                )}
+                                {gazette.appointment_authority && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Appointing Authority:</span>
+                                    <span className="text-sm font-medium text-gray-900">{gazette.appointment_authority}</span>
+                                  </div>
+                                )}
+                                {gazette.jurisdiction_area && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Jurisdiction Area:</span>
+                                    <span className="text-sm font-medium text-gray-900">{gazette.jurisdiction_area}</span>
+                                  </div>
+                                )}
+                                {gazette.effective_date_of_change && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-purple-600">Appointment Date:</span>
+                                    <span className="text-sm font-medium text-purple-900">
+                                      {new Date(gazette.effective_date_of_change).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                      })}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Alias Names */}
+                          {gazette.alias_names && gazette.alias_names.length > 0 && (
+                            <div className="mb-3">
+                              <span className="text-sm font-medium text-slate-700 mb-2 block">Also Known As:</span>
+                              <div className="flex flex-wrap gap-2">
+                                {gazette.alias_names.map((alias, aliasIndex) => (
+                                  <span key={aliasIndex} className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">
+                                    {alias}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Effective Date */}
+                          {gazette.effective_date_of_change && (
+                            <div className="mb-3">
+                              <span className="text-sm font-medium text-slate-700">Effective Date of Change:</span>
+                              <p className="text-sm text-slate-600 mt-1">
+                                {new Date(gazette.effective_date_of_change).toLocaleDateString('en-US', { 
+                                  year: 'numeric', 
+                                  month: 'long', 
+                                  day: 'numeric' 
+                                })}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Remarks */}
+                          {gazette.remarks && (
+                            <div className="mb-3">
+                              <span className="text-sm font-medium text-slate-700">Remarks:</span>
+                              <p className="text-sm text-slate-600 mt-1">{gazette.remarks}</p>
+                            </div>
+                          )}
+
+                          {/* Gazette Source */}
+                          <div className="text-xs text-gray-500 border-t pt-2">
+                            Source: {gazette.gazette_number} - {gazette.source || 'High Court'}
+                            {gazette.effective_date_of_change && (
+                              <span className="ml-2">
+                                (Effective: {new Date(gazette.effective_date_of_change).toLocaleDateString('en-US', { 
+                                  year: 'numeric', 
+                                  month: 'long', 
+                                  day: 'numeric' 
+                                })})
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <User className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Related Names Found</h3>
+                      <p className="text-gray-500">
+                        No gazette entries or name changes found for this person.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
               </div>
@@ -1173,6 +1492,31 @@ const PersonProfile = () => {
                   })()}
                 </div>
               )}
+            </div>
+
+            {/* Gazette Entries */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  Gazette Entries
+                </h2>
+                <button 
+                  onClick={() => navigate('/gazette')}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  View All
+                </button>
+              </div>
+              
+              <GazetteSearch 
+                personId={id}
+                showActions={false}
+                onGazetteSelect={(gazette) => {
+                  // Handle gazette selection if needed
+                  console.log('Selected gazette:', gazette);
+                }}
+              />
             </div>
 
           </div>

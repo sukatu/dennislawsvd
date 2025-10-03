@@ -31,19 +31,19 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Support</h4>
             <ul className="space-y-2 text-sm text-slate-300">
-              <li><a href="#" className="hover:text-white">Help Center</a></li>
+              <li><button className="hover:text-white text-left">Help Center</button></li>
               <li><Link to="/contact" className="hover:text-white">Contact Support</Link></li>
-              <li><a href="#" className="hover:text-white">Training Resources</a></li>
-              <li><a href="#" className="hover:text-white">FAQ</a></li>
+              <li><button className="hover:text-white text-left">Training Resources</button></li>
+              <li><button className="hover:text-white text-left">FAQ</button></li>
             </ul>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4">Connect</h4>
             <ul className="space-y-2 text-sm text-slate-300">
-              <li><a href="#" className="hover:text-white">Twitter</a></li>
-              <li><a href="#" className="hover:text-white">LinkedIn</a></li>
-              <li><a href="#" className="hover:text-white">Facebook</a></li>
+              <li><button className="hover:text-white text-left">Twitter</button></li>
+              <li><button className="hover:text-white text-left">LinkedIn</button></li>
+              <li><button className="hover:text-white text-left">Facebook</button></li>
               <li><Link to="/contact" className="hover:text-white">Email</Link></li>
             </ul>
           </div>

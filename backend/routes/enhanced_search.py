@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, func, desc, asc
+from sqlalchemy import and_, or_, func, desc, asc, String
 from database import get_db
 from models.reported_cases import ReportedCases
 from models.people import People
@@ -137,7 +137,9 @@ async def search_people(db: Session, query: str, risk_level: Optional[str], regi
             People.last_name.ilike(f"%{query}%"),
             People.occupation.ilike(f"%{query}%"),
             People.city.ilike(f"%{query}%"),
-            People.region.ilike(f"%{query}%")
+            People.region.ilike(f"%{query}%"),
+            # Search in previous_names (alias names) JSON array
+            func.cast(People.previous_names, String).ilike(f"%{query}%")
         )
         query_obj = query_obj.filter(search_conditions)
         

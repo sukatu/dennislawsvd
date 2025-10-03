@@ -96,3 +96,4 @@ class Companies(Base):
     # Relationships
     analytics = relationship("CompanyAnalytics", back_populates="company", uselist=False)
     case_statistics = relationship("CompanyCaseStatistics", back_populates="company", uselist=False)
+    gazette_entries = relationship("Gazette", back_populates="company", lazy="dynamic")

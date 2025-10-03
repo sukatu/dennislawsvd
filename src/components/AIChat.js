@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  MessageCircle, 
   Send, 
   Bot, 
   User, 
@@ -160,7 +159,7 @@ const AIChat = ({ caseId, caseTitle, isOpen, onClose, onMinimize }) => {
         <div className="flex items-center space-x-2">
           <Bot className="h-5 w-5" />
           <div>
-            <h3 className="font-semibold text-sm">AI Legal Assistant</h3>
+            <h3 className="font-semibold text-sm">JuridenceAI</h3>
             <p className="text-xs opacity-90">{caseTitle?.substring(0, 30)}...</p>
           </div>
         </div>
@@ -187,7 +186,7 @@ const AIChat = ({ caseId, caseTitle, isOpen, onClose, onMinimize }) => {
             {messages.length === 0 && (
               <div className="text-center py-8">
                 <Sparkles className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">AI Legal Assistant</h4>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">JuridenceAI</h4>
                 <p className="text-sm text-gray-600 mb-4">
                   Ask me anything about this case. I can analyze legal issues, financial implications, and provide expert insights.
                 </p>

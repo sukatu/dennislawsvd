@@ -613,9 +613,9 @@ GET /api/search/quick?query=mahama&limit=5`}
                   AI Chat & Analytics (20 endpoints)
                 </h4>
                 
-                {/* AI Assistant Overview */}
+                {/* JuridenceAI Overview */}
                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
-                  <h5 className="font-semibold text-purple-900 mb-2">🤖 AI Assistant Features</h5>
+                  <h5 className="font-semibold text-purple-900 mb-2">🤖 JuridenceAI Features</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-purple-800">
                     <div>
                       <p><strong>Case Analysis:</strong> AI-powered legal case analysis and insights</p>
@@ -674,7 +674,7 @@ GET /api/search/quick?query=mahama&limit=5`}
                   </div>
                 </div>
 
-                {/* AI Assistant Usage Examples */}
+                {/* JuridenceAI Usage Examples */}
                 <div className="mt-4 space-y-4">
                   <div className="bg-slate-50 rounded-lg p-4">
                     <h5 className="font-semibold text-slate-900 mb-3">💬 AI Chat Session Example</h5>
@@ -771,7 +771,7 @@ POST /api/ai-chat/case-summary
 
                 {/* Pricing Information */}
                 <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h5 className="font-semibold text-blue-900 mb-3">💳 AI Assistant Pricing</h5>
+                  <h5 className="font-semibold text-blue-900 mb-3">💳 JuridenceAI Pricing</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
                     <div>
                       <h6 className="font-medium mb-2">Token Costs (USD):</h6>
@@ -1297,18 +1297,18 @@ except requests.exceptions.RequestException as e:
               </div>
             </div>
 
-            {/* AI Assistant Integration */}
+            {/* JuridenceAI Integration */}
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
                 <Zap className="h-5 w-5 mr-2 text-purple-600" />
-                AI Assistant Integration
+                JuridenceAI Integration
               </h3>
               
               <div className="space-y-4">
                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-purple-900 mb-2">🤖 AI Assistant Overview</h4>
+                  <h4 className="font-semibold text-purple-900 mb-2">🤖 JuridenceAI Overview</h4>
                   <p className="text-sm text-purple-800 mb-3">
-                    The AI Assistant provides intelligent case analysis, legal research, and interactive chat capabilities. 
+                    JuridenceAI provides intelligent case analysis, legal research, and interactive chat capabilities. 
                     All AI interactions are tracked and billed based on token usage.
                   </p>
                 </div>
@@ -1728,7 +1728,7 @@ $results = $api->search('mahama');`}
                 <div className="bg-purple-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
                   <Zap className="h-6 w-6 text-purple-600" />
                 </div>
-                <h4 className="font-semibold text-slate-900 mb-2">AI Assistant</h4>
+                <h4 className="font-semibold text-slate-900 mb-2">JuridenceAI</h4>
                 <p className="text-sm text-slate-700">AI-powered case analysis and legal research with billing tracking</p>
               </div>
               <div className="text-center p-4">
@@ -1841,16 +1841,16 @@ $results = $api->search('mahama');`}
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
                 <Zap className="h-5 w-5 mr-2 text-purple-600" />
-                AI Assistant Tutorial
+                JuridenceAI Tutorial
               </h3>
               <div className="space-y-4">
                 <div className="bg-purple-50 border border-purple-200 rounded p-4">
-                  <h4 className="font-semibold text-purple-900 mb-2">🤖 How to Use the AI Assistant</h4>
+                  <h4 className="font-semibold text-purple-900 mb-2">🤖 How to Use JuridenceAI</h4>
                   <div className="space-y-3 text-sm text-purple-800">
                     <div className="flex items-start space-x-3">
                       <div className="bg-purple-100 text-purple-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold">1</div>
                       <div>
-                        <p><strong>Access AI Assistant:</strong> Click the floating AI icon on any case details page</p>
+                        <p><strong>Access JuridenceAI:</strong> Click the floating AI icon on any case details page</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
@@ -1885,7 +1885,7 @@ $results = $api->search('mahama');`}
                 </div>
 
                 <div className="bg-blue-50 border border-blue-200 rounded p-4">
-                  <h4 className="font-semibold text-blue-900 mb-2">💡 Best Practices for AI Assistant</h4>
+                  <h4 className="font-semibold text-blue-900 mb-2">💡 Best Practices for JuridenceAI</h4>
                   <div className="space-y-2 text-sm text-blue-800">
                     <p>• Ask specific questions about case details, legal issues, or precedents</p>
                     <p>• Use the AI for case analysis, legal research, and document interpretation</p>
@@ -1908,7 +1908,7 @@ $results = $api->search('mahama');`}
               </div>
               <div className="border border-slate-200 rounded-lg p-4">
                 <Zap className="h-8 w-8 text-purple-600 mb-2" />
-                <h4 className="font-semibold text-slate-900 mb-2">AI Assistant</h4>
+                <h4 className="font-semibold text-slate-900 mb-2">JuridenceAI</h4>
                 <p className="text-sm text-slate-700">Get help from AI for case analysis and summaries</p>
               </div>
               <div className="border border-slate-200 rounded-lg p-4">
@@ -2245,14 +2245,14 @@ $results = $api->search('mahama');`}
         </div>
       </div>
       
-      {/* Floating AI Assistant Button */}
+      {/* Floating JuridenceAI Button */}
       <button
         onClick={() => setIsAIChatOpen(true)}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center group"
-        title="Open AI Documentation Assistant"
+        title="Open JuridenceAI Documentation Assistant"
       >
         <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
-        <span className="sr-only">AI Documentation Assistant</span>
+        <span className="sr-only">JuridenceAI Documentation Assistant</span>
       </button>
 
       {/* AI Chat Component */}

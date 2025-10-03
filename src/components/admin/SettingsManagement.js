@@ -62,7 +62,7 @@ const SettingsManagement = () => {
       
       // Use direct backend URL for now
       const baseUrl = '/api';
-      const response = await fetch(`${baseUrl}/api/admin/settings?${params}`);
+      const response = await fetch(`${baseUrl}/admin/settings?${params}`);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -93,7 +93,7 @@ const SettingsManagement = () => {
     try {
       // Use direct backend URL for now
       const baseUrl = '/api';
-      const response = await fetch(`${baseUrl}/api/admin/settings/stats`);
+      const response = await fetch(`${baseUrl}/admin/settings/stats`);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -132,9 +132,9 @@ const SettingsManagement = () => {
       setSuccess(null);
       
       const baseUrl = '/api';
-      const url = editingSetting 
-        ? `${baseUrl}/api/admin/settings/${editingSetting.id}`
-        : `${baseUrl}/api/admin/settings`;
+      const url = editingSetting
+        ? `${baseUrl}/admin/settings/${editingSetting.id}`
+        : `${baseUrl}/admin/settings`;
       
       const method = editingSetting ? 'PUT' : 'POST';
       
@@ -173,7 +173,7 @@ const SettingsManagement = () => {
       setSuccess(null);
       
       const baseUrl = '/api';
-      const response = await fetch(`${baseUrl}/api/admin/settings/${settingId}`, {
+      const response = await fetch(`${baseUrl}/admin/settings/${settingId}`, {
         method: 'DELETE',
       });
       
@@ -220,7 +220,7 @@ const SettingsManagement = () => {
       
       const baseUrl = '/api';
       const deletePromises = selectedSettings.map(id => 
-        fetch(`${baseUrl}/api/admin/settings/${id}`, { method: 'DELETE' })
+        fetch(`${baseUrl}/admin/settings/${id}`, { method: 'DELETE' })
       );
       
       const results = await Promise.allSettled(deletePromises);

@@ -52,11 +52,12 @@ class UnifiedSearchRequest(BaseModel):
 class SearchResultItem(BaseModel):
     id: int
     name: str
-    type: str  # "people", "banks", "insurance"
+    type: str  # "people", "banks", "insurance", "companies", "gazette"
     description: Optional[str] = None
     city: Optional[str] = None
     region: Optional[str] = None
     logo_url: Optional[str] = None
+    person_id: Optional[int] = None  # For gazette entries linked to people
     additional_info: Optional[Dict[str, Any]] = None
 
 class UnifiedSearchResponse(BaseModel):
